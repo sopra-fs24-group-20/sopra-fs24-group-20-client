@@ -7,7 +7,7 @@ import { isProduction } from "./isProduction"
  * @returns {string}
  */
 export const getDomain = () => {
-  const prodUrl = "https://my-server-url.oa.r.appspot.com/" // TODO: insert your prod url for server (once deployed)
+  const prodUrl = "https://console.cloud.google.com/cloud-build/builds;region=europe-west6/d9ea0b7a-cc4a-4261-91aa-6f3bc19c504f?project=sopra-fs24-mirwei-server" // TODO: insert your prod url for server (once deployed)
   const devUrl = "http://localhost:8080"
 
   return isProduction() ? prodUrl : devUrl
