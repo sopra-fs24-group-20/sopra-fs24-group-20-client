@@ -49,19 +49,19 @@ const Login = () => {
           localStorage.setItem("token", user.token);
           navigate("/game");}
 
-      else {
-        alert ("Invalid username or password");
+        else {
+          alert ("Invalid username or password");
       }
 
 
-      // Get the returned user and update a new object.
-      // const user = new User(response.data);
+        // Get the returned user and update a new object.
+        // const user = new User(response.data);
 
-      // Store the token into the local storage.
+        // Store the token into the local storage.
 
-      // Login successfully worked --> navigate to the route /game in the GameRouter
+        // Login successfully worked --> navigate to the route /game in the GameRouter
 
-    }}
+      }}
     catch (error) {
       alert(
         `Something went wrong during the login: \n${handleError(error)}`

@@ -44,8 +44,8 @@ const Register = () => {
   const doRegister = async () => {
     try {
       const response = await api.get(`/users?username=${username}&name=${name}`);
-      if (response.data.lenght > 0){
-        setError("Username or name already taken. Please choose another one.");
+      if (response.data.length > 0){
+        alert("Username or name already taken. Please choose another one.");
         return;
       }
       const requestBody = JSON.stringify({ username, name, password });
