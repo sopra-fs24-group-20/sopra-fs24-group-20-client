@@ -46,7 +46,6 @@ const Register = () => {
       const response = await api.get(`/users?username=${username}&name=${name}`);
       if (response.data.length > 0){
         alert("Username or name already taken. Please choose another one.");
-        return;
       }
       const requestBody = JSON.stringify({ username, name, password });
       const registerResponse = await api.post("/users", requestBody);

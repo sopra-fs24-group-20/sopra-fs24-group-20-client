@@ -49,9 +49,9 @@ const Login = () => {
           localStorage.setItem("token", user.token);
           navigate("/game");}
 
-        else {
+        else{
           alert ("Invalid username or password");
-      }
+        }
 
 
         // Get the returned user and update a new object.
