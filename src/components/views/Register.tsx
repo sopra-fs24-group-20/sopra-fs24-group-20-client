@@ -3,7 +3,7 @@ import { api, handleError } from "helpers/api";
 import User from "models/User";
 import {useNavigate} from "react-router-dom";
 import { Button } from "components/ui/Button";
-import "styles/views/Login.scss";
+import "styles/views/Register.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 
@@ -15,10 +15,10 @@ specific components that belong to the main one in the same file.
  */
 const FormField = (props) => {
   return (
-    <div className="login field">
-      <label className="login label">{props.label}</label>
+    <div className="register field">
+      <label className="register label">{props.label}</label>
       <input
-        className="login input"
+        className="register input"
         placeholder="enter here.."
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
@@ -33,49 +33,39 @@ FormField.propTypes = {
   onChange: PropTypes.func,
 };
 
-const Login = () => {
+const Register = () => {
   const navigate = useNavigate();
   const [name, setName] = useState<string>(null);
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
+  const [error, setError] = useState()
 
-  const doLogin = async () => {
+
+  const doRegister = async () => {
     try {
-      const requestBody = JSON.stringify({ username, password });
-      const response = await api.post("/login", requestBody);
-      if (response.status === 200){
-        const user = response.data;
-        if (user && user.username === username && user.password === password){
-          localStorage.setItem("token", user.token);
-          navigate("/game");}
-
-      else {
-        alert ("Invalid username or password");
+      const response = await api.get(`/users?username=${username}&name=${name}`);
+      if (response.data.lenght > 0){
+        setError("Username or name already taken. Please choose another one.");
+        return;
       }
-
-
+      const requestBody = JSON.stringify({ username, name, password });
+      const registerResponse = await api.post("/users", requestBody);
+      const userData = registerResponse.data;
       // Get the returned user and update a new object.
-      // const user = new User(response.data);
+      const user = new User(userData);
 
       // Store the token into the local storage.
+      localStorage.setItem("token", user.token);
 
       // Login successfully worked --> navigate to the route /game in the GameRouter
-
-    }}
-    catch (error) {
+      navigate("/game");
+    } catch (error) {
       alert(
         `Something went wrong during the login: \n${handleError(error)}`
       );
     }
   };
 
-  const doRegister = () => {
-    navigate("/register");
-  }
-
-  const ClickHere = () => {
-    return (<p>Don&apos;t have an account yet? Register <a href= "#" onClick={() => {navigate("/register")}}>here</a></p>);
-  }
 
   return (
     <BaseContainer>
@@ -87,18 +77,24 @@ const Login = () => {
             onChange={(un: string) => setUsername(un)}
           />
           <FormField
+            label="Name"
+            value={name}
+            onChange={(n) => setName(n)}
+          />
+
+          <FormField
             label="Password"
             value={password}
             onChange={(n) => setPassword(n)}
           />
-          <ClickHere></ClickHere>
-          <div className="login button-container">
+
+          <div className="register button-container">
             <Button
-              disabled={!username || !password}
+              disabled={!username || !name || !password}
               width="100%"
-              onClick={() => doLogin()}
+              onClick={() => doRegister()}
             >
-              Login
+              Register
             </Button>
           </div>
         </div>
@@ -110,4 +106,4 @@ const Login = () => {
 /**
  * You can get access to the history object's properties via the useLocation, useNavigate, useParams, ... hooks.
  */
-export default Login;
+export default Register;
