@@ -8,9 +8,10 @@ import PropTypes from "prop-types";
 import "styles/views/Game.scss";
 import { User } from "types";
 
-const Player = ({ user }: { user: User }) => (
+const Player = ({ user, onClick }: { user: User, onClick }) => (
   <div className="player container">
-    <div className="player username">{user.username}</div>
+    <div className="player username" onClick={onClick}>
+      <a href="#">{user.username}</a></div>
     <div className="player name">{user.name}</div>
     <div className="player id">id: {user.id}</div>
   </div>
@@ -18,6 +19,7 @@ const Player = ({ user }: { user: User }) => (
 
 Player.propTypes = {
   user: PropTypes.object,
+  onClick: PropTypes.func.isRequired
 };
 
 const Game = () => {
@@ -79,6 +81,10 @@ const Game = () => {
     fetchData();
   }, []);
 
+  const handleUserClick = (username) => {
+    navigate(`user/${username}`)
+  }
+
   let content = <Spinner />;
 
   if (users) {
@@ -87,7 +93,8 @@ const Game = () => {
         <ul className="game user-list">
           {users.map((user: User) => (
             <li key={user.id}>
-              <Player user={user} />
+              <Player user={user}
+                onClick={() => handleUserClick(user.username)}/>
             </li>
           ))}
         </ul>

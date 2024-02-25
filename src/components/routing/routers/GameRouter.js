@@ -1,12 +1,21 @@
 import React from "react";
-import {Navigate, Route, Routes} from "react-router-dom";
+import {Navigate, Route, Routes, useParams} from "react-router-dom";
 import Game from "../../views/Game";
 import PropTypes from "prop-types";
+import ProfilePage from "../../views/ProfilePage";
+
+
+const ProfilePageRoute = () => {
+  const {username} = useParams();
+  return <ProfilePage username={username} />
+};
 
 const GameRouter = () => {
   return (
     <div style={{display: "flex", flexDirection: "column"}}>
       <Routes>
+
+        <Route path="user/:username" element={<ProfilePageRoute />} />
 
         <Route path="" element={<Game />} />
 
@@ -15,7 +24,7 @@ const GameRouter = () => {
         <Route path="*" element={<Navigate to="dashboard" replace />} />
 
       </Routes>
-   
+
     </div>
   );
 };

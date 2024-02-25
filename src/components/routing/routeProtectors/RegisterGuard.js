@@ -13,7 +13,7 @@ export const RegisterGuard= () => {
     return <Outlet />;
   }
   
-  return <Navigate to="/game" replace />;
+  return <Navigate to="/register" replace />;
 };
 
 RegisterGuard.propTypes = {

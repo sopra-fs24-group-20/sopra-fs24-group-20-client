@@ -38,15 +38,11 @@ const Register = () => {
   const [name, setName] = useState<string>(null);
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
-  const [error, setError] = useState()
 
 
   const doRegister = async () => {
     try {
       const response = await api.get(`/users?username=${username}&name=${name}`);
-      if (response.data.length > 0){
-        alert("Username or name already taken. Please choose another one.");
-      }
       const requestBody = JSON.stringify({ username, name, password });
       const registerResponse = await api.post("/users", requestBody);
       const userData = registerResponse.data;
@@ -62,14 +58,15 @@ const Register = () => {
       alert(
         `Something went wrong during the login: \n${handleError(error)}`
       );
+      navigate("/register");
     }
   };
 
 
   return (
     <BaseContainer>
-      <div className="login container">
-        <div className="login form">
+      <div className="register container">
+        <div className="register form">
           <FormField
             label="Username"
             value={username}
@@ -84,7 +81,7 @@ const Register = () => {
           <FormField
             label="Password"
             value={password}
-            onChange={(n) => setPassword(n)}
+            onChange={(pw) => setPassword(pw)}
           />
 
           <div className="register button-container">
