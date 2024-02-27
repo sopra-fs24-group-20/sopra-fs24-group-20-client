@@ -50,4 +50,10 @@
     justify-content: center;
     margin-top: 2em;
   }
+
+  &.error-message{
+    color:red;
+    font-weight: bold;
+    font-size: 14px;
+  }
 }

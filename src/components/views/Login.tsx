@@ -38,6 +38,7 @@ const Login = () => {
   const [name, setName] = useState<string>(null);
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
+  const [error, setError] = useState(null);
 
   const doLogin = async () => {
     try {
@@ -50,7 +51,7 @@ const Login = () => {
           navigate("/game");}
 
         else{
-          alert ("Invalid username or password");
+          setError ("Invalid username or password");
         }
 
 
@@ -81,6 +82,7 @@ const Login = () => {
     <BaseContainer>
       <div className="login container">
         <div className="login form">
+          {error && <div className="login error-message">{error}</div>}
           <FormField
             label="Username"
             value={username}
