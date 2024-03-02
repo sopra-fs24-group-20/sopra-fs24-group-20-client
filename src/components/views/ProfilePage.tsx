@@ -13,7 +13,7 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const loggedInUserId = localStorage.getItem('id');
+  const loggedInUserId = localStorage.getItem("id");
   const [editUsernameMode, setEditUsernameMode] = useState<boolean>(false);
   const [editBirthdateMode, setEditBirthdateMode] = useState<boolean>(false);
   const [editedUsername, setEditedUsername] = useState<string>("");
