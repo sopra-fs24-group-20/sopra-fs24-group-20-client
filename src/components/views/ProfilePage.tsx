@@ -33,8 +33,6 @@ const ProfilePage = () => {
     navigate("/game");
   };
 
-
-
   return (
     <BaseContainer className="game container">
       {loading ? (

@@ -7,6 +7,7 @@ import ProfilePage from "../../views/ProfilePage";
 
 const ProfilePageRoute = () => {
   const {username} = useParams();
+
   return <ProfilePage username={username} />
 };
 

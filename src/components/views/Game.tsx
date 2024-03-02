@@ -37,10 +37,10 @@ const Game = () => {
     try {
       const localid = localStorage.getItem("id");
       if (localid === null){
-        navigate('/login');
+        navigate("/login");
       }
       else{
-        await api.put(`/logout`, localid);
+        await api.put("/logout", localid);
         localStorage.removeItem("token");
         localStorage.removeItem("id");
         navigate("/login");
