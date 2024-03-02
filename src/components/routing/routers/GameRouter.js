@@ -15,8 +15,6 @@ const GameRouter = () => {
     <div style={{display: "flex", flexDirection: "column"}}>
       <Routes>
 
-        <Route path="user/:username" element={<ProfilePageRoute />} />
-
         <Route path="" element={<Game />} />
 
         <Route path="dashboard" element={<Game />} />

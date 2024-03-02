@@ -33,9 +33,23 @@ const Game = () => {
   // more information can be found under https://react.dev/learn/state-a-components-memory and https://react.dev/reference/react/useState 
   const [users, setUsers] = useState<User[]>(null);
 
-  const logout = (): void => {
-    localStorage.removeItem("token");
-    navigate("/login");
+  const logout = async (id: string): Promise<void> => {
+    try {
+      const localid = localStorage.getItem("id");
+      if (localid === null){
+        navigate('/login');
+      }
+      else{
+        await api.put(`/logout`, localid);
+        localStorage.removeItem("token");
+        localStorage.removeItem("id");
+        navigate("/login");
+      }
+
+    } catch (error) {
+      console.error(`Error logging out: ${handleError(error)}`);
+      alert("Error logging out. Please try again.");
+    }
   };
 
   // the effect hook can be used to react to change in your component.
@@ -81,8 +95,8 @@ const Game = () => {
     fetchData();
   }, []);
 
-  const handleUserClick = (username) => {
-    navigate(`user/${username}`)
+  const handleUserClick = (id) => {
+    navigate(`/user/${id}`)
   }
 
   let content = <Spinner />;
@@ -94,11 +108,11 @@ const Game = () => {
           {users.map((user: User) => (
             <li key={user.id}>
               <Player user={user}
-                onClick={() => handleUserClick(user.username)}/>
+                onClick={() => handleUserClick(user.id)}/>
             </li>
           ))}
         </ul>
-        <Button width="100%" onClick={() => logout()}>
+        <Button width="100%" onClick={() => logout(localStorage.getItem ("id"))}>
           Logout
         </Button>
       </div>
