@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
  * instead of 'export default' at the end of the file.
  */
 export const RegisterGuard= () => {
-  if (!localStorage.getItem("token")) {
+  if (!localStorage.getItem("id")) {
     
     return <Outlet />;
   }
