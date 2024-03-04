@@ -35,19 +35,19 @@ const Game = () => {
 
   const logout = async (id: string) => {
     if (id === null){
-      console.log("no id logout")
+      console.log("no id saved logout")
       navigate("/login");
     }
     try {
       const response = await api.get(`/users/${id}`);
-      console.log("id exists logout");
+      console.log("id saved and exists logout");
       await api.put(`/logout/${id}`);
       localStorage.removeItem("token");
       localStorage.removeItem("id");
       navigate("/login");
     } catch (error) {
       if (error.response.status === 404){
-        console.log("id doesn't exist logout");
+        console.log("id saved but doesn't exist logout");
         localStorage.removeItem("token");
         localStorage.removeItem("id");
         navigate("/login");

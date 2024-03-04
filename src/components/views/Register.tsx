@@ -42,12 +42,13 @@ const Register = () => {
 
   const doRegister = async () => {
     try {
-      const response = await api.get(`/users?username=${username}&name=${name}`);
       const requestBody = JSON.stringify({ username, name, password });
       const registerResponse = await api.post("/users", requestBody);
       const userData = registerResponse.data;
       // Get the returned user and update a new object.
       const user = new User(userData);
+      const loginBody = JSON.stringify({ username, password });
+      await api.post("/login", loginBody);
 
       // Store the token into the local storage.
       localStorage.setItem("token", user.token);

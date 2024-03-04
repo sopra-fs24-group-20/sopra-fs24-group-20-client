@@ -49,9 +49,10 @@ const ProfilePage = () => {
   const handleSaveUsername = async () => {
     try {
       console.log(editedUsername)
-      const response =  await api.put(`/users/${id}/username`, { username: editedUsername } );
+      await api.put(`/users/${id}`, { username: editedUsername , birthdate: user.birthdate } );
       // Refresh user data after successful update
-      setUser(response.data);
+      const updated = await api.get(`/users/${id}`);
+      setUser(updated.data);
       setEditUsernameMode(false); // Disable edit mode
     } catch (error) {
       console.error("Error updating username:", error);
@@ -61,9 +62,11 @@ const ProfilePage = () => {
 
   const handleSaveBirthdate = async () => {
     try {
-      const response = await api.put(`/users/${id}/birthdate`, editedBirthdate );
+      await api.put(`/users/${id}`, {username: user.username,  birthdate: editedBirthdate} );
       // Refresh user data after successful update
-      setUser(response.data);
+      const updated = await api.get(`/users/${id}`);
+      setUser(updated.data);
+
       setEditBirthdateMode(false); // Disable edit mode
     } catch (error) {
       console.error("Error updating birthdate:", error);
