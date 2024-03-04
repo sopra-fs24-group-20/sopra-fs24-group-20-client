@@ -49,7 +49,7 @@ const ProfilePage = () => {
   const handleSaveUsername = async () => {
     try {
       console.log(editedUsername)
-      await api.put(`/users/${id}`, { username: editedUsername , birthdate: user.birthdate } );
+      await api.put(`/users/${id}`, {username: editedUsername , birthdate: user.birthdate } );
       // Refresh user data after successful update
       const updated = await api.get(`/users/${id}`);
       setUser(updated.data);

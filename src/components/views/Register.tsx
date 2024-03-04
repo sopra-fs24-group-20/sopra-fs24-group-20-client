@@ -35,20 +35,19 @@ FormField.propTypes = {
 
 const Register = () => {
   const navigate = useNavigate();
-  const [name, setName] = useState<string>(null);
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
 
 
   const doRegister = async () => {
     try {
-      const requestBody = JSON.stringify({ username, name, password });
+      const requestBody = JSON.stringify({ username, password });
       const registerResponse = await api.post("/users", requestBody);
       const userData = registerResponse.data;
       // Get the returned user and update a new object.
       const user = new User(userData);
-      const loginBody = JSON.stringify({ username, password });
-      await api.post("/login", loginBody);
+      await api.post("/login", { username, password });
+
 
       // Store the token into the local storage.
       localStorage.setItem("token", user.token);
@@ -74,11 +73,6 @@ const Register = () => {
             value={username}
             onChange={(un: string) => setUsername(un)}
           />
-          <FormField
-            label="Name"
-            value={name}
-            onChange={(n) => setName(n)}
-          />
 
           <FormField
             label="Password"
@@ -88,7 +82,7 @@ const Register = () => {
 
           <div className="register button-container">
             <Button
-              disabled={!username || !name || !password}
+              disabled={!username || !password}
               width="100%"
               onClick={() => doRegister()}
             >
