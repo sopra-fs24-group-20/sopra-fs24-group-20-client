@@ -38,6 +38,10 @@ const Register = () => {
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
 
+  const ClickHere = () => {
+    return (<p> Already have an account? Back to <a href= "#" onClick={() => {navigate("/login")}}>login</a></p>);
+  }
+
 
   const doRegister = async () => {
     try {
@@ -79,7 +83,7 @@ const Register = () => {
             value={password}
             onChange={(pw) => setPassword(pw)}
           />
-
+          <ClickHere></ClickHere>
           <div className="register button-container">
             <Button
               disabled={!username || !password}
