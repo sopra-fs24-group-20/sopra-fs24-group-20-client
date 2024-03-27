@@ -8,8 +8,12 @@
    feel free to play around with these and see what other look you can come up with! :D
 */
 
-$accent: #97ABFF;
-$accentDark: #123597;
+$accentBottom: #A8047F;
+$accentMiddle: #8C1BD1;
+$accentTop: #58d1d1;
+$accentBottomLight: #ff03bf;
+$accentMiddleLight: #a220fd;
+$accentTopLight: #64f1f1;
 $textColor: white;
 $background: #262632;
 
@@ -22,7 +26,7 @@ $SMALL_WIDTH: 768px;
 
 /* some standard elements */
 /* fonts */
-$fontDefault: "M PLUS Rounded 1c", sans-serif;
+$fontDefault: "Open Sans", sans-serif;
 $fontMono: "Roboto Mono", monospace;
 
 /* a standard drop shadow */
@@ -33,7 +37,7 @@ $borderRadius: 0.75em;
 /* mixins
 
   these allow you to create small snippets that you can insert with a one-liner in other stylesheets
-  for an example, see styles/views/Login.scss
+  for an example, see styles/views/Authentication.scss
 */
 @mixin center {
   display: flex;

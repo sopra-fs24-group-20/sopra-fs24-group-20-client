@@ -17,7 +17,7 @@ export const UserGuard = () => {
     return <Outlet />;
   }
   
-  return <Navigate to="/login" replace />;
+  return <Navigate to="/start" replace />;
 };
 
 UserGuard.propTypes = {
