@@ -10,7 +10,10 @@ body {
   min-width: 100vw;
   min-height: 100vh;
   font-family: $fontDefault;
-  background-image: linear-gradient(0deg, $accentBottom, $accentMiddle, $accentTop);
+  background-image: url('../forest.jpeg');
+  background-color: linear-gradient(0deg, $accentBottom, $accentMiddle, $accentTop);
+  background-size: cover;
+  background-position: center;
 }
 
 input,

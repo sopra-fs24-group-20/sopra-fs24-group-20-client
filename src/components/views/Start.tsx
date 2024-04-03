@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { Button } from "components/ui/Button";
-import "styles/views/Authentication.scss";
+import "styles/views/Start.scss";
 import BaseContainer from "components/ui/BaseContainer";
 
 const Start = () => {
   return (
     <BaseContainer>
-      <div className="authentication container">
-        <div className="authentication circle">
-          <h1 className="authentication title" >Categories</h1>
-          <div className="authentication start-button-container">
+      <div className="start container">
+        <div className="start circle">
+          <h1 className="start title" >Categories</h1>
+          <div className="start button-container">
             <Button
               className="secondary-button"
               width="60%"
@@ -18,7 +18,7 @@ const Start = () => {
               register
             </Button>
           </div>
-          <div className="authentication start-button-container">
+          <div className="start button-container">
             <Button
               className="secondary-button"
               width="60%"
@@ -27,7 +27,7 @@ const Start = () => {
               login
             </Button>
           </div>
-          <div className="authentication start-button-container">
+          <div className="start button-container">
             <Button
               className="secondary-button"
               width="60%"
