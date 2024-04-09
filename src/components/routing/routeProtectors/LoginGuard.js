@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
  * instead of 'export default' at the end of the file.
  */
 export const LoginGuard = () => {
-  if (!localStorage.getItem("id")) {
+  if (!localStorage.getItem("username")) {
     
     return <Outlet />;
   }

@@ -46,8 +46,8 @@ const Login = () => {
       const response = await api.post("/login", requestBody);
       const user = response.data;
 
-      localStorage.setItem("token", user.token);
-      localStorage.setItem("id", user.id);
+      localStorage.setItem("username", user.username);
+      // localStorage.setItem("id", user.id);
       navigate("/game");}
 
     catch (error) {
