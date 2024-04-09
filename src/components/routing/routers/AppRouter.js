@@ -9,6 +9,8 @@ import Register from "../../views/Register";
 import {RegisterGuard} from "../routeProtectors/RegisterGuard"
 import ProfilePage from "../../views/ProfilePage";
 import {UserGuard} from "../routeProtectors/UserGuard";
+import JoinLobby from "../../views/JoinLobby";
+import { JoinLobbyGuard } from "../routeProtectors/JoinLobbyGuard";
 
 /**
  * Main router of your application.
@@ -40,6 +42,10 @@ const AppRouter = () => {
 
         <Route path="/register" element={<RegisterGuard />}>
           <Route path="/register" element={<Register/>} />
+        </Route>
+
+        <Route path="/joinlobby" element={<JoinLobbyGuard/>}>
+          <Route path="/joinlobby" element={<JoinLobby/>} />
         </Route>
 
         <Route path="/" element={
