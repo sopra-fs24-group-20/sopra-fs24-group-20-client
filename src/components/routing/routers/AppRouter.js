@@ -11,6 +11,8 @@ import ProfilePage from "../../views/ProfilePage";
 import {UserGuard} from "../routeProtectors/UserGuard";
 import JoinLobby from "../../views/JoinLobby";
 import { JoinLobbyGuard } from "../routeProtectors/JoinLobbyGuard";
+import CreateLobby  from "../../views/CreateLobby";
+import {CreateLobbyGuard } from "../routeProtectors/CreateLobbyGuard";
 
 /**
  * Main router of your application.
@@ -46,6 +48,10 @@ const AppRouter = () => {
 
         <Route path="/joinlobby" element={<JoinLobbyGuard/>}>
           <Route path="/joinlobby" element={<JoinLobby/>} />
+        </Route>
+
+        <Route path="/createlobby" element={<CreateLobbyGuard/>}>
+          <Route path="/createlobby" element={<CreateLobby/>} />
         </Route>
 
         <Route path="/" element={
