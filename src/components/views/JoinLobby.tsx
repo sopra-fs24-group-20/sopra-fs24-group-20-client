@@ -41,12 +41,12 @@ const JoinLobby = () => {
 
   const username = localStorage.getItem("username");
 
-  const JoinLobby = async () => {
+  const doJoinLobby = async () => {
     try {
       const requestBody = JSON.stringify({ LobbyName, LobbyPassword });
       const response = await api.post("/lobby/join", requestBody);
       if (response.status === 200){
-        navigate("/game")
+        navigate(`/lobby/${LobbyName}`)
       }
       else if (response.status === 400){
         setError("Join lobby failed because password doesn't match")
@@ -83,7 +83,7 @@ const JoinLobby = () => {
           <Button
             disabled={!LobbyName || !LobbyPassword}
             width="100%"
-            onClick={() => JoinLobby()}
+            onClick={() => doJoinLobby()}
           >
             Join Lobby
           </Button>
