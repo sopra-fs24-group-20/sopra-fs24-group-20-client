@@ -41,11 +41,11 @@ const Register = () => {
   const doRegister = async () => {
     try {
       const requestBody = JSON.stringify({ username, password });
-      const registerResponse = await api.post("/users", requestBody);
+      const registerResponse = await api.post("/players", requestBody);
       const userData = registerResponse.data;
       // Get the returned user and update a new object.
       const user = new User(userData);
-      await api.post("/login", { username, password });
+      await api.post("/players/login", { username, password });
 
 
       // Store the username into the local storage.
@@ -53,10 +53,10 @@ const Register = () => {
       // localStorage.setItem("id", user.id);
 
       // Login successfully worked --> navigate to the route /game in the GameRouter
-      navigate("/game");
+      navigate(`/user/${user.id}`);
     } catch (error) {
       alert(
-        `Something went wrong during the login: \n${handleError(error)}`
+        `Something went wrong during registering: \n${handleError(error)}`
       );
       navigate("/register");
     }

@@ -43,15 +43,15 @@ const Login = () => {
   const doLogin = async () => {
     try {
       const requestBody = JSON.stringify({ username, password });
-      const response = await api.post("/login", requestBody);
+      const response = await api.post("/players/login", requestBody);
       const user = response.data;
 
       localStorage.setItem("username", user.username);
       // localStorage.setItem("id", user.id);
-      navigate("/game");}
-
-    catch (error) {
+      navigate(`/user/${user.id}`);
+    } catch (error) {
       setError ("Invalid username or password");
+      navigate("/login");
     }
   };
 

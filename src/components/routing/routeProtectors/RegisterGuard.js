@@ -8,12 +8,12 @@ import PropTypes from "prop-types";
  * instead of 'export default' at the end of the file.
  */
 export const RegisterGuard= () => {
-  if (!localStorage.getItem("username")) {
+  if (localStorage.getItem("username")) {
     
     return <Outlet />;
   }
   
-  return <Navigate to="/game" replace />;
+  return <Navigate to="/start" replace />;
 };
 
 RegisterGuard.propTypes = {

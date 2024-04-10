@@ -31,7 +31,7 @@ const Start = () => {
             <Button
               className="secondary-button"
               width="60%"
-              onClick={() => window.location.href="/profile"}
+              onClick={() => window.location.href="/user"}
             >
               play as guest
             </Button>
