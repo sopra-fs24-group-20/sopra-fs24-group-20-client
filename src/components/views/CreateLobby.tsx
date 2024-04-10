@@ -1,18 +1,12 @@
 import React, { useState } from "react";
 import { api, handleError } from "helpers/api";
 import User from "models/User";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "components/ui/Button";
 import "styles/views/Authentication.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 
-/*
-It is possible to add multiple components inside a single file,
-however be sure not to clutter your files with an endless amount!
-As a rule of thumb, use one file per component and only add small,
-specific components that belong to the main one and the same file.
- */
 const FormField = (props) => {
   return (
     <div className="authentication field">
@@ -45,26 +39,28 @@ const CreateLobby = () => {
     try {
       const requestBody = JSON.stringify({ LobbyName, LobbyPassword });
       const response = await api.post("/lobby/create", requestBody);
-      if (response.status === 201){
-        navigate(`/lobby/${LobbyName}`)
+      if (response.status === 201) {
+        navigate(`/lobby/${LobbyName}`);
+      } else if (response.status === 400) {
+        setError("Create lobby failed because the lobby name already exists");
       }
-      else if (response.status === 400){
-        setError("Create lobby failed because the lobby name already exists")
-      }
-
+    } catch (error) {
+      setError("An error occurred while creating the lobby");
     }
+  };
 
-    catch (error) {
-      setError ("An error occurred while creating the lobby");
-    }
+  const goBack = () => {
+    window.history.back(); // Navigate back using browser's history object
   };
 
   return (
     <BaseContainer>
       <div className="authentication container">
         <div className="authentication form">
-          <h1 className="authentication centered-text" >Join Lobby</h1>
-          {error && <div className="authentication error-message">{error}</div>}
+          <h1 className="authentication centered-text">Create Lobby</h1>
+          {error && (
+            <div className="authentication error-message">{error}</div>
+          )}
           <FormField
             label="Lobby Name"
             value={LobbyName}
@@ -82,18 +78,17 @@ const CreateLobby = () => {
             width="100%"
             onClick={() => doCreateLobby()}
           >
-            Join Lobby
+            Create Lobby
           </Button>
         </div>
         <div>
-          <a className="authentication link" href="/start">back</a>
+          <a className="authentication link" href="#" onClick={goBack}>
+            Back
+          </a>
         </div>
       </div>
     </BaseContainer>
   );
 };
 
-/**
- * You can get access to the history object's properties via the useLocation, useNavigate, useParams, ... hooks.
- */
 export default CreateLobby;

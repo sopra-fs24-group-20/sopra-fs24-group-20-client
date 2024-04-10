@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { api, handleError } from "helpers/api";
-import { Spinner } from "components/ui/Spinner";
 import { Button } from "components/ui/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
-import PropTypes from "prop-types";
-import "styles/views/Game.scss";
+import "styles/views/Profile.scss";
 import { User } from "types";
 
 const ProfilePage = () => {
@@ -13,11 +11,38 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const loggedInUserId = localStorage.getItem("id");
-  const [editUsernameMode, setEditUsernameMode] = useState<boolean>(false);
-  const [editBirthdateMode, setEditBirthdateMode] = useState<boolean>(false);
-  const [editedUsername, setEditedUsername] = useState<string>("");
-  const [editedBirthdate, setEditedBirthdate] = useState<string>("");
+
+  const logout = async (id: string) => {
+    if (id === null){
+      console.log("no id saved logout")
+      navigate("/login");
+    }
+    try {
+      const response = await api.get(`/users/${id}`);
+      console.log("id saved and exists logout");
+      await api.put(`/logout/${id}`);
+      localStorage.removeItem("token");
+      localStorage.removeItem("id");
+      navigate("/login");
+    } catch (error) {
+      if (error.response.status === 404){
+        console.log("id saved but doesn't exist logout");
+        localStorage.removeItem("token");
+        localStorage.removeItem("id");
+        navigate("/login");
+      }
+      console.error(
+        `An error occurred while checking user authorization: \n${handleError(error)}`
+      );
+    }
+  };
+
+
+  const handleClick = () => {
+    logout(localStorage.getItem("id"))
+  };
+
+
 
   useEffect(() => {
     async function fetchData() {
@@ -34,106 +59,42 @@ const ProfilePage = () => {
     fetchData();
   }, [id]);
 
-  const editAllowed = loggedInUserId === id;
-
-  const handleEditUsername = () => {
-    setEditUsernameMode(true);
-    setEditedUsername(user.username);
-  };
-
-  const handleEditBirthdate = () => {
-    setEditBirthdateMode(true);
-    setEditedBirthdate(user.birthdate);
-  };
-
-  const handleSaveUsername = async () => {
-    try {
-      console.log(editedUsername)
-      await api.put(`/users/${id}`, {username: editedUsername , birthdate: user.birthdate } );
-      // Refresh user data after successful update
-      const updated = await api.get(`/users/${id}`);
-      setUser(updated.data);
-      setEditUsernameMode(false); // Disable edit mode
-    } catch (error) {
-      console.error("Error updating username:", error);
-      alert("Failed to save username changes. Please try again.");
-    }
-  };
-
-  const handleSaveBirthdate = async () => {
-    try {
-      await api.put(`/users/${id}`, {username: user.username,  birthdate: editedBirthdate} );
-      // Refresh user data after successful update
-      const updated = await api.get(`/users/${id}`);
-      setUser(updated.data);
-
-      setEditBirthdateMode(false); // Disable edit mode
-    } catch (error) {
-      console.error("Error updating birthdate:", error);
-      alert("Failed to save birthdate changes. Please try again.");
-    }
-  };
-
-  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEditedUsername(event.target.value);
-  };
-
-  const handleBirthdateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEditedBirthdate(event.target.value);
-  };
-
-  const goback = (): void => {
-    navigate("/game");
-  };
-
   return (
-    <BaseContainer className="game container">
-      {loading ? (
-        <Spinner />
-      ) : user ? (
-        <>
-          <h2>Profile Page</h2>
-          <div>
-            <p><strong>Username:</strong>
-              {editUsernameMode ? (
-                <>
-                  <input type="text" value={editedUsername} onChange={handleUsernameChange} />
-                  <Button onClick={handleSaveUsername}>Save</Button>
-                </>
-              ) : (
-                <>
-                  {user.username}
-                  {editAllowed && (
-                    <Button onClick={handleEditUsername}>Edit</Button>
-                  )}
-                </>
-              )}
-            </p>
-            <p><strong>Status:</strong> {user.status}</p>
-            <p><strong>Creation Date:</strong> {user.creationDate}</p>
-            <p><strong>Birthdate:</strong>
-              {editBirthdateMode ? (
-                <>
-                  <input type="date" value={editedBirthdate} onChange={handleBirthdateChange} />
-                  <Button onClick={handleSaveBirthdate}>Save</Button>
-                </>
-              ) : (
-                <>
-                  {user.birthdate}
-                  {editAllowed && (
-                    <Button onClick={handleEditBirthdate}>Edit</Button>
-                  )}
-                </>
-              )}
-            </p>
+    <BaseContainer>
+      <div className="profile container">
+        <div className="profile form">
+          <div className="profile left-axis">
+            <h1 className="profile top-text">{user?.username}</h1>
+            <div>
+              <p>
+                 <a href="#" onClick={handleClick}>logout</a>
+              </p>
+            </div>
           </div>
-          <Button onClick={goback}>
-            Return to user overview
-          </Button>
-        </>
-      ) : (
-        <p>User not found</p>
-      )}
+
+          <div className="profile right-axis">
+            <div className="profile button-container">
+            <Button
+                className="secondary-button"
+                width="60%"
+                onClick={() => navigate("/CreateLobby")}
+              >
+                Create Lobby
+              </Button>
+            </div>
+            <div className="profile button-container">
+              <Button
+                className="secondary-button"
+                width="60%"
+                onClick={() => navigate("/JoinLobby")}
+              >
+                Join Lobby
+              </Button>
+            </div>
+
+          </div>
+        </div>
+      </div>
     </BaseContainer>
   );
 };
