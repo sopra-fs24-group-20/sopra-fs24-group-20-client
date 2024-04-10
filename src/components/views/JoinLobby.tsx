@@ -1,18 +1,12 @@
 import React, { useState } from "react";
 import { api, handleError } from "helpers/api";
 import User from "models/User";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "components/ui/Button";
 import "styles/views/Authentication.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 
-/*
-It is possible to add multiple components inside a single file,
-however be sure not to clutter your files with an endless amount!
-As a rule of thumb, use one file per component and only add small,
-specific components that belong to the main one and the same file.
- */
 const FormField = (props) => {
   return (
     <div className="authentication field">
@@ -45,29 +39,30 @@ const JoinLobby = () => {
     try {
       const requestBody = JSON.stringify({ LobbyName, LobbyPassword });
       const response = await api.post("/lobby/join", requestBody);
-      if (response.status === 200){
-        navigate(`/lobby/${LobbyName}`)
+      if (response.status === 200) {
+        navigate(`/lobby/${LobbyName}`);
+      } else if (response.status === 400) {
+        setError("Join lobby failed because password doesn't match");
+      } else if (response.status === 404) {
+        setError("Join lobby failed because lobby doesn't exist");
       }
-      else if (response.status === 400){
-        setError("Join lobby failed because password doesn't match")
-      }
-      else if (response.status === 404){
-        setError("Join lobby failed because lobby doesn't exist")
-      }
-
+    } catch (error) {
+      setError("An error occurred while joining the lobby");
     }
+  };
 
-    catch (error) {
-      setError ("An error occurred while joining the lobby");
-    }
+  const goBack = () => {
+    window.history.back(); // Navigate back using browser's history object
   };
 
   return (
     <BaseContainer>
       <div className="authentication container">
         <div className="authentication form">
-          <h1 className="authentication centered-text" >Join Lobby</h1>
-          {error && <div className="authentication error-message">{error}</div>}
+          <h1 className="authentication centered-text">Join Lobby</h1>
+          {error && (
+            <div className="authentication error-message">{error}</div>
+          )}
           <FormField
             label="Lobby Name"
             value={LobbyName}
@@ -89,14 +84,13 @@ const JoinLobby = () => {
           </Button>
         </div>
         <div>
-          <a className="authentication link" href="/start">back</a>
+          <a className="authentication link" href="#" onClick={goBack}>
+            Back
+          </a>
         </div>
       </div>
     </BaseContainer>
   );
 };
 
-/**
- * You can get access to the history object's properties via the useLocation, useNavigate, useParams, ... hooks.
- */
 export default JoinLobby;

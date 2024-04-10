@@ -8,12 +8,12 @@ import PropTypes from "prop-types";
  * instead of 'export default' at the end of the file.
  */
 export const CreateLobbyGuard = () => {
-  if (!localStorage.getItem("username")) {
-    
-    return <Navigate to="/start" replace />;
+  if (localStorage.getItem("username")) {
+
+    return <Outlet />;
   }
-  
-  return <Navigate to="/createlobby" replace />;
+
+  return <Navigate to="/start" replace />;
 };
 
 CreateLobbyGuard.propTypes = {
