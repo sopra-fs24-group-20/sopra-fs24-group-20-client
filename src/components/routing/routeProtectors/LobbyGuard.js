@@ -8,8 +8,8 @@ import PropTypes from "prop-types";
  * In this case, if the user is authenticated (i.e., a token is stored in the local storage)
  * <Outlet /> is rendered --> The content inside the <GameGuard> in the App.js file, i.e. the user is able to access the main app.
  * If the user isn't authenticated, the components redirects to the /login screen
- * @Guard
- * @param props
+ * Guard
+ * param props
  */
 export const LobbyGuard = () => {
   if (localStorage.getItem("username")) {
