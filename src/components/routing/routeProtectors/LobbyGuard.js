@@ -12,14 +12,9 @@ import PropTypes from "prop-types";
  * @param props
  */
 export const LobbyGuard = () => {
-  if (localStorage.getItem("username") && localStorage.getItem("lobbyName")) {
+  if (localStorage.getItem("username")) {
     
     return <Outlet />;
-  }
-
-  if (!localStorage.getItem("lobbyName")){
-
-    return <Navigate to={location.pathname} replace />;
   }
   
   return <Navigate to="/start" replace />;
