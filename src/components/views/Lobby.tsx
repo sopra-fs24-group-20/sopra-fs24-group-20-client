@@ -26,7 +26,7 @@ const LobbyPage = () => {
   const exit = async () => {
     const local_username = localStorage.getItem("username");
     try {
-      await api.put(`/lobby/leave`, JSON.stringify({lobbyName: lobby.lobbyName, username: local_username}) );
+      await api.put("/lobby/leave", JSON.stringify({lobbyName: lobby.lobbyName, username: local_username}) );
       navigate(`/user/${local_username}`);
 
     } catch (error) {
@@ -50,7 +50,7 @@ const LobbyPage = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const players = await api.get(`/lobby/players`, lobby.lobbyName);
+        const players = await api.get("/lobby/players", lobby.lobbyName);
         setLobby(players.data);
 
       } catch (error) {
