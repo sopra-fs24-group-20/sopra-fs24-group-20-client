@@ -20,4 +20,5 @@ export type Lobby = {
   game: any;
   players: any;
   autoCorrectMode: boolean;
+  players_ready: number;
 };

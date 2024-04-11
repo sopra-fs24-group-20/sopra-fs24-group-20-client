@@ -20,29 +20,26 @@ Player.propTypes = {
 };
 
 const LobbyPage = () => {
-  const { id: id } = useParams();
   const navigate = useNavigate();
   const [lobby, setLobby] = useState<Lobby>(null);
-  const [loading, setLoading] = useState<boolean>(true);
 
   const exit = async () => {
-    const local_id = localStorage.getItem("id");
+    const local_username = localStorage.getItem("username");
     try {
-      const response = await api.get(`/users/${local_id}`);
-      await api.put(`/logout/${local_id}`);
-      navigate(`/user/${local_id}`);
+      await api.put(`/lobby/leave`, JSON.stringify({lobbyName: lobby.lobbyName, username: local_username}) );
+      navigate(`/user/${local_username}`);
+
     } catch (error) {
       alert(
         `Something went wrong during exiting the lobby: \n${handleError(error)}`
       );
-      navigate(`/user/${local_id}`);
+      navigate(`/user/${local_username}`);
     }
   };
-
   const ready = async () => {
     try {
-      const requestBody = JSON.stringify({ready: true});
-      await api.put("/player/${user.id}", requestBody);
+      await api.put("/player/${user.id}", JSON.stringify({ready: true}));
+
     } catch (error) {
       alert(
         `Something went wrong while preparing the game: \n${handleError(error)}`
@@ -53,24 +50,23 @@ const LobbyPage = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const players = await api.get(`/lobby/players`, lobby.lobbyName); ///// BRUDER WAS
+        const players = await api.get(`/lobby/players`, lobby.lobbyName);
         setLobby(players.data);
-        setLoading(false);
+
       } catch (error) {
-        console.error("Error fetching user data:", error);
-        alert("Something went wrong while fetching the user! See the console for details.");
+        alert("Something went wrong while fetching the lobby data.");
       }
     }
 
     fetchData();
-  }, [id]);
+  }, [lobby.lobbyName]);
 
   return (
     <BaseContainer>
       <div className="lobby container">
         <div className="lobby form">
           <div className="lobby centered-text">
-            <h1 className="lobby title">test</h1>
+            <h1 className="lobby title">{lobby.lobbyName}</h1>
 
             <ul className="lobby ul">
               {lobby.players.map((player: User) => (
@@ -80,7 +76,7 @@ const LobbyPage = () => {
               ))}
             </ul>
 
-            <div className="lobby ready">test</div>
+            <div className="lobby ready">{lobby.players_ready}/{lobby.players.length} players are ready</div>
             <Button
               className="secondary-button"
               width="60%"
