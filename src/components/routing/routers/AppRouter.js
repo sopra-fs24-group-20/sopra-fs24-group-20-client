@@ -54,8 +54,8 @@ const AppRouter = () => {
         </Route>
 
         {/* Game Section */}
-        <Route path="/lobby/:lobby" element={<LobbyGuard />}>
-          <Route path="/lobby/:lobby" element={<Lobby />} />
+        <Route path="/lobby/:lobbyName" element={<LobbyGuard />}>
+          <Route path="/lobby/:lobbyName" element={<Lobby />} />
         </Route>
 
         <Route path="/game/*" element={<GameGuard />}>

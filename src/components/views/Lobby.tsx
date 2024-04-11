@@ -4,7 +4,20 @@ import { Button } from "components/ui/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import "styles/views/Lobby.scss";
-import { Lobby } from "types";
+import PropTypes from "prop-types";
+import { Lobby, User } from "types";
+
+const Player = ({ user }) => (
+  <div className="player container">
+    <div className="player username">
+      <a href="#">{user.username}</a>
+    </div>
+  </div>
+);
+
+Player.propTypes = {
+  user: PropTypes.object,
+};
 
 const LobbyPage = () => {
   const { id: id } = useParams();
@@ -28,15 +41,20 @@ const LobbyPage = () => {
 
   const ready = async () => {
     try {
+      const requestBody = JSON.stringify({ready: true});
+      await api.put("/player/${user.id}", requestBody);
     } catch (error) {
+      alert(
+        `Something went wrong while preparing the game: \n${handleError(error)}`
+      );
     }
   };
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await api.get(`/lobby/${lobby.lobbyName}`); ///// BRUDER WAS
-        setLobby(response.data);
+        const players = await api.get(`/lobby/players`, lobby.lobbyName); ///// BRUDER WAS
+        setLobby(players.data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -55,9 +73,11 @@ const LobbyPage = () => {
             <h1 className="lobby title">test</h1>
 
             <ul className="lobby ul">
-              <li className="lobby li"> Player 1</li>
-              <li className="lobby li"> Player 2</li>
-              <li className="lobby li"> Player 3</li>
+              {lobby.players.map((player: User) => (
+                <li className="lobby li" key={player.id}>
+                  <Player user={player}/>
+                </li>
+              ))}
             </ul>
 
             <div className="lobby ready">test</div>
