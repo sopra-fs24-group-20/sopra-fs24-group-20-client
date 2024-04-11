@@ -50,7 +50,7 @@ const LobbyPage = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const players = await api.get("/lobby/players", lobby.lobbyName);
+        const players = await api.get("/lobby/players", JSON.stringify(lobby.lobbyName));
         setLobby(players.data);
 
       } catch (error) {
