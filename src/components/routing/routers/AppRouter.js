@@ -14,7 +14,7 @@ import { JoinLobbyGuard } from "../routeProtectors/JoinLobbyGuard";
 import CreateLobby  from "../../views/CreateLobby";
 import {CreateLobbyGuard } from "../routeProtectors/CreateLobbyGuard";
 import {LobbyGuard} from "../routeProtectors/LobbyGuard";
-import Lobby from "../../views/Lobby";
+import LobbyPage from "../../views/LobbyPage";
 
 /**
  * Main router of your application.
@@ -54,8 +54,8 @@ const AppRouter = () => {
         </Route>
 
         {/* Game Section */}
-        <Route path="/lobby/:lobby" element={<LobbyGuard />}>
-          <Route path="/lobby/:lobby" element={<Lobby />} />
+        <Route path="/lobby/:lobbyName" element={<LobbyGuard />}>
+          <Route path="/lobby/:lobbyName" element={<LobbyPage/>} />
         </Route>
 
         <Route path="/game/*" element={<GameGuard />}>

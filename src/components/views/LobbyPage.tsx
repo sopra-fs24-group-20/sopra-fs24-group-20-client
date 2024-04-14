@@ -4,63 +4,76 @@ import { Button } from "components/ui/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import "styles/views/Lobby.scss";
-import { Lobby } from "types";
+import PropTypes from "prop-types";
+import { Lobby, User } from "types";
+
+const Player = ({ user }) => (
+  <div className="player container">
+    <div className="player username">
+      <a href="#">{user.username}</a>
+    </div>
+  </div>
+);
+
+Player.propTypes = {
+  user: PropTypes.object,
+};
 
 const LobbyPage = () => {
-  const { id: id } = useParams();
   const navigate = useNavigate();
   const [lobby, setLobby] = useState<Lobby>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const localLobbyName = localStorage.getItem(("lobbyName"));
 
   const exit = async () => {
-    const local_id = localStorage.getItem("id");
+    const local_username = localStorage.getItem("username");
     try {
-      const response = await api.get(`/users/${local_id}`);
-      await api.put(`/logout/${local_id}`);
-      navigate(`/user/${local_id}`);
+      await api.put("/lobby/leave", JSON.stringify({lobbyName: lobby.lobbyName, username: local_username}) );
+      navigate(`/user/${local_username}`);
+
     } catch (error) {
       alert(
         `Something went wrong during exiting the lobby: \n${handleError(error)}`
       );
-      navigate(`/user/${local_id}`);
+      navigate(`/user/${local_username}`);
     }
   };
-
   const ready = async () => {
     try {
+      await api.put("/player/${user.id}", JSON.stringify({ready: true}));
+
     } catch (error) {
+      alert(
+        `Something went wrong while preparing the game: \n${handleError(error)}`
+      );
     }
   };
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await api.get(`/lobby/${lobby.lobbyName}`); ///// BRUDER WAS
-        setLobby(response.data);
-        setLoading(false);
+        const players = await api.get("/lobby/players", JSON.stringify(localLobbyName));
+        setLobby(players.data);
+
       } catch (error) {
-        console.error("Error fetching user data:", error);
-        alert("Something went wrong while fetching the user! See the console for details.");
+        alert("Something went wrong while fetching the lobby data.");
       }
     }
 
     fetchData();
-  }, [id]);
+  }, [localLobbyName]);
 
   return (
     <BaseContainer>
       <div className="lobby container">
         <div className="lobby form">
           <div className="lobby centered-text">
-            <h1 className="lobby title">test</h1>
+            <h1 className="lobby title">lobbyname</h1>
 
             <ul className="lobby ul">
-              <li className="lobby li"> Player 1</li>
-              <li className="lobby li"> Player 2</li>
-              <li className="lobby li"> Player 3</li>
+                <li className="lobby li">players</li>
             </ul>
 
-            <div className="lobby ready">test</div>
+            <div className="lobby ready">x/x players are ready</div>
             <Button
               className="secondary-button"
               width="60%"

@@ -14,6 +14,7 @@ class Lobby {
     this.game = null;
     this.players = null;
     this.autoCorrectMode = null;
+    this.players_ready = null;
     Object.assign(this, data);
   }
 }
