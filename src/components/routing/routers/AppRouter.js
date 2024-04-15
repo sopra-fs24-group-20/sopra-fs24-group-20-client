@@ -15,6 +15,8 @@ import CreateLobby  from "../../views/CreateLobby";
 import {CreateLobbyGuard } from "../routeProtectors/CreateLobbyGuard";
 import {LobbyGuard} from "../routeProtectors/LobbyGuard";
 import LobbyPage from "../../views/LobbyPage";
+import { LeaderboardGuard } from "../routeProtectors/LeaderboardGuard";
+import FinalLeader from "../../views/FinalLeader";
 
 /**
  * Main router of your application.
@@ -60,6 +62,10 @@ const AppRouter = () => {
 
         <Route path="/game/*" element={<GameGuard />}>
           <Route path="/game/*" element={<GameRouter base="/game"/>} />
+        </Route>
+
+        <Route path="/leaderboard/final" element={<LeaderboardGuard />}>
+          <Route path="/leaderboard/final" element={<FinalLeader/>} />
         </Route>
 
         <Route path="/" element={
