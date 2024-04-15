@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import "styles/views/Lobby.scss";
 import PropTypes from "prop-types";
-import { Lobby, User } from "types";
+import { Lobby } from "types";
 
 const Player = ({ user }) => (
   <div className="player container">
@@ -21,7 +21,7 @@ Player.propTypes = {
 
 const LobbyPage = () => {
   const navigate = useNavigate();
-  const [lobby, setLobby] = useState<Lobby>(null);
+  const [lobby, setLobby] = useState<Lobby[]>({});
   const localLobbyName = localStorage.getItem(("lobbyName"));
 
   const exit = async () => {
@@ -53,9 +53,11 @@ const LobbyPage = () => {
       try {
         const players = await api.get("/lobby/players", JSON.stringify(localLobbyName));
         setLobby(players.data);
+        console.log(players.data);
 
       } catch (error) {
         alert("Something went wrong while fetching the lobby data.");
+        console.log(lobby)
       }
     }
 
@@ -67,13 +69,16 @@ const LobbyPage = () => {
       <div className="lobby container">
         <div className="lobby form">
           <div className="lobby centered-text">
-            <h1 className="lobby title">lobbyname</h1>
+            <h1 className="lobby title">{lobby.lobbyName}</h1>
 
             <ul className="lobby ul">
                 <li className="lobby li">players</li>
             </ul>
 
-            <div className="lobby ready">x/x players are ready</div>
+            <div className="lobby ready">
+              players are ready
+            </div>
+
             <Button
               className="secondary-button"
               width="60%"
