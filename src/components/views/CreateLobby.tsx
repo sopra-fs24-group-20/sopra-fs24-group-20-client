@@ -42,15 +42,15 @@ const CreateLobby = () => {
         lobbyPassword: lobbyPassword,
         ownerUsername: username,
       };
-      console.log("first");
       const response = await api.post("/lobby/create", requestBody);
-      console.log("second");
       if (response.status === 201) {
         const responseData = response.data;
         localStorage.setItem("lobbyName", lobbyName);
         navigate(`/lobby/${lobbyName}`);
       } else if (response.status === 400) {
-        setError("Cannot create lobby, because lobby name already exists");
+        console.log("lobby already exists")
+        const errorMessage = response.data.message;
+        setError(errorMessage);
       }
     } catch (error) {
       console.log("unknown error")

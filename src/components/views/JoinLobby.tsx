@@ -37,7 +37,12 @@ const JoinLobby = () => {
 
   const doJoinLobby = async () => {
     try {
-      const requestBody = JSON.stringify({ LobbyName, LobbyPassword });
+      console.log("")
+      const requestBody = JSON.stringify({
+        lobbyName: LobbyName,
+        lobbyPassword: LobbyPassword,
+        username: username
+      });
       const response = await api.post("/lobby/join", requestBody);
       if (response.status === 200) {
         localStorage.setItem("lobbyName", LobbyName);
