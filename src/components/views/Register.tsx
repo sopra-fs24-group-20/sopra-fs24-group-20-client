@@ -54,7 +54,7 @@ const Register = () => {
       // localStorage.setItem("id", user.id);
 
       // Login successfully worked --> navigate to the route /game in the GameRouter
-      navigate(`/user/${user.id}`);
+      navigate(`/user/${user.username}`);
     } catch (error) {
       setError ("username already taken");
       console.log(handleError(error))

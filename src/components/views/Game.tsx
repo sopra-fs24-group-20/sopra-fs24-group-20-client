@@ -1,129 +1,124 @@
 import React, { useEffect, useState } from "react";
 import { api, handleError } from "helpers/api";
-import { Spinner } from "components/ui/Spinner";
 import { Button } from "components/ui/Button";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import "styles/views/Game.scss";
 import { User } from "types";
 
-const Player = ({ user, onClick }: { user: User, onClick }) => (
-  <div className="player container">
-    <div className="player username" onClick={onClick}>
-      <a href="#">{user.username}</a></div>
-    <div className="player id">id: {user.id}</div>
-  </div>
-);
+const FormField = (props) => {
+  return (
+    <div className="game field">
+      <label className="game label">{props.label}</label>
+      <input
+        className="game input"
+        placeholder="enter here.."
+        value={props.value}
+        onChange={(e) => props.onChange(e.target.value)}
+      />
+    </div>
+  );
+};
 
-Player.propTypes = {
-  user: PropTypes.object,
-  onClick: PropTypes.func.isRequired
+FormField.propTypes = {
+  label: PropTypes.string,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
 };
 
 const Game = () => {
-  // use react-router-dom's hook to access navigation, more info: https://reactrouter.com/en/main/hooks/use-navigate
   const navigate = useNavigate();
+  const [letter, setLetter] = useState<string>("A");
+  const [countdown, setCountdown] = useState<number>(60); // Initial countdown value set to 60 seconds
+  const [countdownInterval, setCountdownInterval] = useState<any>(null); // State variable for interval ID
+  const lobbyName = localStorage.getItem("lobbyName");
+  const [country, setCountry] = useState<string>(null);
+  const [city, setCity] = useState<string>(null);
+  const [profession, setProfession] = useState<string>(null);
+  const [celebrity, setCelebrity] = useState<string>(null);
+  const [error, setError] = useState(null);
 
-  // define a state variable (using the state hook).
-  // if this variable changes, the component will re-render, but the variable will
-  // keep its value throughout render cycles.
-  // a component can have as many state variables as you like.
-  // more information can be found under https://react.dev/learn/state-a-components-memory and https://react.dev/reference/react/useState
-  const [users, setUsers] = useState<User[]>(null);
+  const doStop = async () => {
+    clearInterval(countdownInterval); // Stop the countdown timer
+    // send something to backend so game stops for everyone
+    // send the answers to backend for verification
+    navigate("/evaluation");
+  };
 
-  const logout = async (id: string) => {
-    if (id === null){
-      console.log("no id saved logout")
-      navigate("/login");
-    }
+  useEffect(() => {
+    getLetter();
+    // Start countdown after 60 seconds
+    setTimeout(startCountdown, 1); // Delay startCountdown by 60 seconds
+  }, []);
+
+  const getLetter = async () => {
     try {
-      const response = await api.get(`/users/${id}`);
-      console.log("id saved and exists logout");
-      await api.put(`/logout/${id}`);
-      localStorage.removeItem("token");
-      localStorage.removeItem("id");
-      navigate("/login");
+      const response = await api.get(`/round/${lobbyName}/letters`);
+      setLetter(response.data);
     } catch (error) {
-      if (error.response.status === 404){
-        console.log("id saved but doesn't exist logout");
-        localStorage.removeItem("token");
-        localStorage.removeItem("id");
-        navigate("/login");
-      }
-      console.error(
-        `An error occurred while checking user authorization: \n${handleError(error)}`
-      );
+      console.log("Error fetching the current letter");
     }
   };
 
-  // the effect hook can be used to react to change in your component.
-  // in this case, the effect hook is only run once, the first time the component is mounted
-  // this can be achieved by leaving the second argument an empty array.
-  // for more information on the effect hook, please see https://react.dev/reference/react/useEffect
+  const startCountdown = () => {
+    // Start the countdown timer
+    const intervalId = setInterval(() => {
+      setCountdown((prevCountdown) => prevCountdown - 1);
+    }, 1000);
+    setCountdownInterval(intervalId);
+  };
+
   useEffect(() => {
-    // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
-    async function fetchData() {
-      try {
-        const response = await api.get("/users");
-
-        // delays continuous execution of an async operation for 1 second.
-        // This is just a fake async call, so that the spinner can be displayed
-        // feel free to remove it :)
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Get the returned users and update the state.
-        setUsers(response.data);
-
-        // See here to get more data.
-        console.log(response);
-      } catch (error) {
-        console.error(
-          `Something went wrong while fetching the users: \n${handleError(
-            error
-          )}`
-        );
-        console.error("Details:", error);
-        alert(
-          "Something went wrong while fetching the users! See the console for details."
-        );
-      }
+    // Check if countdown has reached 0
+    if (countdown === 0) {
+      clearInterval(countdownInterval); // Stop the countdown timer
+      // Perform actions when countdown reaches 0
+      // Example: doStop()
+      doStop();
     }
-
-    fetchData();
-  }, []);
-
-  const handleUserClick = (id) => {
-    navigate(`/user/${id}`)
-  }
-
-  let content = <Spinner />;
-
-  if (users) {
-    content = (
-      <div className="game">
-        <ul className="game user-list">
-          {users.map((user: User) => (
-            <li key={user.id}>
-              <Player user={user}
-                onClick={() => handleUserClick(user.id)}/>
-            </li>
-          ))}
-        </ul>
-        <Button width="100%" onClick={() => logout(localStorage.getItem ("id"))}>
-          Logout
-        </Button>
-      </div>
-    );
-  }
+  }, [countdown]);
 
   return (
-    <BaseContainer className="game container">
-      <h2>Happy Coding!</h2>
-      <p className="game paragraph">
-        Get all users from secure endpoint:
-      </p>
-      {content}
+    <BaseContainer>
+      <div className="game container">
+        <div className="game form">
+          <div className="header">
+            <h1 className="Letter">{letter}</h1>
+            <h1 className="countdown">{countdown}</h1>
+          </div>
+          {error && <div className="game error-message">{error}</div>}
+          <FormField
+            label="country"
+            value={country}
+            onChange={(co: string) => setCountry(co)}
+          />
+          <FormField
+            label="city"
+            value={city}
+            onChange={(ci: string) => setCity(ci)}
+          />
+          <FormField
+            label="profession"
+            value={profession}
+            onChange={(pr: string) => setProfession(pr)}
+          />
+          <FormField
+            label="celebrity"
+            value={celebrity}
+            onChange={(ce: string) => setCelebrity(ce)}
+          />
+        </div>
+        <div className="game button-container">
+          <Button
+            disabled={!country || !city || !profession || !celebrity}
+            width="100%"
+            onClick={() => doStop()}
+          >
+            Stop
+          </Button>
+        </div>
+      </div>
     </BaseContainer>
   );
 };
