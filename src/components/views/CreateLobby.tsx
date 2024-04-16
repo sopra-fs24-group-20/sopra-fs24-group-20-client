@@ -29,23 +29,31 @@ FormField.propTypes = {
 
 const CreateLobby = () => {
   const navigate = useNavigate();
-  const [LobbyName, setLobbyName] = useState<string>(null);
-  const [LobbyPassword, setLobbyPassword] = useState<string>(null);
+  const [lobbyName, setLobbyName] = useState("");
+  const [lobbyPassword, setLobbyPassword] = useState("");
   const [error, setError] = useState(null);
 
   const username = localStorage.getItem("username");
 
   const doCreateLobby = async () => {
     try {
-      const requestBody = JSON.stringify({ LobbyName, LobbyPassword });
+      const requestBody = {
+        lobbyName: lobbyName,
+        lobbyPassword: lobbyPassword,
+        ownerUsername: username,
+      };
+      console.log("first");
       const response = await api.post("/lobby/create", requestBody);
+      console.log("second");
       if (response.status === 201) {
-        localStorage.setItem("lobbyName", LobbyName);
-        navigate(`/lobby/${LobbyName}`);
+        const responseData = response.data;
+        localStorage.setItem("lobbyName", lobbyName);
+        navigate(`/lobby/${lobbyName}`);
       } else if (response.status === 400) {
-        setError("Create lobby failed because the lobby name already exists");
+        setError("Cannot create lobby, because lobby name already exists");
       }
     } catch (error) {
+      console.log("unknown error")
       setError("An error occurred while creating the lobby");
     }
   };
@@ -64,18 +72,18 @@ const CreateLobby = () => {
           )}
           <FormField
             label="Lobby Name"
-            value={LobbyName}
-            onChange={(name: string) => setLobbyName(name)}
+            value={lobbyName}
+            onChange={(name) => setLobbyName(name)}
           />
           <FormField
             label="Lobby Password"
-            value={LobbyPassword}
-            onChange={(password: string) => setLobbyPassword(password)}
+            value={lobbyPassword}
+            onChange={(password) => setLobbyPassword(password)}
           />
         </div>
         <div className="authentication button-container">
           <Button
-            disabled={!LobbyName || !LobbyPassword}
+            disabled={!lobbyName || !lobbyPassword}
             width="100%"
             onClick={() => doCreateLobby()}
           >

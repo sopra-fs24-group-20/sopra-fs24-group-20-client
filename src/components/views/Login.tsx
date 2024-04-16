@@ -48,7 +48,7 @@ const Login = () => {
 
       localStorage.setItem("username", user.username);
       // localStorage.setItem("id", user.id);
-      navigate(`/user/${user.id}`);
+      navigate(`/user/${user.username}`);
     } catch (error) {
       setError ("Invalid username or password");
       navigate("/login");

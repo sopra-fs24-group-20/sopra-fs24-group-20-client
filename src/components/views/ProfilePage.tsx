@@ -12,23 +12,23 @@ const ProfilePage = () => {
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const logout = async (id: string) => {
-    if (id === null){
+  const logout = async (username: string) => {
+    if (username === null){
       console.log("no id saved logout")
       navigate("/start");
     }
     try {
-      const response = await api.get(`/users/${id}`);
+      const response = await api.get(`/players/${localStorage.getItem("username")}`);
       console.log("id saved and exists logout");
       await api.put(`/logout/${id}`);
-      localStorage.removeItem("token");
-      localStorage.removeItem("id");
+      localStorage.removeItem("username");
+      // localStorage.removeItem("id");
       navigate("/start");
     } catch (error) {
       if (error.response.status === 404){
         console.log("id saved but doesn't exist logout");
-        localStorage.removeItem("token");
-        localStorage.removeItem("id");
+        localStorage.removeItem("username");
+        // localStorage.removeItem("id");
         navigate("/start");
       }
       console.error(
@@ -39,7 +39,7 @@ const ProfilePage = () => {
 
 
   const handleClick = () => {
-    logout(localStorage.getItem("id"))
+    logout(localStorage.getItem("username"))
   };
 
 
@@ -47,7 +47,7 @@ const ProfilePage = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await api.get(`/users/${id}`);
+        const response = await api.get(`/players/${localStorage.getItem("username")}`);
         setUser(response.data);
         setLoading(false);
       } catch (error) {
@@ -57,7 +57,7 @@ const ProfilePage = () => {
     }
 
     fetchData();
-  }, [id]);
+  }, [localStorage.getItem("username")]);
 
   return (
     <BaseContainer>

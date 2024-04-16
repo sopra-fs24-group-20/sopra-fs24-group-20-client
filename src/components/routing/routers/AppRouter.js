@@ -43,13 +43,13 @@ const AppRouter = () => {
         </Route>
 
         {/* User Section */}
-        <Route path="/user/:id" element={<UserGuard />}>
-          <Route path="/user/:id" element={<ProfilePage />} />
+        <Route path="/user/:username" element={<UserGuard />}>
+          <Route path="/user/:username" element={<ProfilePage />} />
         </Route>
 
-        <Route path="/joinlobby" element={<JoinLobbyGuard/>}>
+         <Route path="/joinlobby" element={<JoinLobbyGuard/>}>
           <Route path="/joinlobby" element={<JoinLobby/>} />
-        </Route>
+         </Route> */
 
         <Route path="/createlobby" element={<CreateLobbyGuard/>}>
           <Route path="/createlobby" element={<CreateLobby/>} />
