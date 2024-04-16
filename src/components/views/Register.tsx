@@ -37,6 +37,7 @@ const Register = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
+  const [error, setError] = useState(null);
 
   const doRegister = async () => {
     try {
@@ -55,9 +56,8 @@ const Register = () => {
       // Login successfully worked --> navigate to the route /game in the GameRouter
       navigate(`/user/${user.id}`);
     } catch (error) {
-      alert(
-        `Something went wrong during registering: \n${handleError(error)}`
-      );
+      setError ("username already taken");
+      console.log(handleError(error))
       navigate("/register");
     }
   };
@@ -68,6 +68,7 @@ const Register = () => {
       <div className="authentication container">
         <div className="authentication form">
           <h1 className="authentication centered-text" >Register</h1>
+          {error && <div className="authentication error-message">{error}</div>}
           <FormField
             label="Username"
             value={username}

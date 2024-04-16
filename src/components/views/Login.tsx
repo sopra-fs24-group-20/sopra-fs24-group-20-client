@@ -7,12 +7,6 @@ import "styles/views/Authentication.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 
-/*
-It is possible to add multiple components inside a single file,
-however be sure not to clutter your files with an endless amount!
-As a rule of thumb, use one file per component and only add small,
-specific components that belong to the main one and the same file.
- */
 const FormField = (props) => {
   return (
     <div className="authentication field">
@@ -35,7 +29,6 @@ FormField.propTypes = {
 
 const Login = () => {
   const navigate = useNavigate();
-  const [name, setName] = useState<string>(null);
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
   const [error, setError] = useState(null);
@@ -51,6 +44,7 @@ const Login = () => {
       navigate(`/user/${user.id}`);
     } catch (error) {
       setError ("Invalid username or password");
+      console.log(handleError(error))
       navigate("/login");
     }
   };
