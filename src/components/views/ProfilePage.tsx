@@ -15,7 +15,7 @@ const ProfilePage = () => {
   const logout = async (id: string) => {
     if (id === null){
       console.log("no id saved logout")
-      navigate("/login");
+      navigate("/start");
     }
     try {
       const response = await api.get(`/users/${id}`);
@@ -23,13 +23,13 @@ const ProfilePage = () => {
       await api.put(`/logout/${id}`);
       localStorage.removeItem("token");
       localStorage.removeItem("id");
-      navigate("/login");
+      navigate("/start");
     } catch (error) {
       if (error.response.status === 404){
         console.log("id saved but doesn't exist logout");
         localStorage.removeItem("token");
         localStorage.removeItem("id");
-        navigate("/login");
+        navigate("/start");
       }
       console.error(
         `An error occurred while checking user authorization: \n${handleError(error)}`

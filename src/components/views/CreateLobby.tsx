@@ -40,6 +40,7 @@ const CreateLobby = () => {
       const requestBody = JSON.stringify({ LobbyName, LobbyPassword });
       const response = await api.post("/lobby/create", requestBody);
       if (response.status === 201) {
+        localStorage.setItem("lobbyName", LobbyName);
         navigate(`/lobby/${LobbyName}`);
       } else if (response.status === 400) {
         setError("Create lobby failed because the lobby name already exists");

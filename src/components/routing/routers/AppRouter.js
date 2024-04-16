@@ -13,6 +13,10 @@ import JoinLobby from "../../views/JoinLobby";
 import { JoinLobbyGuard } from "../routeProtectors/JoinLobbyGuard";
 import CreateLobby  from "../../views/CreateLobby";
 import {CreateLobbyGuard } from "../routeProtectors/CreateLobbyGuard";
+import {LobbyGuard} from "../routeProtectors/LobbyGuard";
+import LobbyPage from "../../views/LobbyPage";
+import { LeaderboardGuard } from "../routeProtectors/LeaderboardGuard";
+import FinalLeader from "../../views/FinalLeader";
 
 /**
  * Main router of your application.
@@ -27,23 +31,20 @@ const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-
-        <Route path="/user/:id" element={<UserGuard />}>
-          <Route path="/user/:id" element={<ProfilePage />} />
-        </Route>
-
-        <Route path="/game/*" element={<GameGuard />}>
-          <Route path="/game/*" element={<GameRouter base="/game"/>} />
-        </Route>
+        {/* Start Section */}
+        <Route path="/start" element={<Start/>} />
 
         <Route path="/login" element={<LoginGuard />}>
           <Route path="/login" element={<Login/>} />
         </Route>
 
-        <Route path="/start" element={<Start/>} />
-
         <Route path="/register" element={<RegisterGuard />}>
           <Route path="/register" element={<Register/>} />
+        </Route>
+
+        {/* User Section */}
+        <Route path="/user/:id" element={<UserGuard />}>
+          <Route path="/user/:id" element={<ProfilePage />} />
         </Route>
 
         <Route path="/joinlobby" element={<JoinLobbyGuard/>}>
@@ -52,6 +53,19 @@ const AppRouter = () => {
 
         <Route path="/createlobby" element={<CreateLobbyGuard/>}>
           <Route path="/createlobby" element={<CreateLobby/>} />
+        </Route>
+
+        {/* Game Section */}
+        <Route path="/lobby/:lobbyName" element={<LobbyGuard />}>
+          <Route path="/lobby/:lobbyName" element={<LobbyPage/>} />
+        </Route>
+
+        <Route path="/game/*" element={<GameGuard />}>
+          <Route path="/game/*" element={<GameRouter base="/game"/>} />
+        </Route>
+
+        <Route path="/leaderboard/final" element={<LeaderboardGuard />}>
+          <Route path="/leaderboard/final" element={<FinalLeader/>} />
         </Route>
 
         <Route path="/" element={
