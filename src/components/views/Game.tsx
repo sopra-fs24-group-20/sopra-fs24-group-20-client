@@ -33,10 +33,10 @@ const Game = () => {
   const [countdown, setCountdown] = useState<number>(60); // Initial countdown value set to 60 seconds
   const [countdownInterval, setCountdownInterval] = useState<any>(null); // State variable for interval ID
   const lobbyName = localStorage.getItem("lobbyName");
-  const [country, setCountry] = useState<string>(null);
-  const [city, setCity] = useState<string>(null);
-  const [profession, setProfession] = useState<string>(null);
-  const [celebrity, setCelebrity] = useState<string>(null);
+  const [country, setCountry] = useState<string>("");
+  const [city, setCity] = useState<string>("");
+  const [profession, setProfession] = useState<string>("");
+  const [celebrity, setCelebrity] = useState<string>("");
   const [error, setError] = useState(null);
 
   const doStop = async () => {
