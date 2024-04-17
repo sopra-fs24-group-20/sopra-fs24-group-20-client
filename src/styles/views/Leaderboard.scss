@@ -1,6 +1,6 @@
 @import "../theme";
 
-.lobby {
+.leaderboard {
   &.container {
     margin-top: 2em;
     min-height: 300px;
@@ -10,13 +10,6 @@
   }
   &.centered-text {
     text-align: center;
-  }
-  &.title{
-    text-align: center;
-    font-size: 50px;
-  }
-  &.ul {
-    list-style: none;
   }
 
   &.li{
@@ -49,41 +42,29 @@
     max-width: 480px;
     min-width: 200px;
   }
-
-  &.link {
-    margin-top: 3em;
-    color: white;
-    text-decoration: underline;
+  &.user-list {
+    list-style: none;
+    padding-left: 0;
   }
-  &.link:visited {
-    margin-top: 3em;
-    color: white;
-    text-decoration: underline;
-  }
-  &.ready{
-    text-align: center;
-    font-size: 13px;
-  }
-}
-
-.player{
-  &.container {
+  &.user-item {
     display: flex;
-    align-items: center;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
-    max-width: 10em;
-    min-width: 10em;
-    height: 10em;
-    padding: 5%;
-    background-image: linear-gradient(0deg, $accentBottomLight, $accentMiddleLight, $accentTopLight);
-    box-shadow: $dropShadow;
-    border-radius: 50%;
+  }
+  &.name {
+    font-weight: 300;
+    margin-left: 5px;
   }
   &.username {
     font-weight: 500;
     color: $accentBottom;
   }
-  &.picture {
+  &.id {
+    margin-left: auto;
+    margin-right: 10px;
+    font-family: $fontMono;
+    font-weight: 300;
   }
+
 }

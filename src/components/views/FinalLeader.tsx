@@ -4,12 +4,13 @@ import { Button } from "components/ui/Button";
 import {useNavigate} from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
-import "styles/views/Lobby.scss";
+import "styles/views/Leaderboard.scss";
 import { Lobby, User } from "types";
+import Confetti from "react-confetti";
 
 const Player = ({ user }: { user: User }) => (
-  <div className="lobby container">
-    <div className="leader username">
+  <div className="leaderboard container">
+    <div className="leaderboard username">
       <a href="#">{user.username}</a></div>
   </div>
 );
@@ -46,12 +47,10 @@ const FinalLeader = () => {
 
   return (
     <BaseContainer>
-      <div className="lobby container">
-        <div className="lobby form">
-          <h2 className="lobby centered-text">
-            Final Ranking
-          </h2>
-          <ul className="leader user-list">
+      <div className="leaderboard container">
+        <div className="leaderboard form">
+          <h2 className="leaderboard centered-text">Final Ranking</h2>
+          <ul className="leaderboard user-list">
               <li >
                 he
               </li>
@@ -59,6 +58,11 @@ const FinalLeader = () => {
           <Button width="100%" onClick={() => navigate(`/lobby/${lobby.lobbyName}`)}>
             Back to Lobby
           </Button>
+          <Confetti
+            colors={['#64f1f1','#9135a4','#ff03bf','#e8d152','#c0c0c0']}
+            width={window.innerWidth}
+            height={window.innerHeight}>
+          </Confetti>
         </div>
       </div>
     </BaseContainer>
