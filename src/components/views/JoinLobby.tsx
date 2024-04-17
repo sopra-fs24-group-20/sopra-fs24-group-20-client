@@ -37,12 +37,14 @@ const JoinLobby = () => {
 
   const doJoinLobby = async () => {
     try {
-      console.log("")
-      const requestBody = JSON.stringify({
+      const requestBody = {
         lobbyName: LobbyName,
         lobbyPassword: LobbyPassword,
         username: username
-      });
+      };
+      console.log(LobbyPassword);
+      console.log(LobbyName);
+      console.log(username);
       const response = await api.post("/lobby/join", requestBody);
       if (response.status === 200) {
         localStorage.setItem("lobbyName", LobbyName);
@@ -72,12 +74,12 @@ const JoinLobby = () => {
           <FormField
             label="Lobby Name"
             value={LobbyName}
-            onChange={(name: string) => setLobbyName(name)}
+            onChange={(name) => setLobbyName(name)}
           />
           <FormField
             label="Lobby Password"
             value={LobbyPassword}
-            onChange={(password: string) => setLobbyPassword(password)}
+            onChange={(password) => setLobbyPassword(password)}
           />
         </div>
         <div className="authentication button-container">
