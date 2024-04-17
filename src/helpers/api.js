@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getDomain } from "./getDomain";
+import io from 'socket.io-client';
 
 export const api = axios.create({
   baseURL: getDomain(),
@@ -35,3 +36,23 @@ export const handleError = error => {
     return error.message;
   }
 };
+
+
+const socket = io('${getDomain()}');
+socket.on('connect', () => {
+  console.log('Connected to Socket.IO server');
+});
+
+socket.on('message', (data) => {
+  console.log('Received message from server:', data);
+});
+
+socket.on('disconnect', () => {
+  console.log('Disconnected from Socket.IO server');
+});
+
+socket.on('connect_error', (error) => {
+  console.error('Connection error:', error);
+});
+
+export  const client = socket;

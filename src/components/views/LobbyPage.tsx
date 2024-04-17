@@ -3,6 +3,7 @@ import { api, handleError } from "helpers/api";
 import { Button } from "components/ui/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
+import io from 'socket.io-client';
 import "styles/views/Lobby.scss";
 import PropTypes from "prop-types";
 import { Lobby } from "types";
@@ -23,24 +24,33 @@ const LobbyPage = () => {
   const navigate = useNavigate();
   const [lobby, setLobby] = useState<Lobby[]>({});
   const localLobbyName = localStorage.getItem(("lobbyName"));
+  const localUsername = localStorage.getItem(("username"));
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    const newSocket = io('http://localhost:3000');
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
 
   const exit = async () => {
-    const local_username = localStorage.getItem("username");
     try {
-      await api.put("/lobby/leave", JSON.stringify({lobbyName: lobby.lobbyName, username: local_username}) );
-      navigate(`/user/${local_username}`);
+      await api.put("/lobby/leave", JSON.stringify({lobbyName: lobby.lobbyName, username: localUsername}) );
+      navigate(`/user/${localUsername}`);
 
     } catch (error) {
       alert(
         `Something went wrong during exiting the lobby: \n${handleError(error)}`
       );
-      navigate(`/user/${local_username}`);
+      navigate(`/user/${localUsername}`);
     }
   };
   const ready = async () => {
     try {
-      await api.put("/player/${user.id}", JSON.stringify({ready: true}));
-
+      await api.put("/player/${localUsername}", JSON.stringify({ready: true}));
     } catch (error) {
       alert(
         `Something went wrong while preparing the game: \n${handleError(error)}`
@@ -69,7 +79,7 @@ const LobbyPage = () => {
       <div className="lobby container">
         <div className="lobby form">
           <div className="lobby centered-text">
-            <h1 className="lobby title">{lobby.lobbyName}</h1>
+            <h1 className="lobby title">{localLobbyName}</h1>
 
             <ul className="lobby ul">
                 <li className="lobby li">players</li>
