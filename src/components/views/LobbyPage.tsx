@@ -56,6 +56,7 @@ const LobbyPage = () => {
       try {
         const response = await api.get("/lobby/players", JSON.stringify(localLobbyName));
         setPlayers(response.data);
+
         if (players_ready(response.data) === response.data.length) {
           await api.put(`/players/${local_username}`, JSON.stringify({ready: false}));
           navigate("/game");
