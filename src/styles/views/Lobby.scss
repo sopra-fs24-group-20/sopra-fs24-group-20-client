@@ -30,7 +30,7 @@
     justify-content: center;
     width: 60%;
     max-width: 30em;
-    min-height: 18em;
+    min-height: 20em;
     font-size: 16px;
     font-weight: 300;
     padding-left: 37px;
@@ -63,6 +63,7 @@
   &.ready{
     text-align: center;
     font-size: 13px;
+    margin-bottom: 1em;
   }
 }
 
@@ -72,9 +73,9 @@
     align-items: center;
     flex-direction: column;
     justify-content: center;
-    max-width: 10em;
-    min-width: 10em;
-    height: 10em;
+    max-width: 5em;
+    min-width: 5em;
+    height: 5em;
     padding: 5%;
     background-image: linear-gradient(0deg, $accentBottomLight, $accentMiddleLight, $accentTopLight);
     box-shadow: $dropShadow;
@@ -82,7 +83,7 @@
   }
   &.username {
     font-weight: 500;
-    color: $accentBottom;
+    color: white;
   }
   &.picture {
   }
