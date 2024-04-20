@@ -3,6 +3,7 @@ import { api, handleError } from "helpers/api";
 import { Button } from "components/ui/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
+import WebSocket from 'ws';
 import "styles/views/Lobby.scss";
 import PropTypes from "prop-types";
 import { Lobby } from "types";
@@ -25,18 +26,32 @@ const LobbyPage = () => {
   const localLobbyName = localStorage.getItem(("lobbyName"));
   const local_username = localStorage.getItem("username");
   const [readyButtonClicked, setButtonClicked] = useState(false);
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    const newSocket = new WebSocket('ws://localhost:3000');
+    setSocket(newSocket);
+
+    // Cleanup function
+    return () => {
+      if (newSocket) {
+        newSocket.close();
+      }
+    };
+  }, []);
+
 
   const exit = async () => {
     try {
       await api.put("/lobby/leave", JSON.stringify({lobbyName: localLobbyName, username: local_username}) );
       navigate(`/user/${local_username}`);
-
     } catch (error) {
       alert(
         `Something went wrong during exiting the lobby: \n${handleError(error)}`
       );
     }
   };
+  
   const local_ready = async () => {
     try {
       await api.put(`/players/${local_username}`, JSON.stringify({ready: true}));

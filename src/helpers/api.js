@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getDomain } from "./getDomain";
+import WebSocket from 'ws';
 
 export const api = axios.create({
   baseURL: getDomain(),
@@ -35,3 +36,27 @@ export const handleError = error => {
     return error.message;
   }
 };
+
+
+const socket = new WebSocket('${getDomain()}');
+
+// Connection opened
+socket.addEventListener('open', function (event) {
+  socket.send('Hello Server!');
+});
+
+// Listen for messages
+socket.addEventListener('message', function (event) {
+  console.log('Message from server:', event.data);
+});
+
+// Handle errors
+socket.addEventListener('error', function (event) {
+  console.error('WebSocket error:', event);
+});
+
+// Handle connection close
+socket.addEventListener('close', function (event) {
+  console.log('WebSocket connection closed:', event);
+});
+export  const client = socket;
