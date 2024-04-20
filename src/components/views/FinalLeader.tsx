@@ -8,28 +8,42 @@ import "styles/views/Leaderboard.scss";
 import { Lobby, User } from "types";
 import Confetti from "react-confetti";
 
-const Player = ({ user }: { user: User }) => (
-  <div className="leaderboard container">
-    <div className="leaderboard username">
-      <a href="#">{user.username}</a></div>
-  </div>
-);
+const Player = ({ user, index }) => {
+  // Calculate the total points by summing up all the points in the array
+  //const totalPoints = user.stats.points.reduce((acc, current) => acc + current, 0);
+  // EXCHANGE x WITCH {totalPoints}
+
+  return (
+    <div className="leaderboard container">
+      <div className="leaderboard username">
+        {index + 1}. {user.username} points: x
+      </div>
+    </div>
+  );
+};
 
 Player.propTypes = {
   user: PropTypes.object,
+  index: PropTypes.number,
 };
 
 const FinalLeader = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>(null);
   const [lobby, setLobby] = useState<Lobby[]>({});
+  const [players, setPlayers] = useState([]);
+  const mockplayers = [
+    { ready: false, stats: { points: [1, 2, 3] }, username: "u1" },
+    { ready: false, stats: { points: [5, 5, 5] }, username: "u2" }
+  ];  const localLobbyName = localStorage.getItem(("lobbyName"));
+
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await api.get("/users");
-        setUsers(response.data);
-        console.log(response);
+        const response = await api.get("/lobby/players", JSON.stringify(localLobbyName));
+        setPlayers(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error(
           `Something went wrong while fetching the users: \n${handleError(
@@ -51,9 +65,11 @@ const FinalLeader = () => {
         <div className="leaderboard form">
           <h2 className="leaderboard centered-text">Final Ranking</h2>
           <ul className="leaderboard user-list">
-              <li >
-                he
+            {players.map((player, index) => (
+              <li key={index} className="lobby li">
+                <Player user={player} index={index} />
               </li>
+            ))}
           </ul>
           <Button width="100%" onClick={() => navigate(`/lobby/${lobby.lobbyName}`)}>
             Back to Lobby

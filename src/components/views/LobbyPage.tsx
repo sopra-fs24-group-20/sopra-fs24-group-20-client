@@ -11,7 +11,7 @@ import { Lobby } from "types";
 const Player = ({ user }) => (
   <div className="player container">
     <div className="player username">
-      <a href="#">{user.username}</a>
+      {user.username}
     </div>
   </div>
 );
@@ -22,9 +22,10 @@ Player.propTypes = {
 
 const LobbyPage = () => {
   const navigate = useNavigate();
-  const [lobby, setLobby] = useState<Lobby[]>({});
+  const [players, setPlayers] = useState([]);
   const localLobbyName = localStorage.getItem(("lobbyName"));
-  const localUsername = localStorage.getItem(("username"));
+  const local_username = localStorage.getItem("username");
+  const [readyButtonClicked, setButtonClicked] = useState(false);
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
@@ -39,42 +40,50 @@ const LobbyPage = () => {
     };
   }, []);
 
+
   const exit = async () => {
     try {
-      await api.put("/lobby/leave", JSON.stringify({lobbyName: lobby.lobbyName, username: localUsername}) );
-      navigate(`/user/${localUsername}`);
-
+      await api.put("/lobby/leave", JSON.stringify({lobbyName: localLobbyName, username: local_username}) );
+      navigate(`/user/${local_username}`);
     } catch (error) {
       alert(
         `Something went wrong during exiting the lobby: \n${handleError(error)}`
       );
-      navigate(`/user/${localUsername}`);
     }
   };
-  const ready = async () => {
+  
+  const local_ready = async () => {
     try {
-      await api.put("/player/${localUsername}", JSON.stringify({ready: true}));
+      await api.put(`/players/${local_username}`, JSON.stringify({ready: true}));
+      setButtonClicked(true);
     } catch (error) {
       alert(
         `Something went wrong while preparing the game: \n${handleError(error)}`
       );
     }
   };
+  const players_ready = (players) => {
+    return players.filter(player => player.ready).length;
+  };
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchPlayers() {
       try {
-        const players = await api.get("/lobby/players", JSON.stringify(localLobbyName));
-        setLobby(players.data);
-        console.log(players.data);
+        const response = await api.get("/lobby/players", JSON.stringify(localLobbyName));
+        setPlayers(response.data);
 
+        if (players_ready(response.data) === response.data.length) {
+          await api.put(`/players/${local_username}`, JSON.stringify({ready: false}));
+          navigate("/game");
+        }
+        console.log(response.data)
       } catch (error) {
         alert("Something went wrong while fetching the lobby data.");
-        console.log(lobby)
+        console.log(error)
       }
     }
 
-    fetchData();
+    fetchPlayers();
   }, [localLobbyName]);
 
   return (
@@ -85,17 +94,22 @@ const LobbyPage = () => {
             <h1 className="lobby title">{localLobbyName}</h1>
 
             <ul className="lobby ul">
-                <li className="lobby li">players</li>
+              {players.map((player, index) => (
+                <li key={index} className="lobby li">
+                  <Player user={player} />
+                </li>
+              ))}
             </ul>
 
             <div className="lobby ready">
-              players are ready
+              {players_ready(players)}/{players.length} players are ready
             </div>
 
             <Button
               className="secondary-button"
               width="60%"
-              onClick={ready}
+              onClick={local_ready}
+              disabled={readyButtonClicked}
             >
               ready
             </Button>
