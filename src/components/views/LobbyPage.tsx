@@ -3,7 +3,7 @@ import { api, handleError } from "helpers/api";
 import { Button } from "components/ui/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
-import io from 'socket.io-client';
+import WebSocket from 'ws';
 import "styles/views/Lobby.scss";
 import PropTypes from "prop-types";
 import { Lobby } from "types";
@@ -28,11 +28,14 @@ const LobbyPage = () => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:3000');
+    const newSocket = new WebSocket('ws://localhost:3000');
     setSocket(newSocket);
 
+    // Cleanup function
     return () => {
-      newSocket.disconnect();
+      if (newSocket) {
+        newSocket.close();
+      }
     };
   }, []);
 
