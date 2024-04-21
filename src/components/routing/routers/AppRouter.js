@@ -60,12 +60,12 @@ const AppRouter = () => {
           <Route path="/lobby/:lobbyName" element={<LobbyPage/>} />
         </Route>
 
-        <Route path="/game/*" element={<GameGuard />}>
-          <Route path="/game/*" element={<GameRouter base="/game"/>} />
+        <Route path="/game/:lobbyName" element={<GameGuard />}>
+          <Route path="/game/:lobbyName" element={<GameRouter base="/game"/>} />
         </Route>
 
-        <Route path="/leaderboard/final" element={<LeaderboardGuard />}>
-          <Route path="/leaderboard/final" element={<FinalLeader/>} />
+        <Route path="/leaderboard/final/:lobbyName" element={<LeaderboardGuard />}>
+          <Route path="/leaderboard/final/:lobbyName" element={<FinalLeader/>} />
         </Route>
 
         <Route path="/" element={

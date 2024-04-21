@@ -12,12 +12,12 @@ import PropTypes from "prop-types";
  * @param props
  */
 export const GameGuard = () => {
-  if (localStorage.getItem("username")) {
+  if (localStorage.getItem("lobbyName")) {
     
     return <Outlet />;
   }
   
-  return <Navigate to="/start" replace />;
+  return <Navigate to="/joinlobby" replace />;
 };
 
 GameGuard.propTypes = {

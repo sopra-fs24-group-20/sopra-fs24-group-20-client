@@ -33,33 +33,67 @@ const Game = () => {
   const [countdown, setCountdown] = useState<number>(60); // Initial countdown value set to 60 seconds
   const [countdownInterval, setCountdownInterval] = useState<any>(null); // State variable for interval ID
   const lobbyName = localStorage.getItem("lobbyName");
+  const username = localStorage.getItem("username");
   const [country, setCountry] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [profession, setProfession] = useState<string>("");
   const [celebrity, setCelebrity] = useState<string>("");
   const [error, setError] = useState(null);
 
-  const doStop = async () => {
-    clearInterval(countdownInterval); // Stop the countdown timer
-    // send something to backend so game stops for everyone
-    // send the answers to backend for verification
-    navigate("/evaluation");
+  const getFormattedData = (category: string, username: string, answer: string) => {
+    const data = {
+      Round:1,
+      Category: category,
+      [username]: answer
+    };
+    return JSON.stringify(data);
   };
 
-  useEffect(() => {
-    getLetter();
-    // Start countdown after 60 seconds
-    setTimeout(startCountdown, 1); // Delay startCountdown by 60 seconds
-  }, []);
+  const submitAnswers = async (category, data) =>{
+    try{
+      await api.put(`/round/${lobbyName}/answers`, data);
+    }catch(error){
+      throw new Error(`Error submitting ${category} data`)
+    }
+  };
+
+  const doStop = async () => {
+    clearInterval(countdownInterval); // Stop the countdown timer
+    // send something to backend so game stops for everyone with websocket stuff
+
+
+    const countryans = getFormattedData("country", username, country);
+    const cityans = getFormattedData("city", username, city);
+    const professionans = getFormattedData("profession", username, profession);
+    const celebrityans = getFormattedData("celebrity", username, celebrity);
+    // send the answers to backend for verification
+    try{
+      await submitAnswers("country", countryans);
+      await submitAnswers("city", cityans);
+      await submitAnswers("profession", professionans);
+      await submitAnswers("celebrity", celebrityans);
+    }catch(error){
+      setError("Error submitting data");
+      return;
+    }
+    navigate(`/leaderboard/final/${lobbyName}`);
+  };
 
   const getLetter = async () => {
     try {
-      const response = await api.get(`/round/${lobbyName}/letters`);
+      const response = await api.get(`/round/letters/${lobbyName}`);
       setLetter(response.data);
     } catch (error) {
       console.log("Error fetching the current letter");
     }
   };
+
+  useEffect(() => {
+    getLetter();
+    setTimeout(startCountdown, 1); // Delay startCountdown by 1 second
+  }, []);
+
+
 
   const startCountdown = () => {
     // Start the countdown timer
