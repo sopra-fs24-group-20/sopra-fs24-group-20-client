@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { api, handleError } from "helpers/api";
+import { api, handleError, client } from "helpers/api";
 import { Button } from "components/ui/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
@@ -27,23 +27,11 @@ const LobbyPage = () => {
   const local_username = localStorage.getItem("username");
   const [readyButtonClicked, setButtonClicked] = useState(false);
   const [socket, setSocket] = useState(null);
-
-  useEffect(() => {
-    const newSocket = new WebSocket('ws://localhost:3000');
-    setSocket(newSocket);
-
-    // Cleanup function
-    return () => {
-      if (newSocket) {
-        newSocket.close();
-      }
-    };
-  }, []);
-
+  const localLobbyId = localStorage.getItem(("lobbyId"))
 
   const exit = async () => {
     try {
-      await api.put("/lobby/leave", JSON.stringify({lobbyName: localLobbyName, username: local_username}) );
+      await api.put(`/lobby/leave/${localLobbyId}`, JSON.stringify({lobbyName: localLobbyName, username: local_username}) );
       navigate(`/user/${local_username}`);
     } catch (error) {
       alert(
@@ -74,7 +62,7 @@ const LobbyPage = () => {
 
         if (players_ready(response.data) === response.data.length) {
           await api.put(`/players/${local_username}`, JSON.stringify({ready: false}));
-          navigate("/game");
+          navigate(`/game/${localLobbyName}`);
         }
         console.log(response.data)
       } catch (error) {
