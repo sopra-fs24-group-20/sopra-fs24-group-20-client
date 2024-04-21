@@ -3,7 +3,7 @@
  */
 class Lobby {
   constructor(data = {}) {
-    this.id = null;
+    this.lobbyId = null;
     this.lobbyName = null;
     this.lobbyPassword = null;
     this.roundDuration = null;

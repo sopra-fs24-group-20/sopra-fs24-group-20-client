@@ -44,8 +44,9 @@ const CreateLobby = () => {
       };
       const response = await api.post("/lobby/create", requestBody);
       if (response.status === 201) {
-        const responseData = response.data;
         localStorage.setItem("lobbyName", lobbyName);
+        localStorage.setItem("lobbyId", response.data.id);
+        localStorage.setItem("gameId", response.data.game.id);
         navigate(`/lobby/${lobbyName}`);
       } else if (response.status === 400) {
         console.log("lobby already exists")

@@ -34,6 +34,8 @@ const Game = () => {
   const [countdownInterval, setCountdownInterval] = useState<any>(null); // State variable for interval ID
   const lobbyName = localStorage.getItem("lobbyName");
   const username = localStorage.getItem("username");
+  const gameId = localStorage.getItem("gameId");
+  const lobbyId = localStorage.getItem("lobbyId");
   const [country, setCountry] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [profession, setProfession] = useState<string>("");
@@ -51,7 +53,7 @@ const Game = () => {
 
   const submitAnswers = async (category, data) =>{
     try{
-      await api.put(`/round/${lobbyName}/answers`, data);
+      await api.put(`/round/${gameId}/entries`, data);
     }catch(error){
       throw new Error(`Error submitting ${category} data`)
     }
@@ -81,7 +83,7 @@ const Game = () => {
 
   const getLetter = async () => {
     try {
-      const response = await api.get(`/round/letters/${lobbyName}`);
+      const response = await api.get(`/rounds/letters/${gameId}`);
       setLetter(response.data);
     } catch (error) {
       console.log("Error fetching the current letter");

@@ -48,6 +48,8 @@ const JoinLobby = () => {
       const response = await api.post("/lobby/join", requestBody);
       if (response.status === 200) {
         localStorage.setItem("lobbyName", LobbyName);
+        localStorage.setItem("lobbyId", response.data.id);
+        localStorage.setItem("gameId", response.data.game.id);
         navigate(`/lobby/${LobbyName}`);
       } else if (response.status === 400) {
         setError("Join lobby failed because password doesn't match");
