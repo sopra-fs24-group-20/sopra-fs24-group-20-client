@@ -4,8 +4,11 @@
 
 npm install react-confetti
 
-npm install ws
+npm install net
 
+npm install stompjs
+
+npm install sockjs-client
 
 
 
