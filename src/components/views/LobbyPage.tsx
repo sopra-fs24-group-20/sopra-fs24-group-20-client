@@ -3,7 +3,6 @@ import { api, handleError, client } from "helpers/api";
 import { Button } from "components/ui/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
-import WebSocket from 'ws';
 import "styles/views/Lobby.scss";
 import PropTypes from "prop-types";
 import { Lobby } from "types";
@@ -26,7 +25,6 @@ const LobbyPage = () => {
   const localLobbyName = localStorage.getItem(("lobbyName"));
   const local_username = localStorage.getItem("username");
   const [readyButtonClicked, setButtonClicked] = useState(false);
-  const [socket, setSocket] = useState(null);
   const localLobbyId = localStorage.getItem(("lobbyId"))
 
   const exit = async () => {
@@ -39,7 +37,6 @@ const LobbyPage = () => {
       );
     }
   };
-  
   const local_ready = async () => {
     try {
       await api.put(`/players/${local_username}`, JSON.stringify({ready: true}));
