@@ -45,8 +45,13 @@ const CreateLobby = () => {
       const response = await api.post("/lobby/create", requestBody);
       if (response.status === 201) {
         localStorage.setItem("lobbyName", lobbyName);
+        console.log("lobbyname in storage")
         localStorage.setItem("lobbyId", response.data.id);
-        localStorage.setItem("gameId", response.data.game.id);
+        console.log("lobbyid in storage")
+        // localStorage.setItem("gameId", response.data.game.id);
+        console.log(response.data)
+        console.log("gameid in storage")
+        console.log(response.data.message)
         navigate(`/lobby/${lobbyName}`);
       } else if (response.status === 400) {
         console.log("lobby already exists")
@@ -54,7 +59,7 @@ const CreateLobby = () => {
         setError(errorMessage);
       }
     } catch (error) {
-      console.log("unknown error")
+      console.log(error)
       setError("An error occurred while creating the lobby");
     }
   };
