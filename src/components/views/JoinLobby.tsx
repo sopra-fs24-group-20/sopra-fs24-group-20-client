@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { api, handleError } from "helpers/api";
+import React, { useEffect, useState } from "react";
+import { api, handleError, client } from "helpers/api";
 import User from "models/User";
 import { useNavigate } from "react-router-dom";
 import { Button } from "components/ui/Button";
@@ -35,6 +35,34 @@ const JoinLobby = () => {
 
   const username = localStorage.getItem("username");
 
+  useEffect(() => {
+    // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
+    async function stompConnect() {
+      try {
+        if (!client['connected']) {
+          client.connect({}, function () {
+            client.send("/app/connect", {}, JSON.stringify({ username: username }));
+            client.subscribe("/topic/lobby_join", function (response) {
+            });
+          });
+        }
+      } catch (error) {
+        console.error(`Something went wrong: \n${handleError(error)}`);
+        console.error("Details:", error);
+        alert("Something went wrong! See the console for details.");
+      }
+    }
+    stompConnect();
+    // return a function to disconnect on unmount
+    return function cleanup() {
+      if (client && client['connected']) {
+        client.disconnect(function () {
+          console.log('disconnected from stomp');
+        });
+      }
+    };
+  }, []);
+
   const doJoinLobby = async () => {
     try {
       const requestBody = {
@@ -55,6 +83,7 @@ const JoinLobby = () => {
         console.log(response.data)
         console.log("gameid in storage")
         console.log(response.data.message)
+        client.send("/topic/lobby_join", {}, "{}");
         navigate(`/lobby/${LobbyName}`);
       } else if (response.status === 400) {
         setError("Join lobby failed because password doesn't match");

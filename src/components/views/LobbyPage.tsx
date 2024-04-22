@@ -26,6 +26,42 @@ const LobbyPage = () => {
   const local_username = localStorage.getItem("username");
   const [readyButtonClicked, setButtonClicked] = useState(false);
   const localLobbyId = localStorage.getItem(("lobbyId"))
+  const [ready_ws, setReadyWS] = useState("");
+
+  useEffect(() => {
+    // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
+    async function stompConnect() {
+      try {
+        fetchPlayers();
+        if (!client['connected']) {
+          client.connect({}, function () {
+            client.send("/app/connect", {}, JSON.stringify({ username: local_username }));
+            client.subscribe("/topic/ready-count", function (response) {
+              setReadyWS(response.body);
+            });
+            client.subscribe("/topic/lobby_join", function (response) {
+              if (response.command === "new-join") {
+                fetchPlayers();
+              }
+            });
+          });
+        }
+      } catch (error) {
+        console.error(`Something went wrong: \n${handleError(error)}`);
+        console.error("Details:", error);
+        alert("Something went wrong! See the console for details.");
+      }
+    }
+    stompConnect();
+    // return a function to disconnect on unmount
+    return function cleanup() {
+      if (client && client['connected']) {
+        client.disconnect(function () {
+          console.log('disconnected from stomp');
+        });
+      }
+    };
+  }, []);
 
   const exit = async () => {
     try {
@@ -41,6 +77,8 @@ const LobbyPage = () => {
     try {
       await api.put(`/players/${local_username}`, JSON.stringify({ready: true}));
       setButtonClicked(true);
+      client.send("/app/ready-up", {}, JSON.stringify({ username: local_username }));
+      console.log("yeyy");
     } catch (error) {
       alert(
         `Something went wrong while preparing the game: \n${handleError(error)}`
@@ -51,14 +89,13 @@ const LobbyPage = () => {
     return players.filter(player => player.ready).length;
   };
 
-  useEffect(() => {
+
     async function fetchPlayers() {
       try {
         const response = await api.get("/lobby/players", JSON.stringify(localLobbyName));
         setPlayers(response.data);
 
         if (players_ready(response.data) === response.data.length) {
-          await api.put(`/players/${local_username}`, JSON.stringify({ready: false}));
           navigate(`/game/${localLobbyName}`);
         }
         console.log(response.data)
@@ -68,8 +105,8 @@ const LobbyPage = () => {
       }
     }
 
-    fetchPlayers();
-  }, [localLobbyName]);
+
+
 
   return (
     <BaseContainer>
@@ -87,7 +124,7 @@ const LobbyPage = () => {
             </ul>
 
             <div className="lobby ready">
-              {players_ready(players)}/{players.length} players are ready
+              {players_ready(players)}/{players.length} players are ready {ready_ws}
             </div>
 
             <Button

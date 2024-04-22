@@ -80,6 +80,7 @@ const Game = () => {
 
   const getLetter = async () => {
     try {
+      await api.put(`/players/${username}`, JSON.stringify({ready: false}));
       const response = await api.get(`/rounds/letters/${gameId}`);
       setLetter(response.data);
     } catch (error) {
