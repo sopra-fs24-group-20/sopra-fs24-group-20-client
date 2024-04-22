@@ -80,6 +80,19 @@ const JoinLobby = () => {
         localStorage.setItem("lobbyId", response.data.id);
         console.log("lobbyid in storage")
         // localStorage.setItem("gameId", response.data.game.id);
+        try {
+          // Make a request to get the game ID
+          const gameIdResponse = await api.get(`/${response.data.id}/gameId`);
+          if (gameIdResponse.status === 200) {
+            const gameId = gameIdResponse.data;
+            localStorage.setItem("gameId", gameId);
+            console.log("gameid in storage:", gameId);
+          } else {
+            console.error("Failed to retrieve game ID:", gameIdResponse.data);
+          }
+        } catch (error) {
+          console.error("Error while retrieving game ID:", error);
+        }
         console.log(response.data)
         console.log("gameid in storage")
         console.log(response.data.message)

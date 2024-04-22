@@ -44,18 +44,20 @@ const Game = () => {
 
   const getFormattedData = (category1: string, category2: string, category3: string, category4: string, answer1: string, answer2: string, answer3: string, answer4: string, username: string) => {
     const data = {
-      username: username,
-      [category1]: answer1,
-      [category2]: answer2,
-      [category3]: answer3,
-      [category4]: answer4
+      [username]: {
+        [category1]: answer1,
+        [category2]: answer2,
+        [category3]: answer3,
+        [category4]: answer4
+
+      }
     };
     return JSON.stringify(data);
   };
 
   const submitAnswers = async (data) =>{
     try{
-      await api.put(`/round/${gameId}/entries`, data);
+      await api.put(`/round/answers/player`, data);
     }catch(error){
       throw new Error(`Error submitting data`)
     }
@@ -81,7 +83,7 @@ const Game = () => {
   const getLetter = async () => {
     try {
       await api.put(`/players/${username}`, JSON.stringify({ready: false}));
-      const response = await api.get(`/rounds/letters/${gameId}`);
+      const response = await api.get(`/round/letters/${gameId}`);
       setLetter(response.data);
     } catch (error) {
       console.log("Error fetching the current letter");
