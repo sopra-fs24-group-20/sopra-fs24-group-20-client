@@ -13,7 +13,6 @@
   }
 
   &.li{
-    display: inline-block;
     margin-right: 10px;
   }
 
@@ -45,6 +44,7 @@
   &.user-list {
     list-style: none;
     padding-left: 0;
+    margin-top: -10px;
   }
   &.user-item {
     display: flex;
@@ -58,7 +58,7 @@
   }
   &.username {
     font-weight: 500;
-    color: $accentBottom;
+    color: white;
   }
   &.id {
     margin-left: auto;

@@ -10,13 +10,12 @@ import Confetti from "react-confetti";
 
 const Player = ({ user, index }) => {
   // Calculate the total points by summing up all the points in the array
-  //const totalPoints = user.stats.points.reduce((acc, current) => acc + current, 0);
-  // EXCHANGE x WITCH {totalPoints}
+  const totalPoints = user.stats.points.reduce((acc, current) => acc + current, 0);
 
   return (
-    <div className="leaderboard container">
+    <div>
       <div className="leaderboard username">
-        {index + 1}. {user.username} points: x
+        {index + 1}. {user.username} points: {totalPoints}
       </div>
     </div>
   );
@@ -29,7 +28,6 @@ Player.propTypes = {
 
 const FinalLeader = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState<User[]>(null);
   const [lobby, setLobby] = useState<Lobby[]>({});
   const [players, setPlayers] = useState([]);
   const mockplayers = [
@@ -42,7 +40,12 @@ const FinalLeader = () => {
     async function fetchData() {
       try {
         const response = await api.get("/lobby/players", JSON.stringify(localLobbyName));
-        setPlayers(response.data);
+        const sortedPlayers = response.data.sort((a, b) => {
+          const totalPointsA = a.stats.points.reduce((acc, current) => acc + current, 0);
+          const totalPointsB = b.stats.points.reduce((acc, current) => acc + current, 0);
+          return totalPointsB - totalPointsA;
+        });
+        setPlayers(sortedPlayers);
         console.log(response.data);
       } catch (error) {
         console.error(
@@ -66,7 +69,7 @@ const FinalLeader = () => {
           <h2 className="leaderboard centered-text">Final Ranking</h2>
           <ul className="leaderboard user-list">
             {players.map((player, index) => (
-              <li key={index} className="lobby li">
+              <li key={index} className="leaderboard li">
                 <Player user={player} index={index} />
               </li>
             ))}
