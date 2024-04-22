@@ -124,7 +124,7 @@ const Game = () => {
           <FormField
             label="country"
             value={country}
-            onChange={(coountry: string) => setCountry(country)}
+            onChange={(country: string) => setCountry(country)}
           />
           <FormField
             label="city"
