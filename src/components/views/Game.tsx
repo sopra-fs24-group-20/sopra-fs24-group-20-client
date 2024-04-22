@@ -42,20 +42,22 @@ const Game = () => {
   const [celebrity, setCelebrity] = useState<string>("");
   const [error, setError] = useState(null);
 
-  const getFormattedData = (category: string, username: string, answer: string) => {
+  const getFormattedData = (category1: string, category2: string, category3: string, category4: string, answer1: string, answer2: string, answer3: string, answer4: string, username: string) => {
     const data = {
-      Round:1,
-      Category: category,
-      [username]: answer
+      username: username,
+      [category1]: answer1,
+      [category2]: answer2,
+      [category3]: answer3,
+      [category4]: answer4
     };
     return JSON.stringify(data);
   };
 
-  const submitAnswers = async (category, data) =>{
+  const submitAnswers = async (data) =>{
     try{
       await api.put(`/round/${gameId}/entries`, data);
     }catch(error){
-      throw new Error(`Error submitting ${category} data`)
+      throw new Error(`Error submitting data`)
     }
   };
 
@@ -64,16 +66,11 @@ const Game = () => {
     // send something to backend so game stops for everyone with websocket stuff
 
 
-    const countryans = getFormattedData("country", username, country);
-    const cityans = getFormattedData("city", username, city);
-    const professionans = getFormattedData("profession", username, profession);
-    const celebrityans = getFormattedData("celebrity", username, celebrity);
+    const answers = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
+
     // send the answers to backend for verification
     try{
-      await submitAnswers("country", countryans);
-      await submitAnswers("city", cityans);
-      await submitAnswers("profession", professionans);
-      await submitAnswers("celebrity", celebrityans);
+      await submitAnswers(answers);
     }catch(error){
       setError("Error submitting data");
       return;
@@ -127,22 +124,22 @@ const Game = () => {
           <FormField
             label="country"
             value={country}
-            onChange={(co: string) => setCountry(co)}
+            onChange={(coountry: string) => setCountry(country)}
           />
           <FormField
             label="city"
             value={city}
-            onChange={(ci: string) => setCity(ci)}
+            onChange={(city: string) => setCity(city)}
           />
           <FormField
             label="profession"
             value={profession}
-            onChange={(pr: string) => setProfession(pr)}
+            onChange={(profession: string) => setProfession(profession)}
           />
           <FormField
             label="celebrity"
             value={celebrity}
-            onChange={(ce: string) => setCelebrity(ce)}
+            onChange={(celebrity: string) => setCelebrity(celebrity)}
           />
         </div>
         <div className="game button-container">
