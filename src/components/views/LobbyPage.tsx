@@ -29,8 +29,8 @@ const LobbyPage = () => {
   const [ready_ws, setReadyWS] = useState(null);
 
   useEffect(() => {
-    fetchPlayers();
     async function stompConnect() {
+      fetchPlayers();
       try {
         if (!client["connected"]) {
           client.connect({}, function () {
@@ -62,7 +62,7 @@ const LobbyPage = () => {
   const exit = async () => {
     try {
       await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
-      navigate(`/profile/${local_username}`);
+      navigate(`/user/${local_username}`);
     } catch (error) {
       alert(
         `Something went wrong during exiting the lobby: \n${handleError(error)}`
@@ -88,7 +88,7 @@ const LobbyPage = () => {
 
   async function fetchPlayers() {
     try {
-      console.log("HELLOOOOOOO")
+      console.log("FETCHPLAYERS")
       const response = await api.get("/lobby/players", JSON.stringify(localLobbyName));
       setPlayers(response.data);
 
@@ -101,7 +101,6 @@ const LobbyPage = () => {
         }
         navigate(`/game/${localLobbyName}`);
       }
-      console.log(response.data)
     } catch (error) {
       alert("Something went wrong while fetching the lobby data.");
       console.log(error)
