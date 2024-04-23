@@ -45,9 +45,8 @@ const CreateLobby = () => {
       const response = await api.post("/lobby/create", requestBody);
       if (response.status === 201) {
         localStorage.setItem("lobbyName", lobbyName);
-        console.log("lobbyname in storage")
-        localStorage.setItem("lobbyId", response.data.id);
-        console.log("lobbyid in storage")
+        console.log(response.data);
+        localStorage.setItem("lobbyId", response.data.lobbyId);
         /* try {
           // Make a request to get the game ID
           const gameIdResponse = await api.get(`/${response.data.id}/gameId`);
@@ -62,9 +61,6 @@ const CreateLobby = () => {
           console.error("Error while retrieving game ID:", error);
         }*/ 
         localStorage.setItem("gameId", "1");
-        console.log(response.data)
-        console.log("gameid in storage")
-        console.log(response.data.message)
         navigate(`/lobby/${lobbyName}`);
       } else if (response.status === 400) {
         console.log("lobby already exists")

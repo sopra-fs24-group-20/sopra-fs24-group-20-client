@@ -71,15 +71,11 @@ const JoinLobby = () => {
         lobbyPassword: LobbyPassword,
         username: username
       };
-      console.log(LobbyPassword);
-      console.log(LobbyName);
-      console.log(username);
+
       const response = await api.post("/lobby/join", requestBody);
       if (response.status === 200) {
         localStorage.setItem("lobbyName", LobbyName);
-        console.log("lobbyname in storage")
-        localStorage.setItem("lobbyId", response.data.id);
-        console.log("lobbyid in storage")
+        localStorage.setItem("lobbyId", response.data.lobbyId);
         localStorage.setItem("gameId", "1");
         /*try {
           // Make a request to get the game ID
@@ -94,9 +90,6 @@ const JoinLobby = () => {
         } catch (error) {
           console.error("Error while retrieving game ID:", error);
         }*/
-        console.log(response.data)
-        console.log("gameid in storage")
-        console.log(response.data.message)
         client.send("/topic/lobby_join", {}, "{}");
         navigate(`/lobby/${LobbyName}`);
       } else if (response.status === 400) {

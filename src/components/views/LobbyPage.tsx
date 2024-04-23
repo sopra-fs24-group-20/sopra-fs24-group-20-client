@@ -35,11 +35,11 @@ const LobbyPage = () => {
         if (!client["connected"]) {
           client.connect({}, function () {
             client.send("/app/connect", {}, JSON.stringify({ username: local_username }));
-            client.send("/topic/lobby_join", {}, "{}");
+            client.send("/topic/join", {}, "{}");
             client.subscribe("/topic/ready-count", function (response) {
+              fetchPlayers();
               const data = JSON.parse(response.body);
               setReadyWS(data);
-              fetchPlayers();
             });
             client.subscribe("/topic/lobby_join", function (response) {
               const data = JSON.parse(response.body);
@@ -61,8 +61,8 @@ const LobbyPage = () => {
 
   const exit = async () => {
     try {
-      await api.put(`/lobby/leave/${localLobbyId}`, JSON.stringify({lobbyName: localLobbyName, username: local_username}) );
-      navigate(`/user/${local_username}`);
+      await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
+      navigate(`/profile/${local_username}`);
     } catch (error) {
       alert(
         `Something went wrong during exiting the lobby: \n${handleError(error)}`
@@ -88,6 +88,7 @@ const LobbyPage = () => {
 
   async function fetchPlayers() {
     try {
+      console.log("HELLOOOOOOO")
       const response = await api.get("/lobby/players", JSON.stringify(localLobbyName));
       setPlayers(response.data);
 
