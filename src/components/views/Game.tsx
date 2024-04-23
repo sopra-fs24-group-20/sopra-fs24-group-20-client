@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { api, handleError } from "helpers/api";
+import { api, handleError, client } from "helpers/api";
 import { Button } from "components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
@@ -42,6 +42,40 @@ const Game = () => {
   const [celebrity, setCelebrity] = useState<string>("");
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
+    async function stompConnect() {
+      try {
+        if (!client["connected"]) {
+          client.connect({}, function () {
+            client.send("/app/connect", {}, JSON.stringify({ username: username }));
+            client.subscribe("/topic/stop-game", function (response) {
+              const data = JSON.parse(response.body);
+              if (data.command === "stop") {
+                getStop();
+              }
+              console.log(data.body);
+            });
+          });
+        }
+      } catch (error) {
+        console.error(`Something went wrong: \n${handleError(error)}`);
+        console.error("Details:", error);
+        alert("Something went wrong! See the console for details.");
+      }
+    }
+    stompConnect();
+    // return a function to disconnect on unmount
+
+    return function cleanup() {
+      if (client && client["connected"]) {
+        client.disconnect(function () {
+          console.log("disconnected from stomp");
+        });
+      }
+    };
+  }, []);
+
   const getFormattedData = (category1: string, category2: string, category3: string, category4: string, answer1: string, answer2: string, answer3: string, answer4: string, username: string) => {
     const data = {
       [username]: {
@@ -49,7 +83,6 @@ const Game = () => {
         [category2]: answer2,
         [category3]: answer3,
         [category4]: answer4
-
       }
     };
 
@@ -64,7 +97,26 @@ const Game = () => {
     }
   };
 
+  const getStop = async () => {
+    clearInterval(countdownInterval); // Stop the countdown timer
+    // send something to backend so game stops for everyone with websocket stuff
+
+
+    const answers = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
+
+    // send the answers to backend for verification
+    try{
+      await submitAnswers(answers);
+    }catch(error){
+      setError("Error submitting data");
+
+      return;
+    }
+    navigate(`/leaderboard/final/${lobbyName}`);
+  };
+
   const doStop = async () => {
+    client.send("/topic/stop-game", {}, "{}");
     clearInterval(countdownInterval); // Stop the countdown timer
     // send something to backend so game stops for everyone with websocket stuff
 
