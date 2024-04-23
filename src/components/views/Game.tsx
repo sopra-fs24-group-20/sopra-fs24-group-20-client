@@ -99,9 +99,6 @@ const Game = () => {
 
   const getStop = async () => {
     clearInterval(countdownInterval); // Stop the countdown timer
-    // send something to backend so game stops for everyone with websocket stuff
-
-
     const answers = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
 
     // send the answers to backend for verification
@@ -118,9 +115,6 @@ const Game = () => {
   const doStop = async () => {
     client.send("/topic/stop-game", {}, "{}");
     clearInterval(countdownInterval); // Stop the countdown timer
-    // send something to backend so game stops for everyone with websocket stuff
-
-
     const answers = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
 
     // send the answers to backend for verification
