@@ -91,7 +91,7 @@ const Game = () => {
 
   const submitAnswers = async (data) =>{
     try{
-      await api.put("/round/answers/player", data);
+      await api.put("/rounds/answers/player", data);
     }catch(error){
       throw new Error("Error submitting data")
     }
@@ -131,7 +131,7 @@ const Game = () => {
   const getLetter = async () => {
     try {
       await api.put(`/players/${username}`, JSON.stringify({ready: false}));
-      const response = await api.get(`/round/letters/${gameId}`);
+      const response = await api.get(`/rounds/letters/${gameId}`);
       setLetter(response.data);
     } catch (error) {
       console.log("Error fetching the current letter");
