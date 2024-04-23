@@ -84,7 +84,6 @@ const EvaluationScreen = () => {
   }
 
 
-
   useEffect(() => {
     async function fetchData() {
       try {

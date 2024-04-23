@@ -52,14 +52,15 @@ const Game = () => {
 
       }
     };
+
     return JSON.stringify(data);
   };
 
   const submitAnswers = async (data) =>{
     try{
-      await api.put(`/round/answers/player`, data);
+      await api.put("/round/answers/player", data);
     }catch(error){
-      throw new Error(`Error submitting data`)
+      throw new Error("Error submitting data")
     }
   };
 
@@ -75,6 +76,7 @@ const Game = () => {
       await submitAnswers(answers);
     }catch(error){
       setError("Error submitting data");
+
       return;
     }
     navigate(`/leaderboard/final/${lobbyName}`);
@@ -94,7 +96,6 @@ const Game = () => {
     getLetter();
     setTimeout(startCountdown, 1); // Delay startCountdown by 1 second
   }, []);
-
 
 
   const startCountdown = () => {

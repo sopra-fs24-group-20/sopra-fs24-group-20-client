@@ -43,6 +43,7 @@ const FinalLeader = () => {
         const sortedPlayers = response.data.sort((a, b) => {
           const totalPointsA = a.stats.points.reduce((acc, current) => acc + current, 0);
           const totalPointsB = b.stats.points.reduce((acc, current) => acc + current, 0);
+
           return totalPointsB - totalPointsA;
         });
         setPlayers(sortedPlayers);
@@ -78,7 +79,7 @@ const FinalLeader = () => {
             Back to Lobby
           </Button>
           <Confetti
-            colors={['#64f1f1','#9135a4','#ff03bf','#e8d152','#c0c0c0']}
+            colors={["#64f1f1","#9135a4","#ff03bf","#e8d152","#c0c0c0"]}
             width={window.innerWidth}
             height={window.innerHeight}>
           </Confetti>

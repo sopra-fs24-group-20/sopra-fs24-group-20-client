@@ -43,7 +43,6 @@ const ProfilePage = () => {
   };
 
 
-
   useEffect(() => {
     async function fetchData() {
       try {
@@ -67,14 +66,14 @@ const ProfilePage = () => {
             <h1 className="profile top-text">{user?.username}</h1>
             <div>
               <p>
-                 <a href="#" onClick={handleClick}>logout</a>
+                <a href="#" onClick={handleClick}>logout</a>
               </p>
             </div>
           </div>
 
           <div className="profile right-axis">
             <div className="profile button-container">
-            <Button
+              <Button
                 className="secondary-button"
                 width="60%"
                 onClick={() => navigate("/CreateLobby")}

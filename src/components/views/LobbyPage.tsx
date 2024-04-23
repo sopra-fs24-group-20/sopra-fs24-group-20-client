@@ -32,7 +32,7 @@ const LobbyPage = () => {
     fetchPlayers();
     async function stompConnect() {
       try {
-        if (!client['connected']) {
+        if (!client["connected"]) {
           client.connect({}, function () {
             client.send("/app/connect", {}, JSON.stringify({ username: local_username }));
             client.send("/topic/lobby_join", {}, "{}");
@@ -93,9 +93,9 @@ const LobbyPage = () => {
 
       if (players_ready(response.data) === response.data.length) {
         // before leaving the lobby page, disconnect ws
-        if (client && client['connected']) {
+        if (client && client["connected"]) {
           client.disconnect(function () {
-            console.log('disconnected from stomp');
+            console.log("disconnected from stomp");
           });
         }
         navigate(`/game/${localLobbyName}`);
@@ -106,8 +106,6 @@ const LobbyPage = () => {
       console.log(error)
     }
   }
-
-
 
 
   return (
