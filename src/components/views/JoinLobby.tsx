@@ -34,7 +34,7 @@ const JoinLobby = () => {
   const [error, setError] = useState(null);
 
   const username = localStorage.getItem("username");
-
+/*
   useEffect(() => {
     // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
     async function stompConnect() {
@@ -63,7 +63,7 @@ const JoinLobby = () => {
       }
     };
   }, []);
-
+*/
   const doJoinLobby = async () => {
     try {
       const requestBody = {
@@ -90,7 +90,7 @@ const JoinLobby = () => {
         } catch (error) {
           console.error("Error while retrieving game ID:", error);
         }*/
-        client.send("/topic/lobby_join", {}, "{}");
+        //client.send("/topic/lobby_join", {}, "{}");
         navigate(`/lobby/${LobbyName}`);
       } else if (response.status === 400) {
         setError("Join lobby failed because password doesn't match");
