@@ -20,11 +20,11 @@ const EvaluationScreen = () => {
   const [answers, setAnswers] = useState<String[]>(null);
   const [currentCategory, setCurrentCategory] = useState(null);
   const [nextCategory, setNextCategory] = useState(null);
-  const [rounds, setRounds] = useState(null);
-  const [currentRound, setCurrentRound] = useState(null);
+  const [scores, setScores] = useState<number[]>(null);
 
-  const mockAnswersOne = {"One" : "Dublin", "Two": "Dusseldorf"};
-  const mockAnswersTwo =  {"One": "Denmark", "Two": "Denmark"};
+
+  const mockAnswersOne = {"One" : {score: 10, answer:"Dusseldorf"}, "Two": {score: 10, answer:"Dublin"}};
+  const mockAnswersTwo =  {"One" : {score: 10, answer:"Denmark"}, "Two": {score: 10, answer:"Denmark"}};
   const mockPlayersAnswers = {"City": mockAnswersOne, "Country": mockAnswersTwo};
 
   const leaveLobby = async (requestBody: string) => {
@@ -61,42 +61,39 @@ const EvaluationScreen = () => {
     return Object.keys(playersAnswers[categories[0]]);
   }
 
-  function getPlayerAnswersForCategory(playersAnswers, category) {
+  function getScoresForCategory(playersAnswers,category) {
     const playerAnswersList = [];
     for (const playerName in playersAnswers[Object.keys(playersAnswers)[0]]) {
       if (playersAnswers.hasOwnProperty(category)) {
-        playerAnswersList.push(playersAnswers[category][playerName]);
+        playerAnswersList.push(playersAnswers[category][playerName].score);
       }
     }
 
     return playerAnswersList;
   }
 
-  function changeCategory() {
-    if (localStorage.getItem("nextCategory")) {
-      setCurrentCategory(localStorage.getItem("nextCategory"));
-      const index = categories.indexOf(currentCategory);
-      if (index !== -1 && index < categories.length - 1) {
-        setNextCategory(categories[index + 1]);
-        localStorage.setItem("nextCategory",nextCategory);
-      }
-      else {
-        localStorage.removeItem("nextCategory");
+  function getPlayerAnswersForCategory(playersAnswers, category) {
+    const playerAnswersList = [];
+    for (const playerName in playersAnswers[Object.keys(playersAnswers)[0]]) {
+      if (playersAnswers.hasOwnProperty(category)) {
+        playerAnswersList.push(playersAnswers[category][playerName].answer);
       }
     }
-    else {
-      localStorage.setItem("currentCategory",categories[0]);
-      setCurrentCategory(categories[0]);
-      if (categories.length > 1) {
-        localStorage.setItem("nextCategory",categories[1]);
-      }
+
+    return playerAnswersList;
+  }
+
+  function changeCategory(allCategories) {
+    if (!localStorage.getItem("categoryIndex")) {
+      localStorage.setItem("categoryIndex","0");
     }
+    setCurrentCategory(allCategories[parseInt(localStorage.getItem('categoryIndex'), 10)]);
   }
 
   const mockAnswers = getPlayerAnswersForCategory(mockPlayersAnswers,"City");
   const mockCategories = getCategories(mockPlayersAnswers);
   const mockPlayers = getPlayerNames(mockPlayersAnswers);
-
+  const mockScores = getScoresForCategory(mockPlayersAnswers, "City");
 
   const handleClick = () => {
     const requestBody = JSON.stringify({
@@ -108,11 +105,20 @@ const EvaluationScreen = () => {
   };
 
   const nextEval = () => {
-    if (localStorage.getItem("nextCategory")) {
-      navigate(`/evaluation/${lobbyName}/${nextCategory}`);
+    if (localStorage.getItem("categoryIndex")) {
+      if (parseInt(localStorage.getItem('categoryIndex'), 10) <= categories.length-1) {
+        const newIndex = parseInt(localStorage.getItem('categoryIndex'), 10) + 1;
+        localStorage.setItem("categoryIndex", newIndex.toString());
+        console.log(localStorage.getItem("categoryIndex"));
+        navigate(`/evaluation/${lobbyName}/${categories[newIndex]}`);
+      }
+      else {
+        localStorage.removeItem("currentIndex");
+        navigate(`/leaderboard/final/${lobbyName}`);
+      }
     }
     else {
-      navigate(`/leaderboard/final/${lobbyName}`);
+      navigate(`/start`);
     }
   }
 
@@ -120,12 +126,20 @@ const EvaluationScreen = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await api.get(`/round/scores/${gameId}`, gameId);
-        setPlayers(getPlayerNames(response.data));
-        setCategories(getCategories(response.data));
-        changeCategory();
+        console.log(gameId);
+        const response = await api.get(`/rounds/scores/${gameId}`,gameId);
+        const fetchedPlayers = getPlayerNames(response.data);
+        const fetchedCategories = getCategories(response.data);
+        setPlayers(fetchedPlayers);
+        setCategories(fetchedCategories);
+        changeCategory(fetchedCategories);
         setAnswers(getPlayerAnswersForCategory(response.data,currentCategory));
-
+        setScores(getScoresForCategory(response.data,currentCategory));
+        console.log(fetchedPlayers);
+        console.log(fetchedCategories);
+        console.log(answers);
+        console.log(scores);
+        console.log(response.data);
       } catch (error) {
         console.error(
           `Something went wrong while fetching the players: \n${handleError(
@@ -139,7 +153,7 @@ const EvaluationScreen = () => {
       }
     }
     fetchData();
-  }, [gameId]);
+  }, [gameId, currentCategory, setPlayers, setCategories, setAnswers, setScores]);
 
   return (
     <BaseContainer>
@@ -162,7 +176,7 @@ const EvaluationScreen = () => {
               </div>
               <div className="evaluation transparent-form-exception">
                 <ul className="evaluation ul">
-                  {mockPlayers.map((player, index) => (
+                  {players?.map((player, index) => (
                     <li key={index} className="evaluation li">{player}</li>
                   ))}
                 </ul>
@@ -170,11 +184,13 @@ const EvaluationScreen = () => {
             </div>
 
             <div className="evaluation middle-left-axis">
-              {currentCategory}
+              <h1>{currentCategory}</h1>
               <div className="evaluation transparent-form-normal">
                 <ul className="evaluation ul">
-                  {mockAnswers.map((answer, index) => (
-                    <li key={index} className="evaluation li">{answer}</li>
+                  {answers?.map((answer, index) => (
+                    <li key={index} className="evaluation li">
+                      {answer}   -   {mockScores[index]}
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -182,22 +198,22 @@ const EvaluationScreen = () => {
 
             <div className="evaluation middle-axis">
               Bonus
-              {mockPlayers.map((_, index) => (
+              {players?.map((_, index) => (
                 <button
                   key={index}
                   className="round-button-green"
-                  style={{ marginTop: index === 0 ? "60px" : 0 }}
+                  style={{ marginTop: index === 0 ? "39px" : 0 }}
                 ></button>
               ))}
             </div>
 
             <div className="evaluation middle-right-axis">
               Veto
-              {mockPlayers.map((_, index) => (
+              {players?.map((_, index) => (
                 <button
                   key={index}
                   className="round-button-red"
-                  style={{ marginTop: index === 0 ? "60px" : 0 }}
+                  style={{ marginTop: index === 0 ? "39px" : 0 }}
                 ></button>
               ))}
             </div>

@@ -16,6 +16,7 @@ import {CreateLobbyGuard } from "../routeProtectors/CreateLobbyGuard";
 import {LobbyGuard} from "../routeProtectors/LobbyGuard";
 import LobbyPage from "../../views/LobbyPage";
 import EvaluationScreen from "../../views/EvaluationScreen";
+import {EvaluationGuard} from "../routeProtectors/EvaluationGuard";
 import { LeaderboardGuard } from "../routeProtectors/LeaderboardGuard";
 import FinalLeader from "../../views/FinalLeader";
 
@@ -48,8 +49,8 @@ const AppRouter = () => {
           <Route path="/user/:username" element={<ProfilePage />} />
         </Route>
 
-        <Route path="/evaluation" element={<UserGuard />}>
-          <Route path="/evaluation" element={<EvaluationScreen />} />
+        <Route path="/evaluation/:lobbyname/:category" element={<EvaluationGuard />}>
+          <Route path="/evaluation/:lobbyname/:category" element={<EvaluationScreen />} />
         </Route>
 
         <Route path="/joinlobby" element={<JoinLobbyGuard/>}>

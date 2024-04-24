@@ -110,7 +110,7 @@ const Game = () => {
 
       return;
     }
-    navigate(`/evaluation/${lobbyName}/country`);
+    navigate(`/evaluation/${lobbyName}/profession`);
   };
 
   const doStop = async () => {
@@ -126,7 +126,7 @@ const Game = () => {
 
       return;
     }
-    navigate(`/evaluation/${lobbyName}/country`);
+    navigate(`/evaluation/${lobbyName}/profession`);
   };
 
   const getLetter = async () => {
