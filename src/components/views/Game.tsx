@@ -90,7 +90,8 @@ const Game = () => {
   const submitAnswers = async (data) =>{
     console.log(data);
     try{
-      await api.post("/rounds/${gameId}/entries", data);
+      await api.post(`/rounds/${gameId}/entries`, data);
+
     }catch(error){
       throw new Error("Error submitting data")
     }
