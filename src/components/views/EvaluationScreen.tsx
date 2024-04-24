@@ -97,6 +97,7 @@ const EvaluationScreen = () => {
   const mockCategories = getCategories(mockPlayersAnswers);
   const mockPlayers = getPlayerNames(mockPlayersAnswers);
 
+
   const handleClick = () => {
     const requestBody = JSON.stringify({
       lobbyName: lobbyName,
@@ -114,6 +115,7 @@ const EvaluationScreen = () => {
       navigate(`/leaderboard/final/${lobbyName}`);
     }
   }
+
 
   useEffect(() => {
     async function fetchData() {

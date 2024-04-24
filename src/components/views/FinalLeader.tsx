@@ -9,13 +9,10 @@ import { Lobby, User } from "types";
 import Confetti from "react-confetti";
 
 const Player = ({ user, index }) => {
-  // Calculate the total points by summing up all the points in the array
-  const totalPoints = user.stats.points.reduce((acc, current) => acc + current, 0);
-
   return (
     <div>
       <div className="leaderboard username">
-        {index + 1}. {user.username} points: {totalPoints}
+        {index + 1}. {user.username} {user.points}pt
       </div>
     </div>
   );
@@ -30,21 +27,22 @@ const FinalLeader = () => {
   const navigate = useNavigate();
   const [lobby, setLobby] = useState<Lobby[]>({});
   const [players, setPlayers] = useState([]);
-  const mockplayers = [
-    { ready: false, stats: { points: [1, 2, 3] }, username: "u1" },
-    { ready: false, stats: { points: [5, 5, 5] }, username: "u2" }
-  ];  const localLobbyName = localStorage.getItem(("lobbyName"));
+  const mockplayers = { "barbara": 30 , "paul": 25, "glory":20,"joshi":35 };
+  const localLobbyName = localStorage.getItem(("lobbyName"));
+  const sortedMOCKPlayers: { username: string; points: number }[] = Object.entries(mockplayers)
+    .map(([username, points]: [string, number]) => ({ username, points }))
+    .sort((a, b) => b.points - a.points);
+
 
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await api.get("/lobby/players", JSON.stringify(localLobbyName));
-        const sortedPlayers = response.data.sort((a, b) => {
-          const totalPointsA = a.stats.points.reduce((acc, current) => acc + current, 0);
-          const totalPointsB = b.stats.points.reduce((acc, current) => acc + current, 0);
-          return totalPointsB - totalPointsA;
-        });
+        const response = await api.get(`/rounds/leaderboard/${1}`);
+        const sortedPlayers: { username: string; points: number }[] = Object.entries(response.data)
+          .map(([username, points]: [string, number]) => ({ username, points }))
+          .sort((a, b) => b.points - a.points);
+
         setPlayers(sortedPlayers);
         console.log(response.data);
       } catch (error) {
@@ -78,8 +76,9 @@ const FinalLeader = () => {
             Back to Lobby
           </Button>
           <Confetti
-            colors={['#64f1f1','#9135a4','#ff03bf','#e8d152','#c0c0c0']}
+            colors={["#64f1f1","#9135a4","#ff03bf","#e8d152","#c0c0c0"]}
             width={window.innerWidth}
+            numberOfPieces={500}
             height={window.innerHeight}>
           </Confetti>
         </div>

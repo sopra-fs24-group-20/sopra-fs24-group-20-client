@@ -52,9 +52,9 @@ const AppRouter = () => {
           <Route path="/evaluation" element={<EvaluationScreen />} />
         </Route>
 
-         <Route path="/joinlobby" element={<JoinLobbyGuard/>}>
+        <Route path="/joinlobby" element={<JoinLobbyGuard/>}>
           <Route path="/joinlobby" element={<JoinLobby/>} />
-         </Route> */
+        </Route> */
 
         <Route path="/createlobby" element={<CreateLobbyGuard/>}>
           <Route path="/createlobby" element={<CreateLobby/>} />

@@ -12,36 +12,15 @@ const ProfilePage = () => {
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const logout = async (username: string) => {
-    if (username === null){
-      console.log("no id saved logout")
-      navigate("/start");
-    }
-    try {
-      const response = await api.get(`/players/${localStorage.getItem("username")}`);
-      console.log("id saved and exists logout");
-      await api.put(`/logout/${id}`);
-      localStorage.removeItem("username");
-      // localStorage.removeItem("id");
-      navigate("/start");
-    } catch (error) {
-      if (error.response.status === 404){
-        console.log("id saved but doesn't exist logout");
-        localStorage.removeItem("username");
-        // localStorage.removeItem("id");
-        navigate("/start");
-      }
-      console.error(
-        `An error occurred while checking user authorization: \n${handleError(error)}`
-      );
-    }
+  const logout = async () => {
+    localStorage.clear();
+    navigate("/start");
   };
 
 
   const handleClick = () => {
-    logout(localStorage.getItem("username"))
+    logout()
   };
-
 
 
   useEffect(() => {
@@ -67,14 +46,14 @@ const ProfilePage = () => {
             <h1 className="profile top-text">{user?.username}</h1>
             <div>
               <p>
-                 <a href="#" onClick={handleClick}>logout</a>
+                <a className="profile link" href="#" onClick={handleClick}>logout</a>
               </p>
             </div>
           </div>
 
           <div className="profile right-axis">
             <div className="profile button-container">
-            <Button
+              <Button
                 className="secondary-button"
                 width="60%"
                 onClick={() => navigate("/CreateLobby")}

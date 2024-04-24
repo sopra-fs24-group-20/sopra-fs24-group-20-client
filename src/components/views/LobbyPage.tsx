@@ -27,29 +27,32 @@ const LobbyPage = () => {
   const [readyButtonClicked, setButtonClicked] = useState(false);
   const localLobbyId = localStorage.getItem(("lobbyId"))
   const [ready_ws, setReadyWS] = useState(null);
+  const [new_join, setNewJoinWS] = useState(null);
 
   useEffect(() => {
-    fetchPlayers();
     async function stompConnect() {
+      fetchPlayers();
       try {
-        if (!client['connected']) {
-          client.connect({}, function () {
-            client.send("/app/connect", {}, JSON.stringify({ username: local_username }));
-            client.send("/topic/lobby_join", {}, "{}");
-            client.subscribe("/topic/ready-count", function (response) {
-              const data = JSON.parse(response.body);
-              setReadyWS(data);
-              fetchPlayers();
-            });
-            client.subscribe("/topic/lobby_join", function (response) {
-              const data = JSON.parse(response.body);
-              if (data.command === "new-join") {
-                fetchPlayers();
-              }
-              console.log(data.body);
-            });
+        client.connect({}, function () {
+          client.send("/app/connect", {}, JSON.stringify({ username: local_username }));
+          client.send("/topic/join", {}, "{}");
+          client.subscribe("/topic/ready-count", function (response) {
+            const data = JSON.parse(response.body);
+            fetchPlayers();
+            setReadyWS(data.command);
+            console.log(data.command);
+            if (data.command === "start"){
+              start_game();
+            }
           });
-        }
+          client.subscribe("/topic/lobby_join", function (response) {
+            const data = JSON.parse(response.body);
+            if (data.command === "new-join") {
+              setNewJoinWS(response.body);
+              fetchPlayers();
+            }
+          });
+        });
       } catch (error) {
         console.error(`Something went wrong: \n${handleError(error)}`);
         console.error("Details:", error);
@@ -57,11 +60,11 @@ const LobbyPage = () => {
       }
     }
     stompConnect();
-  }, []);
+  }, [local_username, ready_ws, new_join]);
 
   const exit = async () => {
     try {
-      await api.put(`/lobby/leave/${localLobbyId}`, JSON.stringify({lobbyName: localLobbyName, username: local_username}) );
+      await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
       navigate(`/user/${local_username}`);
     } catch (error) {
       alert(
@@ -74,7 +77,6 @@ const LobbyPage = () => {
       await api.put(`/players/${local_username}`, JSON.stringify({ready: true}));
       setButtonClicked(true);
       client.send("/app/ready-up", {}, JSON.stringify({ username: local_username }));
-      console.log("ws ready send");
     } catch (error) {
       alert(
         `Something went wrong while preparing the game: \n${handleError(error)}`
@@ -85,29 +87,33 @@ const LobbyPage = () => {
     return players.filter(player => player.ready).length;
   };
 
+  const start_game = async () => {
+    try {
+      // before leaving the lobby page, disconnect ws
+      if (client && client["connected"]) {
+        client.disconnect(function () {
+          console.log("disconnected from stomp");
+        });
+      }
+      navigate(`/game/${localLobbyName}`);
+    } catch (error) {
+      alert(
+        `Something went wrong while preparing the game: \n${handleError(error)}`
+      );
+    }
+  };
 
-  async function fetchPlayers() {
+  const fetchPlayers = async () => {
     try {
       const response = await api.get("/lobby/players", JSON.stringify(localLobbyName));
       setPlayers(response.data);
+      console.log(response.data);
 
-      if (players_ready(response.data) === response.data.length) {
-        // before leaving the lobby page, disconnect ws
-        if (client && client['connected']) {
-          client.disconnect(function () {
-            console.log('disconnected from stomp');
-          });
-        }
-        navigate(`/game/${localLobbyName}`);
-      }
-      console.log(response.data)
     } catch (error) {
       alert("Something went wrong while fetching the lobby data.");
       console.log(error)
     }
   }
-
-
 
 
   return (

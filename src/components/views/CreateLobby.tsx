@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { api, handleError } from "helpers/api";
+import React, { useEffect, useState } from "react";
+import { api, handleError, client } from "helpers/api";
 import User from "models/User";
 import { useNavigate } from "react-router-dom";
 import { Button } from "components/ui/Button";
 import "styles/views/Authentication.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
+import JoinLobby from "./JoinLobby";
 
 const FormField = (props) => {
   return (
@@ -34,21 +35,50 @@ const CreateLobby = () => {
   const [error, setError] = useState(null);
 
   const username = localStorage.getItem("username");
+/*
+  useEffect(() => {
+    // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
+    async function stompConnect() {
+      try {
+        if (!client["connected"]) {
+          client.connect({}, function () {
+            client.send("/app/connect", {}, JSON.stringify({ username: username }));
+            client.subscribe("/topic/lobby_join", function (response) {
+            });
+          });
+        }
+      } catch (error) {
+        console.error(`Something went wrong: \n${handleError(error)}`);
+        console.error("Details:", error);
+        alert("Something went wrong! See the console for details.");
+      }
+    }
+    stompConnect();
+    // return a function to disconnect on unmount
 
-  const doCreateLobby = async () => {
+    return function cleanup() {
+      if (client && client["connected"]) {
+        client.disconnect(function () {
+          console.log("disconnected from stomp");
+        });
+      }
+    };
+  }, []);
+*/
+  const doJoinLobby = async () => {
     try {
       const requestBody = {
         lobbyName: lobbyName,
         lobbyPassword: lobbyPassword,
-        ownerUsername: username,
+        username: username
       };
-      const response = await api.post("/lobby/create", requestBody);
-      if (response.status === 201) {
+
+      const response = await api.post("/lobby/join", requestBody);
+      if (response.status === 200) {
         localStorage.setItem("lobbyName", lobbyName);
-        console.log("lobbyname in storage")
-        localStorage.setItem("lobbyId", response.data.id);
-        console.log("lobbyid in storage")
-        try {
+        localStorage.setItem("lobbyId", response.data.lobbyId);
+        localStorage.setItem("gameId", "1");
+        /*try {
           // Make a request to get the game ID
           const gameIdResponse = await api.get(`/${response.data.id}/gameId`);
           if (gameIdResponse.status === 200) {
@@ -60,15 +90,32 @@ const CreateLobby = () => {
           }
         } catch (error) {
           console.error("Error while retrieving game ID:", error);
-        }
-        // localStorage.setItem("gameId", response.data.game.id);
-        console.log(response.data)
-        console.log("gameid in storage")
-        console.log(response.data.message)
+        }*/
+        //client.send("/topic/lobby_join", {}, "{}");
         navigate(`/lobby/${lobbyName}`);
       } else if (response.status === 400) {
+        setError("Join lobby failed because password doesn't match");
+      } else if (response.status === 404) {
+        setError("Join lobby failed because lobby doesn't exist");
+      }
+    } catch (error) {
+      setError("An error occurred while joining the lobby");
+    }
+  };
+
+  const doCreateLobby = async () => {
+    const createBody = {
+      lobbyName: lobbyName,
+      lobbyPassword: lobbyPassword,
+      ownerUsername: username,
+    };
+    try {
+      const create_response = await api.post("/lobby/create", createBody);
+      if (create_response.status === 201) {
+        await doJoinLobby();
+      } else if (create_response.status === 400) {
         console.log("lobby already exists")
-        const errorMessage = response.data.message;
+        const errorMessage = create_response.data.message;
         setError(errorMessage);
       }
     } catch (error) {

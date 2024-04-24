@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { api, handleError } from "helpers/api";
+import { api, handleError, client } from "helpers/api";
 import { Button } from "components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
@@ -29,7 +29,7 @@ FormField.propTypes = {
 
 const Game = () => {
   const navigate = useNavigate();
-  const [letter, setLetter] = useState<string>("A");
+  const [letter, setLetter] = useState<string>("");
   const [countdown, setCountdown] = useState<number>(60); // Initial countdown value set to 60 seconds
   const [countdownInterval, setCountdownInterval] = useState<any>(null); // State variable for interval ID
   const lobbyName = localStorage.getItem("lobbyName");
@@ -42,32 +42,63 @@ const Game = () => {
   const [celebrity, setCelebrity] = useState<string>("");
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
+    async function stompConnect() {
+      try {
+        if (!client["connected"]) {
+          client.connect({}, function () {
+            client.send("/app/connect", {}, JSON.stringify({ username: username }));
+            client.subscribe("/topic/stop-game", function (response) {
+              const data = JSON.parse(response.body);
+              if (data.command === "stop") {
+                getStop();
+              }
+              console.log(data.body);
+            });
+          });
+        }
+      } catch (error) {
+        console.error(`Something went wrong: \n${handleError(error)}`);
+        console.error("Details:", error);
+        alert("Something went wrong! See the console for details.");
+      }
+    }
+    stompConnect();
+    // return a function to disconnect on unmount
+
+    return function cleanup() {
+      if (client && client["connected"]) {
+        client.disconnect(function () {
+          console.log("disconnected from stomp");
+        });
+      }
+    };
+  }, []);
+
   const getFormattedData = (category1: string, category2: string, category3: string, category4: string, answer1: string, answer2: string, answer3: string, answer4: string, username: string) => {
     const data = {
-      [username]: {
+      username: username,
         [category1]: answer1,
         [category2]: answer2,
         [category3]: answer3,
         [category4]: answer4
-
-      }
     };
     return JSON.stringify(data);
   };
 
   const submitAnswers = async (data) =>{
+    console.log(data);
     try{
-      await api.put(`/round/answers/player`, data);
+      await api.post(`/rounds/${gameId}/entries`, data);
+
     }catch(error){
-      throw new Error(`Error submitting data`)
+      throw new Error("Error submitting data")
     }
   };
 
-  const doStop = async () => {
+  const getStop = async () => {
     clearInterval(countdownInterval); // Stop the countdown timer
-    // send something to backend so game stops for everyone with websocket stuff
-
-
     const answers = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
 
     // send the answers to backend for verification
@@ -75,15 +106,32 @@ const Game = () => {
       await submitAnswers(answers);
     }catch(error){
       setError("Error submitting data");
+
       return;
     }
-    navigate(`/leaderboard/final/${lobbyName}`);
+    navigate(`/evaluation/${lobbyName}/country`);
+  };
+
+  const doStop = async () => {
+    client.send("/topic/stop-game", {}, "{}");
+    clearInterval(countdownInterval); // Stop the countdown timer
+    const answers = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
+
+    // send the answers to backend for verification
+    try{
+      await submitAnswers(answers);
+    }catch(error){
+      setError("Error submitting data");
+
+      return;
+    }
+    navigate(`/evaluation/${lobbyName}/country`);
   };
 
   const getLetter = async () => {
     try {
       await api.put(`/players/${username}`, JSON.stringify({ready: false}));
-      const response = await api.get(`/round/letters/${gameId}`);
+      const response = await api.get(`/rounds/letters/${gameId}`);
       setLetter(response.data);
     } catch (error) {
       console.log("Error fetching the current letter");
@@ -94,7 +142,6 @@ const Game = () => {
     getLetter();
     setTimeout(startCountdown, 1); // Delay startCountdown by 1 second
   }, []);
-
 
 
   const startCountdown = () => {

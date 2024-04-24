@@ -34,12 +34,12 @@ const JoinLobby = () => {
   const [error, setError] = useState(null);
 
   const username = localStorage.getItem("username");
-
+/*
   useEffect(() => {
     // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
     async function stompConnect() {
       try {
-        if (!client['connected']) {
+        if (!client["connected"]) {
           client.connect({}, function () {
             client.send("/app/connect", {}, JSON.stringify({ username: username }));
             client.subscribe("/topic/lobby_join", function (response) {
@@ -54,15 +54,16 @@ const JoinLobby = () => {
     }
     stompConnect();
     // return a function to disconnect on unmount
+
     return function cleanup() {
-      if (client && client['connected']) {
+      if (client && client["connected"]) {
         client.disconnect(function () {
-          console.log('disconnected from stomp');
+          console.log("disconnected from stomp");
         });
       }
     };
   }, []);
-
+*/
   const doJoinLobby = async () => {
     try {
       const requestBody = {
@@ -70,17 +71,13 @@ const JoinLobby = () => {
         lobbyPassword: LobbyPassword,
         username: username
       };
-      console.log(LobbyPassword);
-      console.log(LobbyName);
-      console.log(username);
+
       const response = await api.post("/lobby/join", requestBody);
       if (response.status === 200) {
         localStorage.setItem("lobbyName", LobbyName);
-        console.log("lobbyname in storage")
-        localStorage.setItem("lobbyId", response.data.id);
-        console.log("lobbyid in storage")
-        // localStorage.setItem("gameId", response.data.game.id);
-        try {
+        localStorage.setItem("lobbyId", response.data.lobbyId);
+        localStorage.setItem("gameId", "1");
+        /*try {
           // Make a request to get the game ID
           const gameIdResponse = await api.get(`/${response.data.id}/gameId`);
           if (gameIdResponse.status === 200) {
@@ -92,11 +89,8 @@ const JoinLobby = () => {
           }
         } catch (error) {
           console.error("Error while retrieving game ID:", error);
-        }
-        console.log(response.data)
-        console.log("gameid in storage")
-        console.log(response.data.message)
-        client.send("/topic/lobby_join", {}, "{}");
+        }*/
+        //client.send("/topic/lobby_join", {}, "{}");
         navigate(`/lobby/${LobbyName}`);
       } else if (response.status === 400) {
         setError("Join lobby failed because password doesn't match");
