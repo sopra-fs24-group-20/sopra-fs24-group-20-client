@@ -11,15 +11,22 @@ const EvaluationScreen = () => {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
   const username = localStorage.getItem("username");
-  const LobbyName = localStorage.getItem("lobbyName");
-  const LobbyId = localStorage.getItem("lobbyId");
+  const lobbyName = localStorage.getItem("lobbyName");
+  const lobbyId = localStorage.getItem("lobbyId");
+  const gameId = localStorage.getItem("gameId");
   const LobbyPassword = localStorage.getItem("lobbyPassword");
   const [players, setPlayers] = useState<User[]>(null);
   const [categories, setCategories] = useState<String[]>(null);
+  const [answers, setAnswers] = useState<String[]>(null);
   const [currentCategory, setCurrentCategory] = useState(null);
   const [nextCategory, setNextCategory] = useState(null);
   const [rounds, setRounds] = useState(null);
   const [currentRound, setCurrentRound] = useState(null);
+
+  const mockAnswersOne = {"One" : "Dublin", "Two": "Dusseldorf"};
+  const mockAnswersTwo =  {"One": "Denmark", "Two": "Denmark"};
+  const mockPlayersAnswers = {"City": mockAnswersOne, "Country": mockAnswersTwo};
+
   const leaveLobby = async (requestBody: string) => {
     if (requestBody === null){
       console.log("no existing lobby")
@@ -30,6 +37,8 @@ const EvaluationScreen = () => {
       console.log("leave lobby success");
       localStorage.removeItem("lobbyName");
       localStorage.removeItem("lobbyPassword");
+      localStorage.removeItem("currentCategory");
+      localStorage.removeItem("nextCategory");
       navigate(`/profile/${username}`);
     } catch (error) {
       if (error.response.status === 404){
@@ -42,54 +51,78 @@ const EvaluationScreen = () => {
     }
   };
 
+  function getCategories(playersAnswers) {
+    return Object.keys(playersAnswers);
+  }
+
+  function getPlayerNames(playersAnswers) {
+    const categories = Object.keys(playersAnswers);
+
+    return Object.keys(playersAnswers[categories[0]]);
+  }
+
+  function getPlayerAnswersForCategory(playersAnswers, category) {
+    const playerAnswersList = [];
+    for (const playerName in playersAnswers[Object.keys(playersAnswers)[0]]) {
+      if (playersAnswers.hasOwnProperty(category)) {
+        playerAnswersList.push(playersAnswers[category][playerName]);
+      }
+    }
+
+    return playerAnswersList;
+  }
+
+  function changeCategory() {
+    if (localStorage.getItem("nextCategory")) {
+      setCurrentCategory(localStorage.getItem("nextCategory"));
+      const index = categories.indexOf(currentCategory);
+      if (index !== -1 && index < categories.length - 1) {
+        setNextCategory(categories[index + 1]);
+        localStorage.setItem("nextCategory",nextCategory);
+      }
+      else {
+        localStorage.removeItem("nextCategory");
+      }
+    }
+    else {
+      localStorage.setItem("currentCategory",categories[0]);
+      setCurrentCategory(categories[0]);
+      if (categories.length > 1) {
+        localStorage.setItem("nextCategory",categories[1]);
+      }
+    }
+  }
+
+  const mockAnswers = getPlayerAnswersForCategory(mockPlayersAnswers,"City");
+  const mockCategories = getCategories(mockPlayersAnswers);
+  const mockPlayers = getPlayerNames(mockPlayersAnswers);
 
   const handleClick = () => {
     const requestBody = JSON.stringify({
-      lobbyName: LobbyName,
-      lobbyId: LobbyId,
+      lobbyName: lobbyName,
+      lobbyId: lobbyId,
       username: username
     });
     leaveLobby(requestBody)
   };
 
   const nextEval = () => {
-    if (!localStorage.getItem("currentRound")) {
-      setCurrentRound(1);
-      localStorage.setItem("currentRound", currentRound);
-    }
-    if (localStorage.getItem("currentCategory")) {
-      setCurrentCategory(localStorage.getItem("currentCategory"));
-      const index = categories.indexOf(currentCategory);
-      if (index !== -1 && index < categories.length - 1) {
-        setNextCategory(categories[index + 1]);
-        localStorage.setItem("currentCategory",nextCategory);
-      }
-      else {
-        if (currentRound === rounds) {
-          localStorage.removeItem("currentRound");
-          localStorage.removeItem("currentCategory");
-          navigate("/finalLeader");
-        }
-        else {
-          localStorage.setItem("currentRound", currentRound + 1);
-          navigate("/currentLeader");
-        }
-      }
+    if (localStorage.getItem("nextCategory")) {
+      navigate(`/evaluation/${lobbyName}/${nextCategory}`);
     }
     else {
-      setCurrentCategory(categories[0]);
-      localStorage.setItem("currentCategory", currentCategory);
+      navigate(`/leaderboard/final/${lobbyName}`);
     }
-    navigate(`/evaluation/${currentCategory}`);
   }
-
-
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await api.get("/lobby/players", LobbyName);
-        setPlayers(response.data);
+        const response = await api.get(`/round/scores/${gameId}`, gameId);
+        setPlayers(getPlayerNames(response.data));
+        setCategories(getCategories(response.data));
+        changeCategory();
+        setAnswers(getPlayerAnswersForCategory(response.data,currentCategory));
 
       } catch (error) {
         console.error(
@@ -103,26 +136,8 @@ const EvaluationScreen = () => {
         );
       }
     }
-    async function fetchCategories() {
-      try {
-        const response = await api.get("/lobby/settings", LobbyName);
-        setCategories(response.data.categories);
-        setRounds(response.data.rounds);
-      }catch (error) {
-        console.error(
-          `Something went wrong while fetching the categories: \n${handleError(
-            error
-          )}`
-        );
-        console.error("Details:", error);
-        alert(
-          "Something went wrong while fetching the categories! See the console for details."
-        );
-      }
-    }
     fetchData();
-    fetchCategories();
-  }, [LobbyName]);
+  }, [gameId]);
 
   return (
     <BaseContainer>
@@ -143,21 +158,46 @@ const EvaluationScreen = () => {
                   </div>
                 </p>
               </div>
-              <ul className="evaluation ul">
-                <li className="evaluation li">players</li>
-              </ul>
+              <div className="evaluation transparent-form-exception">
+                <ul className="evaluation ul">
+                  {mockPlayers.map((player, index) => (
+                    <li key={index} className="evaluation li">{player}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
             <div className="evaluation middle-left-axis">
-              {currentCategory}{/*to be added*/}
+              {currentCategory}
+              <div className="evaluation transparent-form-normal">
+                <ul className="evaluation ul">
+                  {mockAnswers.map((answer, index) => (
+                    <li key={index} className="evaluation li">{answer}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
             <div className="evaluation middle-axis">
               Bonus
+              {mockPlayers.map((_, index) => (
+                <button
+                  key={index}
+                  className="round-button-green"
+                  style={{ marginTop: index === 0 ? "60px" : 0 }}
+                ></button>
+              ))}
             </div>
 
             <div className="evaluation middle-right-axis">
               Veto
+              {mockPlayers.map((_, index) => (
+                <button
+                  key={index}
+                  className="round-button-red"
+                  style={{ marginTop: index === 0 ? "60px" : 0 }}
+                ></button>
+              ))}
             </div>
           </div>
           <div className="evaluation form-right">
