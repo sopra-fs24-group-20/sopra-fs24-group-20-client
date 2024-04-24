@@ -28,14 +28,18 @@ const LobbyPage = () => {
   const localLobbyId = localStorage.getItem(("lobbyId"))
   const [ready_ws, setReadyWS] = useState(null);
   const [new_join, setNewJoinWS] = useState(null);
+  const [reload, setReload] = useState(null);
 
   useEffect(() => {
     async function stompConnect() {
-      fetchPlayers();
       try {
+        await fetchPlayers();
+        //await new Promise((resolve) => setTimeout(resolve, 1000));
+        //await new Promise((resolve) => client.connect({}, resolve));
         client.connect({}, function () {
           client.send("/app/connect", {}, JSON.stringify({ username: local_username }));
-          client.send("/topic/join", {}, "{}");
+          console.log("CONNECTED");
+          client.send("/topic/refresh", {}, "{}");
           client.subscribe("/topic/ready-count", function (response) {
             const data = JSON.parse(response.body);
             fetchPlayers();
@@ -45,26 +49,28 @@ const LobbyPage = () => {
               start_game();
             }
           });
-          client.subscribe("/topic/lobby_join", function (response) {
+          client.subscribe("/topic/lobby-refresh", function (response) {
             const data = JSON.parse(response.body);
-            if (data.command === "new-join") {
-              setNewJoinWS(response.body);
+            if (data.command === "refresh") {
+              setNewJoinWS(data);
               fetchPlayers();
             }
           });
         });
       } catch (error) {
-        console.error(`Something went wrong: \n${handleError(error)}`);
-        console.error("Details:", error);
-        alert("Something went wrong! See the console for details.");
+        alert(
+          `Something went wrong during connecting to the websocket: \n${handleError(error)}`
+        );
       }
     }
     stompConnect();
-  }, [local_username, ready_ws, new_join]);
+
+  }, [local_username]);
 
   const exit = async () => {
     try {
       await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
+      client.send("/topic/refresh", {}, "{}");
       navigate(`/user/${local_username}`);
     } catch (error) {
       alert(
@@ -79,14 +85,13 @@ const LobbyPage = () => {
       client.send("/app/ready-up", {}, JSON.stringify({ username: local_username }));
     } catch (error) {
       alert(
-        `Something went wrong while preparing the game: \n${handleError(error)}`
+        `Something went wrong while getting ready: \n${handleError(error)}`
       );
     }
   };
   const players_ready = (players) => {
     return players.filter(player => player.ready).length;
   };
-
   const start_game = async () => {
     try {
       // before leaving the lobby page, disconnect ws
@@ -102,16 +107,14 @@ const LobbyPage = () => {
       );
     }
   };
-
   const fetchPlayers = async () => {
     try {
-      const response = await api.get("/lobby/players", JSON.stringify(localLobbyName));
+      const response = await api.get(`/lobby/players/${localLobbyId}`);
       setPlayers(response.data);
-      console.log(response.data);
-
     } catch (error) {
-      alert("Something went wrong while fetching the lobby data.");
-      console.log(error)
+      alert(
+        `Something went wrong while fetching player data: \n${handleError(error)}`
+      );
     }
   }
 
