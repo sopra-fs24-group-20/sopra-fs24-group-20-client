@@ -74,10 +74,12 @@ const CreateLobby = () => {
       };
 
       const response = await api.post("/lobby/join", requestBody);
+      console.log(response.data.game.id);
       if (response.status === 200) {
         localStorage.setItem("lobbyName", lobbyName);
         localStorage.setItem("lobbyId", response.data.lobbyId);
         localStorage.setItem("gameId", "1");
+        localStorage.setItem("roundDuration", response.data.roundDuration);
         /*try {
           // Make a request to get the game ID
           const gameIdResponse = await api.get(`/${response.data.id}/gameId`);

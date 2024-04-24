@@ -30,12 +30,13 @@ FormField.propTypes = {
 const Game = () => {
   const navigate = useNavigate();
   const [letter, setLetter] = useState<string>("");
-  const [countdown, setCountdown] = useState<number>(60); // Initial countdown value set to 60 seconds
+  const [countdown, setCountdown] = useState<number>(parseInt(localStorage.getItem("roundDuration"))); 
   const [countdownInterval, setCountdownInterval] = useState<any>(null); // State variable for interval ID
   const lobbyName = localStorage.getItem("lobbyName");
   const username = localStorage.getItem("username");
   const gameId = localStorage.getItem("gameId");
   const lobbyId = localStorage.getItem("lobbyId");
+  const roundDuration = localStorage.getItem("roundDuration");
   const [country, setCountry] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [profession, setProfession] = useState<string>("");
