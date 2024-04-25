@@ -80,6 +80,8 @@ const CreateLobby = () => {
         localStorage.setItem("lobbyName", lobbyName);
         localStorage.setItem("lobbyId", response.data.lobbyId);
         localStorage.setItem("gameId", response.data.game.id.toString());
+        localStorage.setItem("readyws", JSON.stringify(false));
+        localStorage.setItem("gamews", JSON.stringify(false));
         console.log(localStorage.getItem("gameId"));
         localStorage.setItem("roundDuration", response.data.roundDuration);
         /*try {

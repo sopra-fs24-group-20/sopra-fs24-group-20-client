@@ -34,6 +34,7 @@ const JoinLobby = () => {
   const [error, setError] = useState(null);
 
   const username = localStorage.getItem("username");
+
   /*
   useEffect(() => {
     // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
@@ -79,6 +80,9 @@ const JoinLobby = () => {
         localStorage.setItem("lobbyId", response.data.lobbyId);
         localStorage.setItem("gameId", response.data.game.id.toString());
         localStorage.setItem("roundDuration", response.data.roundDuration);
+        localStorage.setItem("readyws", JSON.stringify(false));
+        localStorage.setItem("gamews", JSON.stringify(false));
+        console.log(response.data.game.id);
         /*try {
           // Make a request to get the game ID
           const gameIdResponse = await api.get(`/${response.data.id}/gameId`);

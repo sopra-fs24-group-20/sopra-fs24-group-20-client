@@ -42,20 +42,29 @@ const Game = () => {
   const [profession, setProfession] = useState<string>("");
   const [celebrity, setCelebrity] = useState<string>("");
   const [error, setError] = useState(null);
+  const ws = localStorage.getItem("gamews");
 
+  useEffect(() => {
+    if (ws === "false") {
+      window.location.reload();
+      localStorage.setItem("gamews", JSON.stringify(true))
+    }
+  }, [ws]);
 
   useEffect(() => {
     console.log("in effect hook");
+    console.log(gameId);
     async function stompConnect() {
       console.log("in async func");
       console.log(username);
+
       try {
         console.log("in try");
         if (!client["connected"]) {
           console.log("in if");
           client.connect({}, function () {
             client.send("/app/connect", {}, JSON.stringify({ username: username }));
-            client.subscribe("/topic/stop-game", function (response) {
+            client.subscribe("/topic/game-control", function (response) {
               const data = JSON.parse(response.body);
               if (data.command === "stop") {
                 getStop();
@@ -119,7 +128,7 @@ const Game = () => {
   };
 
   const doStop = async () => {
-    client.send("/topic/stop-game", {}, "{}");
+    client.send("/app/stop-game", {}, "{}");
     clearInterval(countdownInterval); // Stop the countdown timer
     const answers = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
 
@@ -138,6 +147,7 @@ const Game = () => {
     try {
       await api.put(`/players/${username}`, JSON.stringify({ready: false}));
       const response = await api.get(`/rounds/letters/${gameId}`);
+      console.log(response.data);
       setLetter(response.data);
     } catch (error) {
       console.log("Error fetching the current letter");

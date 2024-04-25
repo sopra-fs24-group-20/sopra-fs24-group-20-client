@@ -29,10 +29,15 @@ const LobbyPage = () => {
   const [ready_ws, setReadyWS] = useState(null);
   const [new_join, setNewJoinWS] = useState(null);
   const [reload, setReload] = useState(null);
+  const ws = localStorage.getItem("readyws");
+
+
+
 
   useEffect(() => {
     async function stompConnect() {
       try {
+        console.log("vor fetch players");
         await fetchPlayers();
         //await new Promise((resolve) => setTimeout(resolve, 1000));
         //await new Promise((resolve) => client.connect({}, resolve));
@@ -43,6 +48,7 @@ const LobbyPage = () => {
           client.subscribe("/topic/ready-count", function (response) {
             const data = JSON.parse(response.body);
             fetchPlayers();
+            window.location.reload();
             setReadyWS(data.command);
             console.log(data.command);
             if (data.command === "start"){
@@ -54,6 +60,7 @@ const LobbyPage = () => {
             if (data.command === "refresh") {
               setNewJoinWS(data);
               fetchPlayers();
+              window.location.reload();
             }
           });
         });
@@ -67,6 +74,18 @@ const LobbyPage = () => {
 
   }, [local_username]);
 
+
+  useEffect(() => {
+    new Promise((resolve) => setTimeout(resolve, 1000));
+    if (ws === "false") {
+      console.log(ws);
+      window.location.reload();
+      localStorage.setItem("readyws", JSON.stringify(true));
+      console.log(ws);
+    }
+  }, [ws]);
+
+
   const exit = async () => {
     try {
       await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
@@ -75,6 +94,8 @@ const LobbyPage = () => {
       localStorage.removeItem("lobbyId");
       localStorage.removeItem("gameId");
       localStorage.removeItem("roundDuration");
+      localStorage.removeItem("gamews");
+      localStorage.removeItem("readyws");
       navigate(`/user/${local_username}`);
     } catch (error) {
       alert(

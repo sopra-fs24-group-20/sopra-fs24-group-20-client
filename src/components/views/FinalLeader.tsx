@@ -72,7 +72,7 @@ const FinalLeader = () => {
               </li>
             ))}
           </ul>
-          <Button width="100%" onClick={() => navigate(`/lobby/${lobby.lobbyName}`)}>
+          <Button width="100%" onClick={() => navigate(`/lobby/${localLobbyName}`)}>
             Back to Lobby
           </Button>
           <Confetti

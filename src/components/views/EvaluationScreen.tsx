@@ -32,6 +32,8 @@ const EvaluationScreen = () => {
       localStorage.removeItem("lobbyId");
       localStorage.removeItem("gameId");
       localStorage.removeItem("roundDuration");
+      localStorage.removeItem("readyws");
+      localStorage.removeItem("gamews");
       navigate(`/profile/${username}`);
     } catch (error) {
       if (error.response.status === 404){
