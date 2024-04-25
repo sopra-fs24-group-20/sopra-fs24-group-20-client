@@ -75,10 +75,12 @@ const CreateLobby = () => {
 
       const response = await api.post("/lobby/join", requestBody);
       console.log(response.data.game.id);
+      console.log(response.data);
       if (response.status === 200) {
         localStorage.setItem("lobbyName", lobbyName);
         localStorage.setItem("lobbyId", response.data.lobbyId);
-        localStorage.setItem("gameId", "1");
+        localStorage.setItem("gameId", response.data.game.id.toString());
+        console.log(localStorage.getItem("gameId"));
         localStorage.setItem("roundDuration", response.data.roundDuration);
         /*try {
           // Make a request to get the game ID

@@ -7,8 +7,6 @@ import PropTypes from "prop-types";
 import "styles/views/Game.scss";
 import { User } from "types";
 
-// testing out github commit branch commit stuff
-
 const FormField = (props) => {
   return (
     <div className="game field">
@@ -44,6 +42,7 @@ const Game = () => {
   const [profession, setProfession] = useState<string>("");
   const [celebrity, setCelebrity] = useState<string>("");
   const [error, setError] = useState(null);
+  
 
   useEffect(() => {
     // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
@@ -160,7 +159,6 @@ const Game = () => {
     if (countdown === 0) {
       clearInterval(countdownInterval); // Stop the countdown timer
       // Perform actions when countdown reaches 0
-      // Example: doStop()
       doStop();
     }
   }, [countdown]);

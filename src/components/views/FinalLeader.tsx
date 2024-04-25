@@ -29,6 +29,7 @@ const FinalLeader = () => {
   const [players, setPlayers] = useState([]);
   const mockplayers = { "barbara": 30 , "paul": 25, "glory":20,"joshi":35 };
   const localLobbyName = localStorage.getItem(("lobbyName"));
+  const gameId = localStorage.getItem("gameId");
   const sortedMOCKPlayers: { username: string; points: number }[] = Object.entries(mockplayers)
     .map(([username, points]: [string, number]) => ({ username, points }))
     .sort((a, b) => b.points - a.points);
@@ -38,7 +39,7 @@ const FinalLeader = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await api.get(`/rounds/leaderboard/${1}`);
+        const response = await api.get(`/rounds/leaderboard/${gameId}`);
         const sortedPlayers: { username: string; points: number }[] = Object.entries(response.data)
           .map(([username, points]: [string, number]) => ({ username, points }))
           .sort((a, b) => b.points - a.points);
