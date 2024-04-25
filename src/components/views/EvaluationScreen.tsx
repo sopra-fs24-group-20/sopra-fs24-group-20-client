@@ -36,9 +36,11 @@ const EvaluationScreen = () => {
       const response = await api.post("/lobby/leave", requestBody);
       console.log("leave lobby success");
       localStorage.removeItem("lobbyName");
-      localStorage.removeItem("lobbyPassword");
       localStorage.removeItem("currentCategory");
       localStorage.removeItem("nextCategory");
+      localStorage.removeItem("lobbyId");
+      localStorage.removeItem("gameId");
+      localStorage.removeItem("roundDuration");
       navigate(`/profile/${username}`);
     } catch (error) {
       if (error.response.status === 404){

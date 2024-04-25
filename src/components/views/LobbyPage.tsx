@@ -71,6 +71,10 @@ const LobbyPage = () => {
     try {
       await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
       client.send("/topic/refresh", {}, "{}");
+      localStorage.removeItem("lobbyName");
+      localStorage.removeItem("lobbyId");
+      localStorage.removeItem("gameId");
+      localStorage.removeItem("roundDuration");
       navigate(`/user/${local_username}`);
     } catch (error) {
       alert(

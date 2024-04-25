@@ -42,14 +42,14 @@ const Game = () => {
   const [profession, setProfession] = useState<string>("");
   const [celebrity, setCelebrity] = useState<string>("");
   const [error, setError] = useState(null);
+  const [isConnected, setIsConnected] = useState(false); // State variable to track websocket connection status
   
-
   useEffect(() => {
-    // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
-    async function stompConnect() {
+    // Connect to websocket if not already connected
+    const stompConnect = async () => {
       try {
         if (!client["connected"]) {
-          client.connect({}, function () {
+          await client.connect({}, () => {
             client.send("/app/connect", {}, JSON.stringify({ username: username }));
             client.subscribe("/topic/stop-game", function (response) {
               const data = JSON.parse(response.body);
@@ -58,6 +58,7 @@ const Game = () => {
               }
               console.log(data.body);
             });
+            setIsConnected(true); // Set connection status to true once connected
           });
         }
       } catch (error) {
@@ -65,19 +66,22 @@ const Game = () => {
         console.error("Details:", error);
         alert("Something went wrong! See the console for details.");
       }
-    }
-    stompConnect();
-    // return a function to disconnect on unmount
+    };
 
-    return function cleanup() {
+    if (!isConnected) {
+      stompConnect(); // Connect to websocket only if not already connected
+    }
+
+    return () => {
+      // Disconnect from websocket on component unmount
       if (client && client["connected"]) {
-        client.disconnect(function () {
+        client.disconnect(() => {
           console.log("disconnected from stomp");
         });
+        setIsConnected(false); // Reset connection status on unmount
       }
     };
-  }, []);
-
+  }, [isConnected]); // Effect runs whenever isConnected changes
   const getFormattedData = (category1: string, category2: string, category3: string, category4: string, answer1: string, answer2: string, answer3: string, answer4: string, username: string) => {
     const data = {
       username: username,
