@@ -80,7 +80,7 @@ const EvaluationScreen = () => {
     if (!localStorage.getItem("categoryIndex")) {
       localStorage.setItem("categoryIndex","0");
     }
-    setCurrentCategory(allCategories[parseInt(localStorage.getItem('categoryIndex'), 10)]);
+    setCurrentCategory(allCategories[parseInt(localStorage.getItem("categoryIndex"), 10)]);
   }
 
   const handleClick = () => {
@@ -94,8 +94,8 @@ const EvaluationScreen = () => {
 
   const nextEval = () => {
     if (localStorage.getItem("categoryIndex")) {
-      if (parseInt(localStorage.getItem('categoryIndex'), 10) < categories.length-1) {
-        const newIndex = parseInt(localStorage.getItem('categoryIndex'), 10) + 1;
+      if (parseInt(localStorage.getItem("categoryIndex"), 10) < categories.length-1) {
+        const newIndex = parseInt(localStorage.getItem("categoryIndex"), 10) + 1;
         localStorage.setItem("categoryIndex", newIndex.toString());
         console.log(localStorage.getItem("categoryIndex"));
         navigate(`/evaluation/${lobbyName}/${categories[newIndex]}`);
@@ -106,7 +106,7 @@ const EvaluationScreen = () => {
       }
     }
     else {
-      navigate(`/start`);
+      navigate("/start");
     }
   }
 

@@ -35,7 +35,6 @@ const FinalLeader = () => {
     .sort((a, b) => b.points - a.points);
 
 
-
   useEffect(() => {
     async function fetchData() {
       try {
