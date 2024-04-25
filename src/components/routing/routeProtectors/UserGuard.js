@@ -12,12 +12,12 @@ import PropTypes from "prop-types";
  * @param props
  */
 export const UserGuard = () => {
-  if (localStorage.getItem("token")) {
+  if (localStorage.getItem("username")) {
     
     return <Outlet />;
   }
   
-  return <Navigate to="/login" replace />;
+  return <Navigate to="/start" replace />;
 };
 
 UserGuard.propTypes = {

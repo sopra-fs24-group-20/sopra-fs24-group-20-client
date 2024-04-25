@@ -1,7 +1,18 @@
 # SoPra FS24 - Client Template with build pack
 
-## Getting started
+### new installs:
 
+npm install react-confetti
+
+npm install net
+
+npm install stompjs
+
+npm install sockjs-client
+
+
+
+## Getting started
 Read and go through these Tutorials. It will make your life easier:)
 
 - Read the React [Docs](https://react.dev/learn)

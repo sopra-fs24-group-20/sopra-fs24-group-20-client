@@ -1,8 +1,23 @@
 export type User = {
   username: string;
-  name: string;
+  lobby: any;
   id: number;
-  status: string;
-  creationDate: any;
-  birthdate: any;
+  stats: any;
+  token: string;
+  ready: boolean;
+  password: string;
+};
+
+export type Lobby = {
+  categories: any;
+  gameMode: number;
+  excludedChars: any;
+  id: number;
+  rounds: number;
+  roundDuration: number;
+  lobbyName: string;
+  lobbyPassword: string;
+  game: any;
+  players: any;
+  autoCorrectMode: boolean;
 };

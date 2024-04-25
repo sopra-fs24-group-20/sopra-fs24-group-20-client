@@ -11,15 +11,11 @@ import PropTypes from "prop-types";
  * @Guard
  * @param props
  */
-export const GameGuard = () => {
-  if (localStorage.getItem("lobbyName")) {
-    
-    return <Outlet />;
-  }
-  
-  return <Navigate to="/joinlobby" replace />;
+export const EvaluationGuard = () => {
+
+  return <Outlet />;
 };
 
-GameGuard.propTypes = {
+EvaluationGuard.propTypes = {
   children: PropTypes.node
 };

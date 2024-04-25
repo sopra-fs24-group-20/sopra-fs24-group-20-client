@@ -4,13 +4,6 @@ import Game from "../../views/Game";
 import PropTypes from "prop-types";
 import ProfilePage from "../../views/ProfilePage";
 
-
-const ProfilePageRoute = () => {
-  const {username} = useParams();
-
-  return <ProfilePage username={username} />
-};
-
 const GameRouter = () => {
   return (
     <div style={{display: "flex", flexDirection: "column"}}>

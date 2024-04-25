@@ -3,7 +3,7 @@ import { api, handleError } from "helpers/api";
 import User from "models/User";
 import {useNavigate} from "react-router-dom";
 import { Button } from "components/ui/Button";
-import "styles/views/Register.scss";
+import "styles/views/Authentication.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 
@@ -15,10 +15,10 @@ specific components that belong to the main one in the same file.
  */
 const FormField = (props) => {
   return (
-    <div className="register field">
-      <label className="register label">{props.label}</label>
+    <div className="authentication field">
+      <label className="authentication label">{props.label}</label>
       <input
-        className="register input"
+        className="authentication input"
         placeholder="enter here.."
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
@@ -37,32 +37,27 @@ const Register = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
-
-  const ClickHere = () => {
-    return (<p> Already have an account? Back to <a href= "#" onClick={() => {navigate("/login")}}>login</a></p>);
-  }
-
+  const [error, setError] = useState(null);
 
   const doRegister = async () => {
     try {
       const requestBody = JSON.stringify({ username, password });
-      const registerResponse = await api.post("/users", requestBody);
+      const registerResponse = await api.post("/players", requestBody);
       const userData = registerResponse.data;
       // Get the returned user and update a new object.
       const user = new User(userData);
-      await api.post("/login", { username, password });
+      await api.post("/players/login", { username, password });
 
 
-      // Store the token into the local storage.
-      localStorage.setItem("token", user.token);
-      localStorage.setItem("id", user.id);
+      // Store the username into the local storage.
+      localStorage.setItem("username", user.username);
+      // localStorage.setItem("id", user.id);
 
       // Login successfully worked --> navigate to the route /game in the GameRouter
-      navigate("/game");
+      navigate(`/user/${user.username}`);
     } catch (error) {
-      alert(
-        `Something went wrong during the login: \n${handleError(error)}`
-      );
+      setError ("username already taken");
+      console.log(handleError(error))
       navigate("/register");
     }
   };
@@ -70,8 +65,10 @@ const Register = () => {
 
   return (
     <BaseContainer>
-      <div className="register container">
-        <div className="register form">
+      <div className="authentication container">
+        <div className="authentication form">
+          <h1 className="authentication centered-text" >Register</h1>
+          {error && <div className="authentication error-message">{error}</div>}
           <FormField
             label="Username"
             value={username}
@@ -83,16 +80,18 @@ const Register = () => {
             value={password}
             onChange={(pw) => setPassword(pw)}
           />
-          <ClickHere></ClickHere>
-          <div className="register button-container">
-            <Button
-              disabled={!username || !password}
-              width="100%"
-              onClick={() => doRegister()}
-            >
-              Register
-            </Button>
-          </div>
+        </div>
+        <div className="authentication button-container">
+          <Button
+            disabled={!username || !password}
+            width="100%"
+            onClick={() => doRegister()}
+          >
+            Register
+          </Button>
+        </div>
+        <div>
+          <a className="authentication link" href="/start">back</a>
         </div>
       </div>
     </BaseContainer>

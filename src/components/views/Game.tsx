@@ -1,137 +1,222 @@
 import React, { useEffect, useState } from "react";
-import { api, handleError } from "helpers/api";
-import { Spinner } from "components/ui/Spinner";
+import { api, handleError, client } from "helpers/api";
 import { Button } from "components/ui/Button";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import "styles/views/Game.scss";
 import { User } from "types";
 
-const Player = ({ user, onClick }: { user: User, onClick }) => (
-  <div className="player container">
-    <div className="player username" onClick={onClick}>
-      <a href="#">{user.username}</a></div>
-    <div className="player name">{user.name}</div>
-    <div className="player id">id: {user.id}</div>
-  </div>
-);
+const FormField = (props) => {
+  return (
+    <div className="game field">
+      <label className="game label">{props.label}</label>
+      <input
+        className="game input"
+        placeholder="enter here.."
+        value={props.value}
+        onChange={(e) => props.onChange(e.target.value)}
+      />
+    </div>
+  );
+};
 
-Player.propTypes = {
-  user: PropTypes.object,
-  onClick: PropTypes.func.isRequired
+FormField.propTypes = {
+  label: PropTypes.string,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
 };
 
 const Game = () => {
-  // use react-router-dom's hook to access navigation, more info: https://reactrouter.com/en/main/hooks/use-navigate
   const navigate = useNavigate();
+  const [letter, setLetter] = useState<string>("");
+  const [countdown, setCountdown] = useState<number>(parseInt(localStorage.getItem("roundDuration"))); 
+  const [countdownInterval, setCountdownInterval] = useState<any>(null); // State variable for interval ID
+  const lobbyName = localStorage.getItem("lobbyName");
+  const username = localStorage.getItem("username");
+  const gameId = localStorage.getItem("gameId");
+  const lobbyId = localStorage.getItem("lobbyId");
+  const roundDuration = localStorage.getItem("roundDuration");
+  const [country, setCountry] = useState<string>("");
+  const [city, setCity] = useState<string>("");
+  const [profession, setProfession] = useState<string>("");
+  const [celebrity, setCelebrity] = useState<string>("");
+  const [error, setError] = useState(null);
+  const ws = localStorage.getItem("gamews");
 
-  // define a state variable (using the state hook).
-  // if this variable changes, the component will re-render, but the variable will
-  // keep its value throughout render cycles.
-  // a component can have as many state variables as you like.
-  // more information can be found under https://react.dev/learn/state-a-components-memory and https://react.dev/reference/react/useState
-  const [users, setUsers] = useState<User[]>(null);
-
-  const logout = async (id: string) => {
-    if (id === null){
-      console.log("no id saved logout")
-      navigate("/login");
+  useEffect(() => {
+    if (ws === "false") {
+      window.location.reload();
+      localStorage.setItem("gamews", JSON.stringify(true))
     }
-    try {
-      const response = await api.get(`/users/${id}`);
-      console.log("id saved and exists logout");
-      await api.put(`/logout/${id}`);
-      localStorage.removeItem("token");
-      localStorage.removeItem("id");
-      navigate("/login");
-    } catch (error) {
-      if (error.response.status === 404){
-        console.log("id saved but doesn't exist logout");
-        localStorage.removeItem("token");
-        localStorage.removeItem("id");
-        navigate("/login");
+  }, [ws]);
+
+  useEffect(() => {
+    console.log("in effect hook");
+    console.log(gameId);
+    async function stompConnect() {
+      console.log("in async func");
+      console.log(username);
+
+      try {
+        console.log("in try");
+        if (!client["connected"]) {
+          console.log("in if");
+          client.connect({}, function () {
+            client.send("/app/connect", {}, JSON.stringify({ username: username }));
+            client.subscribe("/topic/game-control", function (response) {
+              const data = JSON.parse(response.body);
+              if (data.command === "stop") {
+                getStop();
+              }
+              console.log(data.body);
+            });
+          });
+        }
+      } catch (error) {
+        console.error(`Something went wrong: \n${handleError(error)}`);
+        console.error("Details:", error);
+        alert("Something went wrong! See the console for details.");
       }
-      console.error(
-        `An error occurred while checking user authorization: \n${handleError(error)}`
-      );
+    }
+    stompConnect();
+    
+    return function cleanup() {
+      if (client && client["connected"]) {
+        client.disconnect(function () {
+          console.log("disconnected from stomp");
+        });
+      }
+    };
+  }, []);
+
+  const getFormattedData = (category1: string, category2: string, category3: string, category4: string, answer1: string, answer2: string, answer3: string, answer4: string, username: string) => {
+    const data = {
+      username: username,
+      [category1]: answer1,
+      [category2]: answer2,
+      [category3]: answer3,
+      [category4]: answer4
+    };
+
+    return JSON.stringify(data);
+  };
+
+  const submitAnswers = async (data) =>{
+    console.log(data);
+    try{
+      await api.post(`/rounds/${gameId}/entries`, data);
+
+    }catch(error){
+      throw new Error("Error submitting data")
     }
   };
 
-  // the effect hook can be used to react to change in your component.
-  // in this case, the effect hook is only run once, the first time the component is mounted
-  // this can be achieved by leaving the second argument an empty array.
-  // for more information on the effect hook, please see https://react.dev/reference/react/useEffect
-  useEffect(() => {
-    // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
-    async function fetchData() {
-      try {
-        const response = await api.get("/users");
+  const getStop = async () => {
+    clearInterval(countdownInterval); // Stop the countdown timer
+    const answers = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
 
-        // delays continuous execution of an async operation for 1 second.
-        // This is just a fake async call, so that the spinner can be displayed
-        // feel free to remove it :)
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+    // send the answers to backend for verification
+    try{
+      await submitAnswers(answers);
+    }catch(error){
+      setError("Error submitting data");
 
-        // Get the returned users and update the state.
-        setUsers(response.data);
-
-        // This is just some data for you to see what is available.
-        // Feel free to remove it.
-        console.log("request to:", response.request.responseURL);
-        console.log("status code:", response.status);
-        console.log("status text:", response.statusText);
-        console.log("requested data:", response.data);
-
-        // See here to get more data.
-        console.log(response);
-      } catch (error) {
-        console.error(
-          `Something went wrong while fetching the users: \n${handleError(
-            error
-          )}`
-        );
-        console.error("Details:", error);
-        alert(
-          "Something went wrong while fetching the users! See the console for details."
-        );
-      }
+      return;
     }
+    navigate(`/evaluation/${lobbyName}/profession`);
+  };
 
-    fetchData();
+  const doStop = async () => {
+    client.send("/app/stop-game", {}, "{}");
+    clearInterval(countdownInterval); // Stop the countdown timer
+    const answers = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
+
+    // send the answers to backend for verification
+    try{
+      await submitAnswers(answers);
+    }catch(error){
+      setError("Error submitting data");
+
+      return;
+    }
+    navigate(`/evaluation/${lobbyName}/profession`);
+  };
+
+  const getLetter = async () => {
+    try {
+      await api.put(`/players/${username}`, JSON.stringify({ready: false}));
+      const response = await api.get(`/rounds/letters/${gameId}`);
+      console.log(response.data);
+      setLetter(response.data);
+    } catch (error) {
+      console.log("Error fetching the current letter");
+    }
+  };
+
+  useEffect(() => {
+    getLetter();
+    setTimeout(startCountdown, 1); // Delay startCountdown by 1 second
   }, []);
 
-  const handleUserClick = (id) => {
-    navigate(`/user/${id}`)
-  }
 
-  let content = <Spinner />;
+  const startCountdown = () => {
+    // Start the countdown timer
+    const intervalId = setInterval(() => {
+      setCountdown((prevCountdown) => prevCountdown - 1);
+    }, 1000);
+    setCountdownInterval(intervalId);
+  };
 
-  if (users) {
-    content = (
-      <div className="game">
-        <ul className="game user-list">
-          {users.map((user: User) => (
-            <li key={user.id}>
-              <Player user={user}
-                onClick={() => handleUserClick(user.id)}/>
-            </li>
-          ))}
-        </ul>
-        <Button width="100%" onClick={() => logout(localStorage.getItem ("id"))}>
-          Logout
-        </Button>
-      </div>
-    );
-  }
+  useEffect(() => {
+    // Check if countdown has reached 0
+    if (countdown === 0) {
+      clearInterval(countdownInterval); // Stop the countdown timer
+      // Perform actions when countdown reaches 0
+      doStop();
+    }
+  }, [countdown]);
 
   return (
-    <BaseContainer className="game container">
-      <h2>Happy Coding!</h2>
-      <p className="game paragraph">
-        Get all users from secure endpoint:
-      </p>
-      {content}
+    <BaseContainer>
+      <div className="game container">
+        <div className="game form">
+          <div className="header">
+            <h1 className="Letter">{letter}</h1>
+            <h1 className="countdown">{countdown}</h1>
+          </div>
+          {error && <div className="game error-message">{error}</div>}
+          <FormField
+            label="country"
+            value={country}
+            onChange={(country: string) => setCountry(country)}
+          />
+          <FormField
+            label="city"
+            value={city}
+            onChange={(city: string) => setCity(city)}
+          />
+          <FormField
+            label="profession"
+            value={profession}
+            onChange={(profession: string) => setProfession(profession)}
+          />
+          <FormField
+            label="celebrity"
+            value={celebrity}
+            onChange={(celebrity: string) => setCelebrity(celebrity)}
+          />
+        </div>
+        <div className="game button-container">
+          <Button
+            disabled={!country || !city || !profession || !celebrity}
+            width="100%"
+            onClick={() => doStop()}
+          >
+            Stop
+          </Button>
+        </div>
+      </div>
     </BaseContainer>
   );
 };

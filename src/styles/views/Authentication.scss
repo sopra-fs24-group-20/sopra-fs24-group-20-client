@@ -1,6 +1,6 @@
 @import "../theme";
 
-.login {
+.authentication {
   &.container {
     margin-top: 2em;
     min-height: 300px;
@@ -8,19 +8,22 @@
     @include center;
     flex-direction: column;
   }
+  &.centered-text {
+    text-align: center;
+  }
   &.form {
     display: flex;
     flex-direction: column;
     justify-content: center;
     width: 60%;
     max-width: 30em;
-    height: 20em;
+    height: 18em;
     font-size: 16px;
     font-weight: 300;
     padding-left: 37px;
     padding-right: 37px;
     border-radius: 0.75em;
-    background-color: $background;
+    background-image: linear-gradient(0deg, $accentBottomLight, $accentMiddleLight, $accentTopLight);
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: $dropShadow;
   }
@@ -48,12 +51,24 @@
   &.button-container {
     display: flex;
     justify-content: center;
-    margin-top: 2em;
+    margin-top: 20px;
+    width: 60%;
+    max-width: 480px;
+    min-width: 200px;
   }
-
   &.error-message{
     color:red;
     font-weight: bold;
     font-size: 14px;
+  }
+  &.link {
+    margin-top: 2em;
+    color: white;
+    text-decoration: underline;
+  }
+  &.link:visited {
+    margin-top: 2em;
+    color: white;
+    text-decoration: underline;
   }
 }

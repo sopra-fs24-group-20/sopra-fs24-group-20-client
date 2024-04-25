@@ -3,22 +3,16 @@ import { api, handleError } from "helpers/api";
 import User from "models/User";
 import {useNavigate} from "react-router-dom";
 import { Button } from "components/ui/Button";
-import "styles/views/Login.scss";
+import "styles/views/Authentication.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 
-/*
-It is possible to add multiple components inside a single file,
-however be sure not to clutter your files with an endless amount!
-As a rule of thumb, use one file per component and only add small,
-specific components that belong to the main one in the same file.
- */
 const FormField = (props) => {
   return (
-    <div className="login field">
-      <label className="login label">{props.label}</label>
+    <div className="authentication field">
+      <label className="authentication label">{props.label}</label>
       <input
-        className="login input"
+        className="authentication input"
         placeholder="enter here.."
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
@@ -35,7 +29,6 @@ FormField.propTypes = {
 
 const Login = () => {
   const navigate = useNavigate();
-  const [name, setName] = useState<string>(null);
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
   const [error, setError] = useState(null);
@@ -43,31 +36,25 @@ const Login = () => {
   const doLogin = async () => {
     try {
       const requestBody = JSON.stringify({ username, password });
-      const response = await api.post("/login", requestBody);
+      const response = await api.post("/players/login", requestBody);
       const user = response.data;
 
-      localStorage.setItem("token", user.token);
-      localStorage.setItem("id", user.id);
-      navigate("/game");}
-
-    catch (error) {
+      localStorage.setItem("username", user.username);
+      // localStorage.setItem("id", user.id);
+      navigate(`/user/${user.username}`);
+    } catch (error) {
       setError ("Invalid username or password");
+      console.log(handleError(error))
+      navigate("/login");
     }
   };
 
-  const doRegister = () => {
-    navigate("/register");
-  }
-
-  const ClickHere = () => {
-    return (<p>Don&apos;t have an account yet? Register <a href= "#" onClick={() => {navigate("/register")}}>here</a></p>);
-  }
-
   return (
     <BaseContainer>
-      <div className="login container">
-        <div className="login form">
-          {error && <div className="login error-message">{error}</div>}
+      <div className="authentication container">
+        <div className="authentication form">
+          <h1 className="authentication centered-text" >Login</h1>
+          {error && <div className="authentication error-message">{error}</div>}
           <FormField
             label="Username"
             value={username}
@@ -78,16 +65,18 @@ const Login = () => {
             value={password}
             onChange={(n) => setPassword(n)}
           />
-          <ClickHere></ClickHere>
-          <div className="login button-container">
-            <Button
-              disabled={!username || !password}
-              width="100%"
-              onClick={() => doLogin()}
-            >
-              Login
-            </Button>
-          </div>
+        </div>
+        <div className="authentication button-container">
+          <Button
+            disabled={!username || !password}
+            width="100%"
+            onClick={() => doLogin()}
+          >
+            Login
+          </Button>
+        </div>
+        <div>
+          <a className="authentication link" href="/start">back</a>
         </div>
       </div>
     </BaseContainer>
