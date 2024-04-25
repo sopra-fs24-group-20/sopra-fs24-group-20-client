@@ -189,7 +189,7 @@ const EvaluationScreen = () => {
                 <ul className="evaluation ul">
                   {answers?.map((answer, index) => (
                     <li key={index} className="evaluation li">
-                      {answer}   -   {mockScores[index]}
+                      {answer}   -   {scores[index]}
                     </li>
                   ))}
                 </ul>
