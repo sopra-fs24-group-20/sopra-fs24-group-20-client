@@ -31,9 +31,7 @@ const LobbyPage = () => {
   const [reload, setReload] = useState(null);
   const ws = localStorage.getItem("readyws");
 
-
-
-
+  
   useEffect(() => {
     async function stompConnect() {
       try {
