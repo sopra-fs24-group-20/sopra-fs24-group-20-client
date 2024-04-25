@@ -82,7 +82,7 @@ const LobbyPage = () => {
     try {
       await api.put(`/players/${local_username}`, JSON.stringify({ready: true}));
       setButtonClicked(true);
-      client.send("/app/ready-up", {}, JSON.stringify({ username: local_username }));
+      client.send("/app/ready-up", {}, JSON.stringify({ username: local_username, lobbyId:localLobbyId }));
     } catch (error) {
       alert(
         `Something went wrong while getting ready: \n${handleError(error)}`
