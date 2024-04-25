@@ -7,25 +7,16 @@ import "styles/views/Evaluation.scss";
 import { User } from "types";
 
 const EvaluationScreen = () => {
-  const { id: id } = useParams();
   const navigate = useNavigate();
-  const [error, setError] = useState(null);
   const username = localStorage.getItem("username");
   const lobbyName = localStorage.getItem("lobbyName");
   const lobbyId = localStorage.getItem("lobbyId");
   const gameId = localStorage.getItem("gameId");
-  const LobbyPassword = localStorage.getItem("lobbyPassword");
   const [players, setPlayers] = useState<User[]>(null);
   const [categories, setCategories] = useState<String[]>(null);
   const [answers, setAnswers] = useState<String[]>(null);
   const [currentCategory, setCurrentCategory] = useState(null);
-  const [nextCategory, setNextCategory] = useState(null);
   const [scores, setScores] = useState<number[]>(null);
-
-
-  const mockAnswersOne = {"One" : {score: 10, answer:"Dusseldorf"}, "Two": {score: 10, answer:"Dublin"}};
-  const mockAnswersTwo =  {"One" : {score: 10, answer:"Denmark"}, "Two": {score: 10, answer:"Denmark"}};
-  const mockPlayersAnswers = {"City": mockAnswersOne, "Country": mockAnswersTwo};
 
   const leaveLobby = async (requestBody: string) => {
     if (requestBody === null){
@@ -92,11 +83,6 @@ const EvaluationScreen = () => {
     setCurrentCategory(allCategories[parseInt(localStorage.getItem('categoryIndex'), 10)]);
   }
 
-  const mockAnswers = getPlayerAnswersForCategory(mockPlayersAnswers,"City");
-  const mockCategories = getCategories(mockPlayersAnswers);
-  const mockPlayers = getPlayerNames(mockPlayersAnswers);
-  const mockScores = getScoresForCategory(mockPlayersAnswers, "City");
-
   const handleClick = () => {
     const requestBody = JSON.stringify({
       lobbyName: lobbyName,
@@ -115,7 +101,7 @@ const EvaluationScreen = () => {
         navigate(`/evaluation/${lobbyName}/${categories[newIndex]}`);
       }
       else {
-        localStorage.removeItem("currentIndex");
+        localStorage.removeItem("categoryIndex");
         navigate(`/leaderboard/final/${lobbyName}`);
       }
     }
@@ -129,7 +115,6 @@ const EvaluationScreen = () => {
     async function fetchData() {
       try {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log(gameId);
         const response = await api.get(`/rounds/scores/${gameId}`,gameId);
         const fetchedPlayers = getPlayerNames(response.data);
         const fetchedCategories = getCategories(response.data);
@@ -138,10 +123,6 @@ const EvaluationScreen = () => {
         changeCategory(fetchedCategories);
         setAnswers(getPlayerAnswersForCategory(response.data,currentCategory));
         setScores(getScoresForCategory(response.data,currentCategory));
-        console.log(fetchedPlayers);
-        console.log(fetchedCategories);
-        console.log(answers);
-        console.log(scores);
       } catch (error) {
         console.error(
           `Something went wrong while fetching the players: \n${handleError(
