@@ -106,7 +106,7 @@ const EvaluationScreen = () => {
 
   const nextEval = () => {
     if (localStorage.getItem("categoryIndex")) {
-      if (parseInt(localStorage.getItem('categoryIndex'), 10) <= categories.length-1) {
+      if (parseInt(localStorage.getItem('categoryIndex'), 10) < categories.length-1) {
         const newIndex = parseInt(localStorage.getItem('categoryIndex'), 10) + 1;
         localStorage.setItem("categoryIndex", newIndex.toString());
         console.log(localStorage.getItem("categoryIndex"));
@@ -126,6 +126,7 @@ const EvaluationScreen = () => {
   useEffect(() => {
     async function fetchData() {
       try {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         console.log(gameId);
         const response = await api.get(`/rounds/scores/${gameId}`,gameId);
         const fetchedPlayers = getPlayerNames(response.data);
@@ -139,7 +140,6 @@ const EvaluationScreen = () => {
         console.log(fetchedCategories);
         console.log(answers);
         console.log(scores);
-        console.log(response.data);
       } catch (error) {
         console.error(
           `Something went wrong while fetching the players: \n${handleError(
@@ -153,7 +153,7 @@ const EvaluationScreen = () => {
       }
     }
     fetchData();
-  }, [gameId, currentCategory, setPlayers, setCategories, setAnswers, setScores]);
+  }, [gameId, currentCategory, setPlayers, setCategories, setAnswers, setScores,categories]);
 
   return (
     <BaseContainer>
