@@ -17,6 +17,7 @@ const EvaluationScreen = () => {
   const [answers, setAnswers] = useState<String[]>(null);
   const [currentCategory, setCurrentCategory] = useState(null);
   const [scores, setScores] = useState<number[]>(null);
+  const votes = {};
 
   const leaveLobby = async (requestBody: string) => {
     if (requestBody === null){
@@ -27,8 +28,7 @@ const EvaluationScreen = () => {
       const response = await api.post("/lobby/leave", requestBody);
       console.log("leave lobby success");
       localStorage.removeItem("lobbyName");
-      localStorage.removeItem("currentCategory");
-      localStorage.removeItem("nextCategory");
+      localStorage.removeItem("categoryIndex");
       localStorage.removeItem("lobbyId");
       localStorage.removeItem("gameId");
       localStorage.removeItem("roundDuration");
@@ -78,6 +78,17 @@ const EvaluationScreen = () => {
     return playerAnswersList;
   }
 
+  function initiateVotes() {
+    const temporaryVotes = {"veto": false, "bonus": false};
+    categories.forEach(category => {
+      votes[category] = {}; // Initialize votes for each category
+      players.forEach(name => {
+        // Initialize each player's vote object with both bonus and veto keys
+        votes[category][name] = {...temporaryVotes};
+      });
+    });
+  }
+
   function changeCategory(allCategories) {
     if (!localStorage.getItem("categoryIndex")) {
       localStorage.setItem("categoryIndex","0");
@@ -94,16 +105,58 @@ const EvaluationScreen = () => {
     leaveLobby(requestBody)
   };
 
-  const nextEval = () => {
+  const submitBonus =  (player:string) => {
+    if (!localStorage.getItem("totalVotes")) {
+      initiateVotes();
+      localStorage.setItem("totalVotes",JSON.stringify(votes));
+    }
+    const temp = {...JSON.parse(localStorage.getItem("totalVotes"))};
+    temp[currentCategory][player]["bonus"] = true;
+    temp[currentCategory][player]["veto"] = false;
+    localStorage.setItem("totalVotes",JSON.stringify(temp));
+  };
+
+  const submitVeto =  (player:string) => {
+    if (!localStorage.getItem("totalVotes")) {
+      initiateVotes();
+      localStorage.setItem("totalVotes",JSON.stringify(votes));
+    }
+    const temp = {...JSON.parse(localStorage.getItem("totalVotes"))};
+    temp[currentCategory][player]["veto"] = true;
+    temp[currentCategory][player]["bonus"] = false;
+    localStorage.setItem("totalVotes",JSON.stringify(temp));
+  };
+
+  const nextEval = async () => {
     if (localStorage.getItem("categoryIndex")) {
       if (parseInt(localStorage.getItem("categoryIndex"), 10) < categories.length-1) {
         const newIndex = parseInt(localStorage.getItem("categoryIndex"), 10) + 1;
         localStorage.setItem("categoryIndex", newIndex.toString());
-        console.log(localStorage.getItem("categoryIndex"));
+
+        if (!localStorage.getItem("totalVotes")) {
+          initiateVotes();
+          localStorage.setItem("totalVotes",JSON.stringify(votes));
+        }
+
         navigate(`/evaluation/${lobbyName}/${categories[newIndex]}`);
       }
       else {
+        if (!localStorage.getItem("totalVotes")) {
+          initiateVotes();
+          localStorage.setItem("totalVotes",JSON.stringify(votes));
+        }
         localStorage.removeItem("categoryIndex");
+        const temp = JSON.parse(localStorage.getItem("totalVotes"));
+        localStorage.removeItem("totalVotes");
+        try {
+          const requestBody = JSON.stringify(temp);
+          console.log("requestBody",requestBody);
+          const response = await api.post(`/rounds/${gameId}/submitVotes`, requestBody);
+        } catch (error) {
+          console.error(
+            `An error occurred while trying submit the votes: \n${handleError(error)}`
+          );
+        }
         navigate(`/leaderboard/final/${lobbyName}`);
       }
     }
@@ -116,7 +169,6 @@ const EvaluationScreen = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
         const response = await api.get(`/rounds/scores/${gameId}`,gameId);
         const fetchedPlayers = getPlayerNames(response.data);
         const fetchedCategories = getCategories(response.data);
@@ -183,22 +235,26 @@ const EvaluationScreen = () => {
 
             <div className="evaluation middle-axis">
               Bonus
-              {players?.map((_, index) => (
+              {players?.map((player, index) => (
                 <button
                   key={index}
                   className="round-button-green"
                   style={{ marginTop: index === 0 ? "39px" : 0 }}
+                  onClick={() => submitBonus(players[index])}
+                  disabled={username === player}
                 ></button>
               ))}
             </div>
 
             <div className="evaluation middle-right-axis">
               Veto
-              {players?.map((_, index) => (
+              {players?.map((player, index) => (
                 <button
                   key={index}
                   className="round-button-red"
                   style={{ marginTop: index === 0 ? "39px" : 0 }}
+                  onClick={() => submitVeto(players[index])}
+                  disabled={username === player}
                 ></button>
               ))}
             </div>
