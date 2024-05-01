@@ -30,6 +30,8 @@ const EvaluationScreen = () => {
   const [answers, setAnswers] = useState<String[]>(null);
   const [currentCategory, setCurrentCategory] = useState(null);
   const [scores, setScores] = useState<number[]>(null);
+  const [rounds, setRounds] = useState(null);
+  const [currentRound, setCurrentRound] = useState(null);
   const votes = {};
 
   const leaveLobby = async (requestBody: string) => {
@@ -170,6 +172,15 @@ const EvaluationScreen = () => {
             `An error occurred while trying submit the votes: \n${handleError(error)}`
           );
         }
+        if (!localStorage.getItem("round")) {
+          localStorage.setItem("round","1");
+        }
+        setCurrentRound(localStorage.getItem("round"));
+        if (currentRound < rounds) {
+          localStorage.setItem("round", JSON.stringify(currentRound + 1));
+          navigate(`/leaderboard/${lobbyName}`);
+        }
+        localStorage.removeItem("round");
         navigate(`/leaderboard/final/${lobbyName}`);
       }
     }
@@ -202,7 +213,24 @@ const EvaluationScreen = () => {
         );
       }
     }
+    async function fetchRounds() {
+      try {
+        const response = await api.get(`lobby/settings/${lobbyId}`);
+        setRounds(response.data.rounds);
+      } catch (error) {
+        console.error(
+          `Something went wrong while fetching the settings: \n${handleError(
+            error
+          )}`
+        );
+        console.error("Details:", error);
+        alert(
+          "Something went wrong while fetching the settings! See the console for details."
+        );
+      }
+    }
     fetchData();
+    fetchRounds();
   }, [gameId, currentCategory, setPlayers, setCategories, setAnswers, setScores,categories]);
 
   return (

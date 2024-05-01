@@ -115,6 +115,7 @@
       .answer {
         flex: 1;
         position: relative;
+        font-weight: bold;
       }
 
       .score {
@@ -147,6 +148,7 @@
     margin-bottom: 1em;
     max-width: 10%;
     justify-content: flex-start;
+    font-weight: bold;
   }
 
   &.right-axis {
