@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import "styles/views/Game.scss";
-import { User } from "types";
 
 const FormField = (props) => {
   return (
@@ -52,26 +51,18 @@ const Game = () => {
     }
   }, [ws]);
 
-  useEffect(() => {
-    console.log("in effect hook");
-    console.log(gameId);
-    async function stompConnect() {
-      console.log("in async func");
-      console.log(username);
 
+  useEffect(() => {
+    async function stompConnect() {
       try {
-        console.log("in try");
         if (!client["connected"]) {
-          console.log("in if");
           client.connect({}, function () {
             client.send("/app/connect", {}, JSON.stringify({ username: username }));
-            console.log("/topic/game-control accessed");
             client.subscribe("/topic/game-control", function (response) {
               const data = JSON.parse(response.body);
               if (data.command === "stop") {
-                getStop();
+                setCountdown(0);
               }
-              console.log(data.body);
             });
           });
         }
@@ -83,13 +74,23 @@ const Game = () => {
     }
     stompConnect();
     
-    return function cleanup() {
-      if (client && client["connected"]) {
-        client.disconnect(function () {
-          console.log("disconnected from stomp");
-        });
+  }, []);
+
+  useEffect(() => {
+    // Fetch settings before the game starts
+    async function fetchSettings() {
+      try {
+        const response = await api.get(`/lobby/settings/${lobbyId}`);
+        const categories = response.data.categories;
+        console.log("categories", response.data.categories);
+        // Handle response and set state accordingly
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+        // Handle error
       }
-    };
+    }
+
+    fetchSettings();
   }, []);
 
   const getFormattedData = (category1: string, category2: string, category3: string, category4: string, answer1: string, answer2: string, answer3: string, answer4: string, username: string) => {
@@ -100,18 +101,12 @@ const Game = () => {
       [category3]: answer3,
       [category4]: answer4
     };
-    if (!localStorage.getItem("alreadySet")) {
-      setFormatedData(JSON.stringify(data));
-      localStorage.setItem("alreadySet","yes");
-      return JSON.stringify(data);
-    }
-    else {
-      return formatedData;
-    }
+
+    return JSON.stringify(data);
   };
 
   const submitAnswers = async (data) =>{
-    console.log(data);
+    console.log("submit answers ", data);
     try{
       await api.post(`/rounds/${gameId}/entries`, data);
 
@@ -120,8 +115,19 @@ const Game = () => {
     }
   };
 
-  const getStop = async () => {
+
+  const doStop = async () => {
+    if (client && client["connected"]) {
+      client.disconnect(function () {
+        console.log("disconnected from stomp");
+      });
+    }
     clearInterval(countdownInterval); // Stop the countdown timer
+    console.log("co", country);
+    console.log("ci", city);
+    console.log("pro", profession);
+    console.log("cel", celebrity);
+    
     const answer = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
 
     // send the answers to backend for verification
@@ -133,31 +139,19 @@ const Game = () => {
       return;
     }
     localStorage.removeItem("alreadySet");
+    localStorage.setItem("gamews", JSON.stringify(false))
     navigate(`/evaluation/${lobbyName}/profession`);
   };
 
-  const doStop = async () => {
+  const StopGame = async () => {
     client.send("/app/stop-game", {}, "{}");
-    clearInterval(countdownInterval); // Stop the countdown timer
-    const answer = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
-
-    // send the answers to backend for verification
-    try{
-      await submitAnswers(answer);
-    }catch(error){
-      setError("Error submitting data");
-
-      return;
-    }
-    localStorage.removeItem("alreadySet");
-    navigate(`/evaluation/${lobbyName}/profession`);
+    doStop();
   };
 
   const getLetter = async () => {
     try {
       await api.put(`/players/${username}`, JSON.stringify({ready: false}));
       const response = await api.get(`/rounds/letters/${gameId}`);
-      console.log(response.data);
       setLetter(response.data);
     } catch (error) {
       console.log("Error fetching the current letter");
@@ -197,31 +191,46 @@ const Game = () => {
           </div>
           {error && <div className="game error-message">{error}</div>}
           <FormField
-            label="country"
-            value={country}
-            onChange={(country: string) => setCountry(country)}
-          />
-          <FormField
-            label="city"
-            value={city}
-            onChange={(city: string) => setCity(city)}
-          />
-          <FormField
-            label="profession"
-            value={profession}
-            onChange={(profession: string) => setProfession(profession)}
-          />
-          <FormField
-            label="celebrity"
-            value={celebrity}
-            onChange={(celebrity: string) => setCelebrity(celebrity)}
-          />
+              label="country"
+              value={country}
+              onChange={(country: string) => {
+                console.log('Country changed:', country);
+                setCountry(country);
+              }}
+            />
+
+            <FormField
+              label="city"
+              value={city}
+              onChange={(city: string) => {
+                console.log('City changed:', city);
+                setCity(city);
+              }}
+            />
+
+            <FormField
+              label="profession"
+              value={profession}
+              onChange={(profession: string) => {
+                console.log('Profession changed:', profession);
+                setProfession(profession);
+              }}
+            />
+
+            <FormField
+              label="celebrity"
+              value={celebrity}
+              onChange={(celebrity: string) => {
+                console.log('Celebrity changed:', celebrity);
+                setCelebrity(celebrity);
+              }}
+            />
         </div>
         <div className="game button-container">
           <Button
             disabled={!country || !city || !profession || !celebrity}
             width="100%"
-            onClick={() => doStop()}
+            onClick={() => StopGame()}
           >
             Stop
           </Button>
