@@ -128,6 +128,7 @@ const EvaluationScreen = () => {
     const temp = {...JSON.parse(localStorage.getItem("totalVotes"))};
     temp[currentCategory][player]["bonus"] = true;
     temp[currentCategory][player]["veto"] = false;
+    console.log("When submitting a Bonus, our DT looks like this:",temp);
     localStorage.setItem("totalVotes",JSON.stringify(temp));
   };
 
@@ -139,6 +140,7 @@ const EvaluationScreen = () => {
     const temp = {...JSON.parse(localStorage.getItem("totalVotes"))};
     temp[currentCategory][player]["veto"] = true;
     temp[currentCategory][player]["bonus"] = false;
+    console.log("When submitting a Veto, our DT looks like this:",temp);
     localStorage.setItem("totalVotes",JSON.stringify(temp));
   };
 
@@ -152,7 +154,7 @@ const EvaluationScreen = () => {
           initiateVotes();
           localStorage.setItem("totalVotes",JSON.stringify(votes));
         }
-
+        console.log("My totalVotes before navigating to the next Screen:",JSON.parse(localStorage.getItem("totalVotes")));
         navigate(`/evaluation/${lobbyName}/${categories[newIndex]}`);
       }
       else {
@@ -162,6 +164,7 @@ const EvaluationScreen = () => {
         }
         localStorage.removeItem("categoryIndex");
         const temp = JSON.parse(localStorage.getItem("totalVotes"));
+        console.log("My final votes which get send to the backend:",temp);
         localStorage.removeItem("totalVotes");
         try {
           const requestBody = JSON.stringify(temp);
@@ -284,7 +287,7 @@ const EvaluationScreen = () => {
                 <button
                   key={index}
                   className="round-button-red"
-                  style={{ marginTop: index === 0 ? "39px" : 0 }}
+                  style={{ marginTop: index === 0 ? "36px" : 0 }}
                   onClick={() => submitVeto(players[index])}
                   disabled={username === player}
                 ></button>
@@ -297,7 +300,7 @@ const EvaluationScreen = () => {
                 <button
                   key={index}
                   className="round-button-green"
-                  style={{ marginTop: index === 0 ? "39px" : 0 }}
+                  style={{ marginTop: index === 0 ? "36px" : 0 }}
                   onClick={() => submitBonus(players[index])}
                   disabled={username === player}
                 ></button>
