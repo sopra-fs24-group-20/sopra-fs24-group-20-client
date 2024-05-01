@@ -5,6 +5,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import "styles/views/Evaluation.scss";
 import { User } from "types";
+import PropTypes from "prop-types";
+
+const Player = ({ user }) => (
+  <div className="player container">
+    <div className="player username">
+      {user}
+    </div>
+  </div>
+);
+
+Player.propTypes = {
+  user: PropTypes.object,
+};
 
 const EvaluationScreen = () => {
   const navigate = useNavigate();
@@ -203,7 +216,7 @@ const EvaluationScreen = () => {
                   <div className="evaluation button-container">
                     <Button
                       className="secondary-button"
-                      width="60%"
+                      width="40%"
                       onClick={() => handleClick()}
                     >
                       Exit
@@ -214,7 +227,9 @@ const EvaluationScreen = () => {
               <div className="evaluation transparent-form-exception">
                 <ul className="evaluation ul">
                   {players?.map((player, index) => (
-                    <li key={index} className="evaluation li">{player}</li>
+                    <li key={index} className="evaluation li">
+                      <Player user={player} />
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -226,7 +241,9 @@ const EvaluationScreen = () => {
                 <ul className="evaluation ul">
                   {answers?.map((answer, index) => (
                     <li key={index} className="evaluation li">
-                      {answer}   -   {scores[index]}
+                      <div className="evaluation answer">{answer}
+                        <div className="evaluation score">{scores[index]}pt</div>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -234,19 +251,6 @@ const EvaluationScreen = () => {
             </div>
 
             <div className="evaluation middle-axis">
-              Bonus
-              {players?.map((player, index) => (
-                <button
-                  key={index}
-                  className="round-button-green"
-                  style={{ marginTop: index === 0 ? "39px" : 0 }}
-                  onClick={() => submitBonus(players[index])}
-                  disabled={username === player}
-                ></button>
-              ))}
-            </div>
-
-            <div className="evaluation middle-right-axis">
               Veto
               {players?.map((player, index) => (
                 <button
@@ -254,6 +258,19 @@ const EvaluationScreen = () => {
                   className="round-button-red"
                   style={{ marginTop: index === 0 ? "39px" : 0 }}
                   onClick={() => submitVeto(players[index])}
+                  disabled={username === player}
+                ></button>
+              ))}
+            </div>
+
+            <div className="evaluation middle-right-axis">
+              Bonus
+              {players?.map((player, index) => (
+                <button
+                  key={index}
+                  className="round-button-green"
+                  style={{ marginTop: index === 0 ? "39px" : 0 }}
+                  onClick={() => submitBonus(players[index])}
                   disabled={username === player}
                 ></button>
               ))}

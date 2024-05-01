@@ -43,6 +43,7 @@ const Game = () => {
   const [celebrity, setCelebrity] = useState<string>("");
   const [error, setError] = useState(null);
   const ws = localStorage.getItem("gamews");
+  const [formatedData,setFormatedData] = useState<string>("");
 
   useEffect(() => {
     if (ws === "false") {
@@ -64,6 +65,7 @@ const Game = () => {
           console.log("in if");
           client.connect({}, function () {
             client.send("/app/connect", {}, JSON.stringify({ username: username }));
+            console.log("/topic/game-control accessed");
             client.subscribe("/topic/game-control", function (response) {
               const data = JSON.parse(response.body);
               if (data.command === "stop") {
@@ -98,8 +100,14 @@ const Game = () => {
       [category3]: answer3,
       [category4]: answer4
     };
-
-    return JSON.stringify(data);
+    if (!localStorage.getItem("alreadySet")) {
+      setFormatedData(JSON.stringify(data));
+      localStorage.setItem("alreadySet","yes");
+      return JSON.stringify(data);
+    }
+    else {
+      return formatedData;
+    }
   };
 
   const submitAnswers = async (data) =>{
@@ -114,32 +122,34 @@ const Game = () => {
 
   const getStop = async () => {
     clearInterval(countdownInterval); // Stop the countdown timer
-    const answers = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
+    const answer = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
 
     // send the answers to backend for verification
     try{
-      await submitAnswers(answers);
+      await submitAnswers(answer);
     }catch(error){
       setError("Error submitting data");
 
       return;
     }
+    localStorage.removeItem("alreadySet");
     navigate(`/evaluation/${lobbyName}/profession`);
   };
 
   const doStop = async () => {
     client.send("/app/stop-game", {}, "{}");
     clearInterval(countdownInterval); // Stop the countdown timer
-    const answers = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
+    const answer = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
 
     // send the answers to backend for verification
     try{
-      await submitAnswers(answers);
+      await submitAnswers(answer);
     }catch(error){
       setError("Error submitting data");
 
       return;
     }
+    localStorage.removeItem("alreadySet");
     navigate(`/evaluation/${lobbyName}/profession`);
   };
 
