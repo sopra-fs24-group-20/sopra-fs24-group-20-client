@@ -7,12 +7,6 @@ import "styles/views/Authentication.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 
-/*
-It is possible to add multiple components inside a single file,
-however be sure not to clutter your files with an endless amount!
-As a rule of thumb, use one file per component and only add small,
-specific components that belong to the main one in the same file.
- */
 const FormField = (props) => {
   return (
     <div className="authentication field">
@@ -21,6 +15,7 @@ const FormField = (props) => {
         className="authentication input"
         placeholder="enter here.."
         value={props.value}
+        type={props.type}
         onChange={(e) => props.onChange(e.target.value)}
       />
     </div>
@@ -31,6 +26,7 @@ FormField.propTypes = {
   label: PropTypes.string,
   value: PropTypes.string,
   onChange: PropTypes.func,
+  type: PropTypes.string,
 };
 
 const Register = () => {
@@ -74,11 +70,11 @@ const Register = () => {
             value={username}
             onChange={(un: string) => setUsername(un)}
           />
-
           <FormField
             label="Password"
             value={password}
             onChange={(pw) => setPassword(pw)}
+            type="password"
           />
         </div>
         <div className="authentication button-container">

@@ -16,6 +16,7 @@ const FormField = (props) => {
         className="authentication input"
         placeholder="enter here.."
         value={props.value}
+        type={props.type}
         onChange={(e) => props.onChange(e.target.value)}
       />
     </div>
@@ -26,6 +27,7 @@ FormField.propTypes = {
   label: PropTypes.string,
   value: PropTypes.string,
   onChange: PropTypes.func,
+  type: PropTypes.string,
 };
 
 const CreateLobby = () => {
@@ -151,6 +153,7 @@ const CreateLobby = () => {
             label="Lobby Password"
             value={lobbyPassword}
             onChange={(password) => setLobbyPassword(password)}
+            type="password"
           />
         </div>
         <div className="authentication button-container">
