@@ -1,6 +1,11 @@
 @import "../theme";
 
 .leaderboard {
+  &.ready{
+    text-align: center;
+    font-size: 13px;
+    margin-bottom: 1em;
+  }
   &.container {
     margin-top: 2em;
     min-height: 300px;
@@ -67,4 +72,23 @@
     font-weight: 300;
   }
 
+}
+.player-row {
+  display: flex;
+  align-items: center;
+}
+
+.player-col {
+  flex: 1;
+  padding: 2px;
+  text-align: center;
+}
+
+.player-col2 {
+  flex: 1;
+  padding: 2px;
+}
+
+.medal {
+  margin-right: 4px;
 }
