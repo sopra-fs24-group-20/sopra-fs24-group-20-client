@@ -20,6 +20,7 @@ import {EvaluationGuard} from "../routeProtectors/EvaluationGuard";
 import { LeaderboardGuard } from "../routeProtectors/LeaderboardGuard";
 import FinalLeader from "../../views/FinalLeader";
 import Leader from "../../views/Leader";
+import Settings from "../../views/Settings";
 
 /**
  * Main router of your application.
@@ -65,6 +66,10 @@ const AppRouter = () => {
         {/* Game Section */}
         <Route path="/lobby/:lobbyName" element={<LobbyGuard />}>
           <Route path="/lobby/:lobbyName" element={<LobbyPage/>} />
+        </Route>
+
+        <Route path="/settings/:lobbyName" element={<LobbyGuard />}>
+          <Route path="/settings/:lobbyName" element={<Settings/>} />
         </Route>
 
         <Route path="/game/:lobbyName" element={<GameGuard />}>

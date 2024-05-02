@@ -149,6 +149,11 @@ const LobbyPage = () => {
       <div className="lobby container">
         <div className="lobby form">
           <div className="lobby centered-text">
+            <div className="lobby settings"
+                 onClick={() => navigate(`/settings/${localLobbyName}`)}
+            >
+              ⚙️
+            </div>
             <h1 className="lobby title">{localLobbyName}</h1>
 
             <ul className="lobby ul">
