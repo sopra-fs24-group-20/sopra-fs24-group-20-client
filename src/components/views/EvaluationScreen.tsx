@@ -34,13 +34,9 @@ const EvaluationScreen = () => {
   const [currentRound, setCurrentRound] = useState(null);
   const votes = {};
 
-  const leaveLobby = async (requestBody: string) => {
-    if (requestBody === null){
-      console.log("no existing lobby")
-      navigate(`/profile/${username}`);
-    }
+  const leaveLobby = async () => {
     try {
-      const response = await api.post("/lobby/leave", requestBody);
+      await api.put(`/lobby/leave/${lobbyId}?username=${username}`);
       console.log("leave lobby success");
       localStorage.removeItem("lobbyName");
       localStorage.removeItem("categoryIndex");
@@ -49,11 +45,11 @@ const EvaluationScreen = () => {
       localStorage.removeItem("roundDuration");
       localStorage.removeItem("readyws");
       localStorage.removeItem("gamews");
-      navigate(`/profile/${username}`);
+      navigate(`/user/${username}`);
     } catch (error) {
       if (error.response.status === 404){
         console.log("Lobby doesn't exist");
-        navigate(`/profile/${username}`);
+        navigate(`/user/${username}`);
       }
       console.error(
         `An error occurred while trying to exit the lobby: \n${handleError(error)}`
@@ -110,15 +106,6 @@ const EvaluationScreen = () => {
     }
     setCurrentCategory(allCategories[parseInt(localStorage.getItem("categoryIndex"), 10)]);
   }
-
-  const handleClick = () => {
-    const requestBody = JSON.stringify({
-      lobbyName: lobbyName,
-      lobbyId: lobbyId,
-      username: username
-    });
-    leaveLobby(requestBody)
-  };
 
   const submitBonus =  (player:string) => {
     if (!localStorage.getItem("totalVotes")) {
@@ -248,7 +235,7 @@ const EvaluationScreen = () => {
                     <Button
                       className="secondary-button"
                       width="40%"
-                      onClick={() => handleClick()}
+                      onClick={() => leaveLobby()}
                     >
                       Exit
                     </Button>
