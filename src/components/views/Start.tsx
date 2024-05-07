@@ -10,7 +10,8 @@ const Start = () => {
   const [error, setError] = useState(null);
   const doGuest = async () => {
     try {
-      const response = await api.post("/players/login/guest");
+      const requestBody = JSON.stringify({});
+      const response = await api.post("/players", requestBody);
       const user = response.data;
 
       localStorage.setItem("username", user.username);
@@ -51,7 +52,6 @@ const Start = () => {
               className="secondary-button"
               width="60%"
               onClick={() => doGuest()}
-              disabled={true}
             >
               play as guest
             </Button>

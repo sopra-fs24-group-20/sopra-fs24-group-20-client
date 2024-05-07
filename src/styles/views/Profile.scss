@@ -26,7 +26,6 @@
 
   &.right-axis {
     padding-left: 1em;
-    justify-content:flex-end;
     margin-bottom: 1em;
   }
 
@@ -49,14 +48,46 @@
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: $dropShadow;
   }
-  &.button-container {
+  &.button-container-create {
     display: flex;
     justify-content: center;
     margin-top: 5px;
     width: 60%;
-    max-width: 480px;
+    max-width: 200px;
     min-width: 200px;
+    position: absolute;
+    bottom: 60px;
+    right: 30px;
   }
+  &.button-container-join {
+    display: flex;
+    justify-content: center;
+    margin-top: 5px;
+    width: 60%;
+    max-width: 200px;
+    min-width: 200px;
+    position: absolute;
+    bottom: 20px;
+    right: 30px;
+  }
+  &.stat-container {
+    display: flex;
+    align-items: center;
+  }
+
+  &.stat-category {
+    margin-right: 10px;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+
+  &.stat-value {
+    position: absolute;
+    right: 40px;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+
   &.link {
     margin-top: 3em;
     color: white;
