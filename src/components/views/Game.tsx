@@ -36,13 +36,10 @@ const Game = () => {
   const gameId = localStorage.getItem("gameId");
   const lobbyId = localStorage.getItem("lobbyId");
   const roundDuration = localStorage.getItem("roundDuration");
-  const [country, setCountry] = useState<string>("");
-  const [city, setCity] = useState<string>("");
-  const [profession, setProfession] = useState<string>("");
-  const [celebrity, setCelebrity] = useState<string>("");
+  const [categories, setCategories] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [error, setError] = useState(null);
   const ws = localStorage.getItem("gamews");
-  const [formatedData,setFormatedData] = useState<string>("");
 
   useEffect(() => {
     if (ws === "false") {
@@ -82,8 +79,9 @@ const Game = () => {
       try {
         const response = await api.get(`/lobby/settings/${lobbyId}`);
         const categories = response.data.categories;
+        setCategories(categories);
         console.log("categories", response.data.categories);
-        // Handle response and set state accordingly
+        
       } catch (error) {
         console.error('Error fetching settings:', error);
         // Handle error
@@ -93,15 +91,12 @@ const Game = () => {
     fetchSettings();
   }, []);
 
-  const getFormattedData = (category1: string, category2: string, category3: string, category4: string, answer1: string, answer2: string, answer3: string, answer4: string, username: string) => {
-    const data = {
-      username: username,
-      [category1]: answer1,
-      [category2]: answer2,
-      [category3]: answer3,
-      [category4]: answer4
-    };
-
+  const getFormattedData = () => {
+    const data: { [key: string]: string } = { username };
+    categories.forEach((category, index) => {
+      data[category] = answers[category] || "";
+    });
+  
     return JSON.stringify(data);
   };
 
@@ -123,24 +118,23 @@ const Game = () => {
       });
     }
     clearInterval(countdownInterval); // Stop the countdown timer
-    console.log("co", country);
-    console.log("ci", city);
-    console.log("pro", profession);
-    console.log("cel", celebrity);
+
     
-    const answer = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
+    const answer = getFormattedData();
 
     // send the answers to backend for verification
     try{
       await submitAnswers(answer);
     }catch(error){
       setError("Error submitting data");
-
       return;
     }
-    localStorage.removeItem("alreadySet");
     localStorage.setItem("gamews", JSON.stringify(false))
-    navigate(`/evaluation/${lobbyName}/profession`);
+    const response = await api.get(`/rounds/scores/${gameId}`);
+    const categoriesObject = response.data;
+    const firstCategory = Object.keys(categoriesObject)[0];
+    console.log(firstCategory);
+    navigate(`/evaluation/${lobbyName}/${firstCategory}`);
   };
 
   const StopGame = async () => {
@@ -181,6 +175,13 @@ const Game = () => {
     }
   }, [countdown]);
 
+  const handleInputChange = (category: string, value: string) => {
+    setAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [category]: value,
+    }));
+  };
+
   return (
     <BaseContainer>
       <div className="game container">
@@ -190,45 +191,18 @@ const Game = () => {
             <h1 className="countdown">{countdown}</h1>
           </div>
           {error && <div className="game error-message">{error}</div>}
-          <FormField
-              label="country"
-              value={country}
-              onChange={(country: string) => {
-                console.log('Country changed:', country);
-                setCountry(country);
-              }}
-            />
-
+          {categories.map((category, index) => (
             <FormField
-              label="city"
-              value={city}
-              onChange={(city: string) => {
-                console.log('City changed:', city);
-                setCity(city);
-              }}
+              key={index}
+              label={category}
+              value={answers[category] || ""}
+              onChange={(value: string) => handleInputChange(category, value)}
             />
-
-            <FormField
-              label="profession"
-              value={profession}
-              onChange={(profession: string) => {
-                console.log('Profession changed:', profession);
-                setProfession(profession);
-              }}
-            />
-
-            <FormField
-              label="celebrity"
-              value={celebrity}
-              onChange={(celebrity: string) => {
-                console.log('Celebrity changed:', celebrity);
-                setCelebrity(celebrity);
-              }}
-            />
+          ))}
         </div>
         <div className="game button-container">
           <Button
-            disabled={!country || !city || !profession || !celebrity}
+            disabled={categories.some((category) => !answers[category])}
             width="100%"
             onClick={() => StopGame()}
           >
