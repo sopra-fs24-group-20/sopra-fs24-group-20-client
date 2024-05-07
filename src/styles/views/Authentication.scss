@@ -17,11 +17,12 @@
     justify-content: center;
     width: 60%;
     max-width: 30em;
-    height: 18em;
+    height: 20em;
     font-size: 16px;
     font-weight: 300;
     padding-left: 37px;
     padding-right: 37px;
+    padding-bottom: 15px;
     border-radius: 0.75em;
     background-image: linear-gradient(0deg, $accentBottomLight, $accentMiddleLight, $accentTopLight);
     transition: opacity 0.5s ease, transform 0.5s ease;
@@ -70,5 +71,24 @@
     margin-top: 2em;
     color: white;
     text-decoration: underline;
+  }
+  &.checkbox-container input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid white; /* box color */
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    vertical-align: middle;
+  }
+  &.checkbox-container input[type="checkbox"]:checked {
+    background-color: white; /* filler color*/
+  }
+  &.checkbox-container .checkbox-label {
+    margin-left: 5px;
+    color: white; /* text color */
   }
 }

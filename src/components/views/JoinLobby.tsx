@@ -34,6 +34,7 @@ const JoinLobby = () => {
   const [LobbyName, setLobbyName] = useState<string>(null);
   const [LobbyPassword, setLobbyPassword] = useState<string>(null);
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const username = localStorage.getItem("username");
 
@@ -131,8 +132,16 @@ const JoinLobby = () => {
             label="Lobby Password"
             value={LobbyPassword}
             onChange={(password) => setLobbyPassword(password)}
-            type="password"
+            type={showPassword ? "text" : "password"}
           />
+          <div className="authentication checkbox-container">
+            <input
+              type="checkbox"
+              checked={showPassword}
+              onChange={() => setShowPassword(!showPassword)}
+            />
+            <label className="authentication checkbox-label">Show Password</label>
+          </div>
         </div>
         <div className="authentication button-container">
           <Button

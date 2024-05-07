@@ -33,6 +33,7 @@ const Register = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState(null);
 
   const doRegister = async () => {
@@ -74,8 +75,16 @@ const Register = () => {
             label="Password"
             value={password}
             onChange={(pw) => setPassword(pw)}
-            type="password"
+            type={showPassword ? "text" : "password"}
           />
+          <div className="authentication checkbox-container">
+            <input
+              type="checkbox"
+              checked={showPassword}
+              onChange={() => setShowPassword(!showPassword)}
+            />
+            <label className="authentication checkbox-label">Show Password</label>
+          </div>
         </div>
         <div className="authentication button-container">
           <Button

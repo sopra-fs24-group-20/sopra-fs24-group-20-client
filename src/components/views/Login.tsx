@@ -34,6 +34,7 @@ const Login = () => {
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const doLogin = async () => {
     try {
@@ -66,8 +67,16 @@ const Login = () => {
             label="Password"
             value={password}
             onChange={(n) => setPassword(n)}
-            type="password"
+            type={showPassword ? "text" : "password"}
           />
+          <div className="authentication checkbox-container">
+            <input
+              type="checkbox"
+              checked={showPassword}
+              onChange={() => setShowPassword(!showPassword)}
+            />
+            <label className="authentication checkbox-label">Show Password</label>
+          </div>
         </div>
         <div className="authentication button-container">
           <Button
