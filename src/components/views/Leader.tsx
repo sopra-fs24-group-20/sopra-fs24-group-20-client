@@ -111,14 +111,14 @@ const Leader = () => {
       <div className="leaderboard container">
         <div className="leaderboard form">
           <div className="leaderboard centered-text">
-          <h1>Ranking</h1>
-          <ul className="leaderboard user-list">
-            {playersPoints.map((player, index) => (
-              <li key={index} className="leaderboard li">
-                <Player user={player} index={index} />
-              </li>
-            ))}
-          </ul>
+            <h1>Ranking</h1>
+            <ul className="leaderboard user-list">
+              {playersPoints.map((player, index) => (
+                <li key={index} className="leaderboard li">
+                  <Player user={player} index={index} />
+                </li>
+              ))}
+            </ul> 
             <div className="leaderboard ready">
               {players_ready(allPlayers)}/{allPlayers.length} players are ready
             </div>

@@ -29,9 +29,6 @@ const LobbyPage = () => {
   const [new_join, setNewJoinWS] = useState(null);
   const [allPlayers, setAllPlayers] = useState([]);
 
-
-
-
   useEffect(() => {
     const intervalId = setInterval(fetchPlayers, 2000); // 2000 milliseconds = 2 seconds
   
@@ -140,7 +137,7 @@ const LobbyPage = () => {
             <div className="lobby settings"
                  onClick={() => navigate(`/settings/${localLobbyName}`)}
             >
-              ⚙️
+           ⚙️
             </div>
             <h1 className="lobby title">{localLobbyName}</h1>
 
@@ -156,7 +153,7 @@ const LobbyPage = () => {
              {players_ready(allPlayers)}/{allPlayers.length} players are ready
             </div>
 
-            <Button
+             <Button
               className="secondary-button"
               width="60%"
               onClick={local_ready}
