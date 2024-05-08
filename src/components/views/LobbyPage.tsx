@@ -135,7 +135,7 @@ const LobbyPage = () => {
         <div className="lobby form">
           <div className="lobby centered-text">
             <div className="lobby settings"
-                 onClick={() => navigate(`/settings/${localLobbyName}`)}
+              onClick={() => navigate(`/settings/${localLobbyName}`)}
             >
            ⚙️
             </div>
@@ -150,10 +150,10 @@ const LobbyPage = () => {
             </ul>
 
             <div className="lobby ready">
-             {players_ready(allPlayers)}/{allPlayers.length} players are ready
+              {players_ready(allPlayers)}/{allPlayers.length} players are ready
             </div>
 
-             <Button
+            <Button
               className="secondary-button"
               width="60%"
               onClick={local_ready}
