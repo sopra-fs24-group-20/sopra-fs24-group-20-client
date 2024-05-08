@@ -31,6 +31,7 @@ const LobbyPage = () => {
 
 
 
+
   useEffect(() => {
     const intervalId = setInterval(fetchPlayers, 2000); // 2000 milliseconds = 2 seconds
   
