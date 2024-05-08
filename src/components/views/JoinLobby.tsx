@@ -82,9 +82,6 @@ const JoinLobby = () => {
         localStorage.setItem("lobbyName", LobbyName);
         localStorage.setItem("lobbyId", response.data.lobbyId);
         localStorage.setItem("gameId", response.data.game.id.toString());
-        localStorage.setItem("roundDuration", response.data.roundDuration);
-        localStorage.setItem("readyws", JSON.stringify(false));
-        localStorage.setItem("gamews", JSON.stringify(false));
         console.log(response.data.game.id);
         /*try {
           // Make a request to get the game ID

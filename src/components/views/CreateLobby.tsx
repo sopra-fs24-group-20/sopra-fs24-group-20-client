@@ -83,13 +83,10 @@ const CreateLobby = () => {
         localStorage.setItem("lobbyName", lobbyName);
         localStorage.setItem("lobbyId", response.data.lobbyId);
         localStorage.setItem("gameId", response.data.game.id.toString());
-        localStorage.setItem("readyws", JSON.stringify(false));
-        localStorage.setItem("gamews", JSON.stringify(false));
         console.log(localStorage.getItem("gameId"));
-        localStorage.setItem("roundDuration", response.data.roundDuration);
         const categories = {categories: ["country", "city", "profession", "celebrity"]};
         JSON.stringify(categories);
-        const setCategories = await api.put(`/lobby/settings/${localStorage.getItem("lobbyId")}`, categories)
+        await api.put(`/lobby/settings/${localStorage.getItem("lobbyId")}`, categories)
         /*try {
           // Make a request to get the game ID
           const gameIdResponse = await api.get(`/${response.data.id}/gameId`);

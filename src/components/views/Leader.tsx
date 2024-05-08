@@ -66,6 +66,7 @@ const Leader = () => {
   };
   const start_game = async () => {
     try {
+      await api.put(`/players/${localUsername}`, JSON.stringify({ready: false}));
       navigate(`/game/${localLobbyName}`);
     } catch (error) {
       alert(
