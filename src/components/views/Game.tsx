@@ -122,6 +122,7 @@ const Game = () => {
         console.log("disconnected from stomp");
       });
     }
+    await api.put(`/players/${username}`, JSON.stringify({ready: false}));
     clearInterval(countdownInterval); // Stop the countdown timer
 
     

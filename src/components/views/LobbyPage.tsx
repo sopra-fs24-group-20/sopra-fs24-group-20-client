@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { api, handleError} from "helpers/api";
-import { client, subscribeToTopic } from "helpers/websocketContext";
 import { Button } from "components/ui/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
@@ -32,9 +31,13 @@ const LobbyPage = () => {
 
 
 
-useEffect(() => {
-  fetchPlayers();
-}, [allPlayers]);
+  useEffect(() => {
+    const intervalId = setInterval(fetchPlayers, 2000); // 2000 milliseconds = 2 seconds
+  
+    // Cleanup function to clear the interval when component unmounts or when allPlayers changes
+    return () => clearInterval(intervalId);
+  }, [allPlayers]);
+  
 
   /*useEffect(() => {
 
@@ -76,6 +79,7 @@ useEffect(() => {
       localStorage.removeItem("lobbyId");
       localStorage.removeItem("gameId");
       localStorage.removeItem("gamews");
+      await api.put(`/players/${local_username}`, JSON.stringify({ready: false}));
       navigate(`/user/${local_username}`);
     } catch (error) {
       alert(
@@ -103,7 +107,7 @@ useEffect(() => {
   const start_game = async () => {
     try {
       localStorage.setItem("gamews", "false")
-      // await api.put(`/players/${local_username}`, JSON.stringify({ready: false}));
+      await api.put(`/players/${local_username}`, JSON.stringify({ready: false}));
       navigate(`/game/${localLobbyName}`);
     } catch (error) {
       alert(`Error starting game: ${handleError(error)}`);

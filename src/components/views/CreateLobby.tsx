@@ -102,13 +102,32 @@ const CreateLobby = () => {
         }*/
         //client.send("/topic/lobby_join", {}, "{}");
         navigate(`/lobby/${lobbyName}`);
-      } else if (response.status === 400) {
-        setError("Join lobby failed because password doesn't match");
-      } else if (response.status === 404) {
-        setError("Join lobby failed because lobby doesn't exist");
-      }
+      } 
     } catch (error) {
-      setError("An error occurred while joining the lobby");
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        if (error.response.status === 400) {
+          // Handle BAD REQUEST error
+          setError("Join lobby failed because password doesn’t match");
+        } else if (error.response.status === 404) {
+          // Handle NOT FOUND error
+          setError("Join lobby failed because the lobby doesn’t exist");
+        } else if (error.response.status === 409) {
+          // Handle CONFLICT error
+          setError("Cannot join lobby as the game is not in SETUP mode.");
+        } else {
+          // Handle other errors
+          setError("An error occurred while joining the lobby. Please try again later.");
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error(error.request);
+        setError("No response received from the server. Please try again later.");
+      } else {
+        // Something happened in setting up the request that triggered an error
+        console.error("Error", error.message);
+        setError("An unexpected error occurred. Please try again later.");
+      }
     }
   };
 
@@ -122,14 +141,32 @@ const CreateLobby = () => {
       const create_response = await api.post("/lobby/create", createBody);
       if (create_response.status === 201) {
         await doJoinLobby();
-      } else if (create_response.status === 400) {
-        console.log("lobby already exists")
-        const errorMessage = create_response.data.message;
-        setError(errorMessage);
-      }
+      } 
     } catch (error) {
-      console.log(error)
-      setError("An error occurred while creating the lobby");
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        if (error.response.status === 400) {
+          // Handle BAD REQUEST error
+          setError("Lobby name must not be empty.");
+        } else if (error.response.status === 404) {
+          // Handle NOT FOUND error
+          setError("Player not found.");
+        } else if (error.response.status === 500) {
+          // Handle INTERNAL SERVER ERROR
+          setError("An internal server error occurred while creating the lobby.");
+        } else {
+          // Handle other errors
+          setError("An error occurred while creating the lobby.");
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error(error.request);
+        setError("No response received from the server. Please try again later.");
+      } else {
+        // Something happened in setting up the request that triggered an error
+        console.error("Error", error.message);
+        setError("An unexpected error occurred. Please try again later.");
+      }
     }
   };
 
