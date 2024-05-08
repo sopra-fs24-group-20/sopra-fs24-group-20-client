@@ -144,7 +144,7 @@ const CreateLobby = () => {
       } 
     } catch (error) {
       if (error.response) {
-        // The request was made and the server responded with a status code
+        // The request was made and the server responded with a status code 
         if (error.response.status === 400) {
           // Handle BAD REQUEST error
           setError("Lobby name must not be empty.");
