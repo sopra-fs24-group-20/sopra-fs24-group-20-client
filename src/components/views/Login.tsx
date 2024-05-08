@@ -15,6 +15,7 @@ const FormField = (props) => {
         className="authentication input"
         placeholder="enter here.."
         value={props.value}
+        type={props.type}
         onChange={(e) => props.onChange(e.target.value)}
       />
     </div>
@@ -25,6 +26,7 @@ FormField.propTypes = {
   label: PropTypes.string,
   value: PropTypes.string,
   onChange: PropTypes.func,
+  type: PropTypes.string,
 };
 
 const Login = () => {
@@ -32,6 +34,7 @@ const Login = () => {
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const doLogin = async () => {
     try {
@@ -64,7 +67,16 @@ const Login = () => {
             label="Password"
             value={password}
             onChange={(n) => setPassword(n)}
+            type={showPassword ? "text" : "password"}
           />
+          <div className="authentication checkbox-container">
+            <input
+              type="checkbox"
+              checked={showPassword}
+              onChange={() => setShowPassword(!showPassword)}
+            />
+            <label className="authentication checkbox-label">Show Password</label>
+          </div>
         </div>
         <div className="authentication button-container">
           <Button

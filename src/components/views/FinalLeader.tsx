@@ -9,11 +9,17 @@ import { Lobby, User } from "types";
 import Confetti from "react-confetti";
 
 const Player = ({ user, index }) => {
+  // Define medal emojis
+  const medalEmojis = ["🥇", "🥈", "🥉"];
+
   return (
-    <div>
-      <div className="leaderboard username">
-        {index + 1}. {user.username} {user.points}pt
+    <div className="player-row">
+      <div className="player-col">
+        {/* Render medal emoji or placeholder */}
+        {index < 3 ? <span className="medal">{medalEmojis[index]}</span> : ""}
       </div>
+      <div className="player-col2">{user.username}</div>
+      <div className="player-col">{user.points}pt</div>
     </div>
   );
 };
@@ -46,14 +52,8 @@ const FinalLeader = () => {
         setPlayers(sortedPlayers);
         console.log(response.data);
       } catch (error) {
-        console.error(
-          `Something went wrong while fetching the users: \n${handleError(
-            error
-          )}`
-        );
-        console.error("Details:", error);
         alert(
-          "Something went wrong while fetching the users! See the console for details."
+          `Something went wrong during exiting the lobby: \n${handleError(error)}`
         );
       }
     }
@@ -64,7 +64,7 @@ const FinalLeader = () => {
     <BaseContainer>
       <div className="leaderboard container">
         <div className="leaderboard form">
-          <h2 className="leaderboard centered-text">Final Ranking</h2>
+          <h1 className="leaderboard centered-text">Final Ranking</h1>
           <ul className="leaderboard user-list">
             {players.map((player, index) => (
               <li key={index} className="leaderboard li">
@@ -72,15 +72,17 @@ const FinalLeader = () => {
               </li>
             ))}
           </ul>
-          <Button width="100%" onClick={() => navigate(`/lobby/${localLobbyName}`)}>
-            Back to Lobby
-          </Button>
           <Confetti
             colors={["#64f1f1","#9135a4","#ff03bf","#e8d152","#c0c0c0"]}
             width={window.innerWidth}
             numberOfPieces={500}
             height={window.innerHeight}>
           </Confetti>
+        </div>
+        <div className="authentication button-container">
+          <Button width="100%" onClick={() => navigate(`/lobby/${localLobbyName}`)}>
+            Back to Lobby
+          </Button>
         </div>
       </div>
     </BaseContainer>

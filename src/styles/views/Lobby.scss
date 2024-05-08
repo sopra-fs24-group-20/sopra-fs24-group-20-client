@@ -1,6 +1,12 @@
 @import "../theme";
 
 .lobby {
+  &.settings{
+    text-align: right;
+    margin-bottom: -1em;
+    font-size: 25px;
+    cursor: pointer;
+  }
   &.container {
     margin-top: 2em;
     min-height: 300px;

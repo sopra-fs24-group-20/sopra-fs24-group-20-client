@@ -1,10 +1,9 @@
 @import "../theme";
 
-.authentication {
+.settings {
   &.container {
     margin-top: 2em;
     min-height: 300px;
-    /* we include the center mixin defined in _theme.scss and save three duplicate lines :) */
     @include center;
     flex-direction: column;
   }
@@ -17,16 +16,22 @@
     justify-content: center;
     width: 60%;
     max-width: 30em;
-    height: 20em;
+    min-height: 18em;
     font-size: 16px;
     font-weight: 300;
     padding-left: 37px;
     padding-right: 37px;
-    padding-bottom: 15px;
+    padding-bottom: 10px;
     border-radius: 0.75em;
     background-image: linear-gradient(0deg, $accentBottomLight, $accentMiddleLight, $accentTopLight);
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: $dropShadow;
+  }
+  &.column {
+    float: left;
+    width: 33.33%;
+    padding: 10px;
+    box-sizing: border-box;
   }
   &.field {
     display: flex;
@@ -39,15 +44,9 @@
     margin-left: -4px;
     border: none;
     border-radius: 0.75em;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     background: transparentize(white, 0.85);
     color: $textColor;
-  }
-  &.label {
-    color: $textColor;
-    margin-bottom: 10px;
-    text-transform: lowercase;
-    font-weight: 300;
   }
   &.button-container {
     display: flex;
@@ -56,39 +55,13 @@
     width: 60%;
     max-width: 480px;
     min-width: 200px;
+    padding-bottom: 20px;
   }
-  &.error-message{
-    color:red;
-    font-weight: bold;
-    font-size: 14px;
-  }
-  &.link {
-    margin-top: 2em;
-    color: white;
-    text-decoration: underline;
-  }
-  &.link:visited {
-    margin-top: 2em;
-    color: white;
-    text-decoration: underline;
-  }
-  &.checkbox-container input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    width: 16px;
-    height: 16px;
-    border: 2px solid white; /* box color */
-    border-radius: 3px;
-    outline: none;
+  &.delete{
+    font-size: 10px;
     cursor: pointer;
-    vertical-align: middle;
+    margin-top: -10px;
+    margin-bottom: 10px;
   }
-  &.checkbox-container input[type="checkbox"]:checked {
-    background-color: white; /* filler color*/
-  }
-  &.checkbox-container .checkbox-label {
-    margin-left: 5px;
-    color: white; /* text color */
-  }
+
 }

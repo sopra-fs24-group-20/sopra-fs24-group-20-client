@@ -33,34 +33,36 @@
   }
   .round-button-red {
     display: inline-block;
-    padding: 10px;
-    width: 10px;
-    height: 10px;
+    padding: 14px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     background-color: red;
     color: white;
     text-align: center;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin-bottom: 1.25em;
   }
   .round-button-red:hover {
     background-color: darkred;
   }
   .round-button-green {
     display: inline-block;
-    padding: 10px;
-    width: 10px;
-    height: 10px;
+    padding: 14px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    background-color: green;
+    background-color: #58d1d1;
     color: white;
     text-align: center;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin-bottom: 1.25em;
   }
 
   .round-button-green:hover {
-    background-color: darkgreen; /* Change color on hover */
+    background-color: lightseagreen; /* Change color on hover */
   }
 
   &.transparent-form-normal {
@@ -72,6 +74,7 @@
     justify-content: center;
     transition: opacity 0.5s ease, transform 0.5s ease;
     padding: 20px;
+    width: 100%;
   }
 
   &.transparent-form-exception {
@@ -85,44 +88,84 @@
     padding: 20px;
   }
 
-  &.left-axis,
-  &.middle-left-axis,
+
+  &.left-axis {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 20%;
+    justify-content: flex-start;
+  }
+
+  &.middle-left-axis {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    min-width: 60%;
+    justify-content: flex-start;
+    ul {
+      margin-top: -0.6em;
+      .li {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1.5em; /* Adjust the value as needed */
+        min-width: 100%;
+      }
+      .answer {
+        flex: 1;
+        position: relative;
+        font-weight: bold;
+        margin-top: 1.6em;
+      }
+
+      .score {
+        position: absolute;
+        margin-top: -1.11em;
+        left: calc(50% + 130px); /* Position from the center */
+        transform: translateX(-50%);
+      }
+
+      .li::after {
+        content: '';
+        position: absolute;
+        left: 40%;
+        transform: translateX(-50%);
+        bottom: -1em; /* Adjust the value to control the distance between text and underline */
+        min-width: 20em;
+        height: 1px; /* Adjust the thickness of the underline */
+        background-color: white; /* Adjust the color of the underline */
+      }
+    }
+  }
+
   &.middle-axis,
-  &.middle-right-axis,
+  &.middle-right-axis {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    max-width: 10%;
+    justify-content: flex-start;
+    font-weight: bold;
+  }
+
   &.right-axis {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-
-  &.left-axis {
-    width: 15%;
-    justify-content: flex-start;
-  }
-
-  &.middle-left-axis,
-  &.middle-axis,
-  &.middle-right-axis {
-    margin-top: 1em;
-    margin-bottom: 1em;
-    justify-content: flex-start;
-  }
-  .middle-left-axis {
-    width: 75%;
-  }
-  .middle-axis,
-  .middle-right-axis {
-    width: 5%;
-  }
-
-  &.right-axis {
     padding-left: 1em;
     margin-bottom: 2em;
     width: 10em;
     justify-content: flex-end;
   }
-  &.middle-left-axis h1 {
+  .middle-left-axis h1 {
     font-size: 24px;
     font-weight: bold;
     margin: 0;
@@ -138,7 +181,7 @@
     position: relative;
     flex-direction: row;
     width: calc(85% - 0.25em);
-    max-width: 50em;
+    max-width: 40em;
     min-height: 18em;
     font-size: 16px;
     font-weight: 300;
@@ -180,5 +223,29 @@
     font-size: 24px;
     height: 2.5em;
     border-radius: 0.5em;
+  }
+}
+
+.player{
+  &.container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 2em;
+    min-width: 2em;
+    margin-bottom: 0.43em;
+    height: 2em;
+    padding: 5%;
+    background-image: linear-gradient(0deg, $accentBottomLight, $accentMiddleLight, $accentTopLight);
+    box-shadow: $dropShadow;
+    border-radius: 50%;
+  }
+  &.username {
+    font-weight: 500;
+    font-size: 10px;
+    color: white;
+  }
+  &.picture {
   }
 }

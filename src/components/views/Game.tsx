@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { api, handleError, client } from "helpers/api";
+import { api, handleError , client} from "helpers/api";
 import { Button } from "components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import "styles/views/Game.scss";
-import { User } from "types";
 
 const FormField = (props) => {
   return (
@@ -30,46 +29,36 @@ FormField.propTypes = {
 const Game = () => {
   const navigate = useNavigate();
   const [letter, setLetter] = useState<string>("");
-  const [countdown, setCountdown] = useState<number>(parseInt(localStorage.getItem("roundDuration"))); 
   const [countdownInterval, setCountdownInterval] = useState<any>(null); // State variable for interval ID
   const lobbyName = localStorage.getItem("lobbyName");
   const username = localStorage.getItem("username");
   const gameId = localStorage.getItem("gameId");
   const lobbyId = localStorage.getItem("lobbyId");
-  const roundDuration = localStorage.getItem("roundDuration");
-  const [country, setCountry] = useState<string>("");
-  const [city, setCity] = useState<string>("");
-  const [profession, setProfession] = useState<string>("");
-  const [celebrity, setCelebrity] = useState<string>("");
+  const [roundDuration, setroundDuration] = useState<number>();
+  const [countdown, setCountdown] = useState<number>(roundDuration);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [error, setError] = useState(null);
   const ws = localStorage.getItem("gamews");
-
+  
   useEffect(() => {
     if (ws === "false") {
       window.location.reload();
-      localStorage.setItem("gamews", JSON.stringify(true))
+      localStorage.setItem("gamews", "true");
     }
   }, [ws]);
 
   useEffect(() => {
-    console.log("in effect hook");
-    console.log(gameId);
     async function stompConnect() {
-      console.log("in async func");
-      console.log(username);
-
       try {
-        console.log("in try");
         if (!client["connected"]) {
-          console.log("in if");
           client.connect({}, function () {
             client.send("/app/connect", {}, JSON.stringify({ username: username }));
             client.subscribe("/topic/game-control", function (response) {
               const data = JSON.parse(response.body);
               if (data.command === "stop") {
-                getStop();
+                setCountdown(0);
               }
-              console.log(data.body);
             });
           });
         }
@@ -81,29 +70,43 @@ const Game = () => {
     }
     stompConnect();
     
-    return function cleanup() {
-      if (client && client["connected"]) {
-        client.disconnect(function () {
-          console.log("disconnected from stomp");
-        });
-      }
-    };
   }, []);
 
-  const getFormattedData = (category1: string, category2: string, category3: string, category4: string, answer1: string, answer2: string, answer3: string, answer4: string, username: string) => {
-    const data = {
-      username: username,
-      [category1]: answer1,
-      [category2]: answer2,
-      [category3]: answer3,
-      [category4]: answer4
-    };
+  useEffect(() => {
+    // Fetch settings before the game starts
+    async function fetchSettings() {
+      try {
+        const response = await api.get(`/lobby/settings/${lobbyId}`);
+        console.log(gameId);
+        const categories = response.data.categories;
+        console.log(response.data);
+        const rounddurationval = parseInt(response.data.roundDuration)
+        setroundDuration(rounddurationval);
+        setCountdown(rounddurationval);
+        setCategories(categories);
+        console.log("categories", response.data.categories);
+        console.log("round duration", response.data.roundDuration);
+        
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+        // Handle error
+      }
+    }
 
+    fetchSettings();
+  }, []);
+
+  const getFormattedData = () => {
+    const data: { [key: string]: string } = { username };
+    categories.forEach((category, index) => {
+      data[category] = answers[category] || "";
+    });
+    console.log(JSON.stringify(data))
     return JSON.stringify(data);
   };
 
   const submitAnswers = async (data) =>{
-    console.log(data);
+    console.log("submit answers ", data);
     try{
       await api.post(`/rounds/${gameId}/entries`, data);
 
@@ -112,50 +115,71 @@ const Game = () => {
     }
   };
 
-  const getStop = async () => {
-    clearInterval(countdownInterval); // Stop the countdown timer
-    const answers = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
-
-    // send the answers to backend for verification
-    try{
-      await submitAnswers(answers);
-    }catch(error){
-      setError("Error submitting data");
-
-      return;
-    }
-    navigate(`/evaluation/${lobbyName}/profession`);
-  };
 
   const doStop = async () => {
-    client.send("/app/stop-game", {}, "{}");
+    if (client && client["connected"]) {
+      client.disconnect(function () {
+        console.log("disconnected from stomp");
+      });
+    }
+    await api.put(`/players/${username}`, JSON.stringify({ready: false}));
     clearInterval(countdownInterval); // Stop the countdown timer
-    const answers = getFormattedData("country", "city", "profession", "celebrity", country, city, profession, celebrity, username);
+
+    
+    const answer = getFormattedData();
 
     // send the answers to backend for verification
     try{
-      await submitAnswers(answers);
+      await submitAnswers(answer);
     }catch(error){
       setError("Error submitting data");
-
       return;
     }
-    navigate(`/evaluation/${lobbyName}/profession`);
+    const response = await api.get(`/rounds/scores/${gameId}`);
+    const categoriesObject = response.data;
+    const firstCategory = Object.keys(categoriesObject)[0];
+    console.log(firstCategory);
+    localStorage.setItem("gamews", "false");
+    navigate(`/evaluation/${lobbyName}/${firstCategory}`);
+  };
+
+  const StopGame = async () => {
+    client.send("/app/stop-game", {}, "{}");
+    doStop();
   };
 
   const getLetter = async () => {
     try {
-      await api.put(`/players/${username}`, JSON.stringify({ready: false}));
+      // await api.put(`/players/${username}`, JSON.stringify({ready: false}));
       const response = await api.get(`/rounds/letters/${gameId}`);
-      console.log(response.data);
       setLetter(response.data);
     } catch (error) {
       console.log("Error fetching the current letter");
     }
   };
 
+  const settings = async() => {
+    try {
+      const response = await api.get(`/lobby/settings/${lobbyId}`);
+      console.log(gameId);
+      const categories = response.data.categories;
+      console.log(response.data);
+      const rounddurationval = parseInt(response.data.roundDuration)
+      setroundDuration(rounddurationval);
+      setCountdown(rounddurationval);
+      setCategories(categories);
+      console.log("categories", response.data.categories);
+      console.log("round duration", response.data.roundDuration);
+      
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+      // Handle error
+    }
+  }
+
   useEffect(() => {
     getLetter();
+    settings();
     setTimeout(startCountdown, 1); // Delay startCountdown by 1 second
   }, []);
 
@@ -177,6 +201,13 @@ const Game = () => {
     }
   }, [countdown]);
 
+  const handleInputChange = (category: string, value: string) => {
+    setAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [category]: value,
+    }));
+  };
+
   return (
     <BaseContainer>
       <div className="game container">
@@ -186,32 +217,20 @@ const Game = () => {
             <h1 className="countdown">{countdown}</h1>
           </div>
           {error && <div className="game error-message">{error}</div>}
-          <FormField
-            label="country"
-            value={country}
-            onChange={(country: string) => setCountry(country)}
-          />
-          <FormField
-            label="city"
-            value={city}
-            onChange={(city: string) => setCity(city)}
-          />
-          <FormField
-            label="profession"
-            value={profession}
-            onChange={(profession: string) => setProfession(profession)}
-          />
-          <FormField
-            label="celebrity"
-            value={celebrity}
-            onChange={(celebrity: string) => setCelebrity(celebrity)}
-          />
+          {categories.map((category, index) => (
+            <FormField
+              key={index}
+              label={category}
+              value={answers[category] || ""}
+              onChange={(value: string) => handleInputChange(category, value)}
+            />
+          ))}
         </div>
         <div className="game button-container">
           <Button
-            disabled={!country || !city || !profession || !celebrity}
+            disabled={categories.some((category) => !answers[category])}
             width="100%"
-            onClick={() => doStop()}
+            onClick={() => StopGame()}
           >
             Stop
           </Button>
