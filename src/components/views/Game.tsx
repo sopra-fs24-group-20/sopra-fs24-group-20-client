@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { api, handleError, client } from "helpers/api";
+import { api, handleError , client} from "helpers/api";
 import { Button } from "components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
@@ -29,25 +29,24 @@ FormField.propTypes = {
 const Game = () => {
   const navigate = useNavigate();
   const [letter, setLetter] = useState<string>("");
-  const [countdown, setCountdown] = useState<number>(parseInt(localStorage.getItem("roundDuration"))); 
   const [countdownInterval, setCountdownInterval] = useState<any>(null); // State variable for interval ID
   const lobbyName = localStorage.getItem("lobbyName");
   const username = localStorage.getItem("username");
   const gameId = localStorage.getItem("gameId");
   const lobbyId = localStorage.getItem("lobbyId");
-  const roundDuration = localStorage.getItem("roundDuration");
+  const [roundDuration, setroundDuration] = useState<number>();
+  const [countdown, setCountdown] = useState<number>(roundDuration);
   const [categories, setCategories] = useState<string[]>([]);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [error, setError] = useState(null);
   const ws = localStorage.getItem("gamews");
-
+  
   useEffect(() => {
     if (ws === "false") {
       window.location.reload();
-      localStorage.setItem("gamews", JSON.stringify(true))
+      localStorage.setItem("gamews", "true");
     }
   }, [ws]);
-
 
   useEffect(() => {
     async function stompConnect() {
@@ -78,9 +77,15 @@ const Game = () => {
     async function fetchSettings() {
       try {
         const response = await api.get(`/lobby/settings/${lobbyId}`);
+        console.log(gameId);
         const categories = response.data.categories;
+        console.log(response.data);
+        const rounddurationval = parseInt(response.data.roundDuration)
+        setroundDuration(rounddurationval);
+        setCountdown(rounddurationval);
         setCategories(categories);
         console.log("categories", response.data.categories);
+        console.log("round duration", response.data.roundDuration);
         
       } catch (error) {
         console.error('Error fetching settings:', error);
@@ -96,7 +101,7 @@ const Game = () => {
     categories.forEach((category, index) => {
       data[category] = answers[category] || "";
     });
-  
+    console.log(JSON.stringify(data))
     return JSON.stringify(data);
   };
 
@@ -117,6 +122,7 @@ const Game = () => {
         console.log("disconnected from stomp");
       });
     }
+    await api.put(`/players/${username}`, JSON.stringify({ready: false}));
     clearInterval(countdownInterval); // Stop the countdown timer
 
     
@@ -129,11 +135,11 @@ const Game = () => {
       setError("Error submitting data");
       return;
     }
-    localStorage.setItem("gamews", JSON.stringify(false))
     const response = await api.get(`/rounds/scores/${gameId}`);
     const categoriesObject = response.data;
     const firstCategory = Object.keys(categoriesObject)[0];
     console.log(firstCategory);
+    localStorage.setItem("gamews", "false");
     navigate(`/evaluation/${lobbyName}/${firstCategory}`);
   };
 
@@ -144,7 +150,7 @@ const Game = () => {
 
   const getLetter = async () => {
     try {
-      await api.put(`/players/${username}`, JSON.stringify({ready: false}));
+      // await api.put(`/players/${username}`, JSON.stringify({ready: false}));
       const response = await api.get(`/rounds/letters/${gameId}`);
       setLetter(response.data);
     } catch (error) {
@@ -152,8 +158,28 @@ const Game = () => {
     }
   };
 
+  const settings = async() => {
+    try {
+      const response = await api.get(`/lobby/settings/${lobbyId}`);
+      console.log(gameId);
+      const categories = response.data.categories;
+      console.log(response.data);
+      const rounddurationval = parseInt(response.data.roundDuration)
+      setroundDuration(rounddurationval);
+      setCountdown(rounddurationval);
+      setCategories(categories);
+      console.log("categories", response.data.categories);
+      console.log("round duration", response.data.roundDuration);
+      
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+      // Handle error
+    }
+  }
+
   useEffect(() => {
     getLetter();
+    settings();
     setTimeout(startCountdown, 1); // Delay startCountdown by 1 second
   }, []);
 

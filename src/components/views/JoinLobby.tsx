@@ -82,9 +82,6 @@ const JoinLobby = () => {
         localStorage.setItem("lobbyName", LobbyName);
         localStorage.setItem("lobbyId", response.data.lobbyId);
         localStorage.setItem("gameId", response.data.game.id.toString());
-        localStorage.setItem("roundDuration", response.data.roundDuration);
-        localStorage.setItem("readyws", JSON.stringify(false));
-        localStorage.setItem("gamews", JSON.stringify(false));
         console.log(response.data.game.id);
         /*try {
           // Make a request to get the game ID
@@ -101,13 +98,32 @@ const JoinLobby = () => {
         }*/
         //client.send("/topic/lobby_join", {}, "{}");
         navigate(`/lobby/${LobbyName}`);
-      } else if (response.status === 400) {
-        setError("Join lobby failed because password doesn't match");
-      } else if (response.status === 404) {
-        setError("Join lobby failed because lobby doesn't exist");
-      }
+      } 
     } catch (error) {
-      setError("An error occurred while joining the lobby");
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        if (error.response.status === 400) {
+          // Handle BAD REQUEST error
+          setError("Join lobby failed because password doesn’t match");
+        } else if (error.response.status === 404) {
+          // Handle NOT FOUND error
+          setError("Join lobby failed because the lobby doesn’t exist");
+        } else if (error.response.status === 409) {
+          // Handle CONFLICT error
+          setError("Cannot join lobby as the game is not in SETUP mode.");
+        } else {
+          // Handle other errors
+          setError("An error occurred while joining the lobby. Please try again later.");
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error(error.request);
+        setError("No response received from the server. Please try again later.");
+      } else {
+        // Something happened in setting up the request that triggered an error
+        console.error("Error", error.message);
+        setError("An unexpected error occurred. Please try again later.");
+      }
     }
   };
 
