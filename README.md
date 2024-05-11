@@ -10,6 +10,10 @@ npm install stompjs
 
 npm install sockjs-client
 
+npm install --save-dev svg-loader
+
+npm install crypto-js
+
 
 
 ## Getting started
