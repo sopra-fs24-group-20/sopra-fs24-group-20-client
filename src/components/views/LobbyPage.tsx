@@ -91,10 +91,28 @@ const LobbyPage = () => {
   const [ready_ws, setReadyWS] = useState(null);
   const [new_join, setNewJoinWS] = useState(null);
   const [allPlayers, setAllPlayers] = useState([]);
+  
+  useEffect(() => {
+    const fetchGameId = async () => {
+      try{
+        const response = await api.get(`game/${localLobbyId}`);
+        if (response.status == 200){
+          localStorage.setItem("gameId", response.data.toString());
+        }
+      }catch(error){
+        alert(
+          `Something went wrong when fetching the gameId: \n${handleError(error)}`
+        );
+      }
+    }
+    fetchGameId();
+  })
+
+
 
   useEffect(() => {
     const intervalId = setInterval(fetchPlayers, 2000); // 2000 milliseconds = 2 seconds
-  
+
     // Cleanup function to clear the interval when component unmounts or when allPlayers changes
     return () => clearInterval(intervalId);
   }, [allPlayers]);
