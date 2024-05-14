@@ -6,6 +6,8 @@ import BaseContainer from "components/ui/BaseContainer";
 import "styles/views/Evaluation.scss";
 import { User } from "types";
 import PropTypes from "prop-types";
+import "styles/views/Authentication.scss";
+import CategoriesLoadingScreen from "components/ui/LoadingScreen";
 
 const Player = ({ user }) => (
   <div className="player container">
@@ -32,6 +34,7 @@ const EvaluationScreen = () => {
   const [scores, setScores] = useState<number[]>(null);
   const [rounds, setRounds] = useState(null);
   const [currentRound, setCurrentRound] = useState(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const votes = {};
 
   const leaveLobby = async () => {
@@ -183,6 +186,7 @@ const EvaluationScreen = () => {
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true);
         const response = await api.get(`/rounds/scores/${gameId}`,gameId);
         const fetchedPlayers = getPlayerNames(response.data);
         const fetchedCategories = getCategories(response.data);
@@ -201,10 +205,13 @@ const EvaluationScreen = () => {
         alert(
           "Something went wrong while fetching the players! See the console for details."
         );
+      } finally {
+        setLoading(false);
       }
     }
     async function fetchRounds() {
       try {
+        setLoading(true);
         const response = await api.get(`lobby/settings/${lobbyId}`);
         setRounds(response.data.rounds);
       } catch (error) {
@@ -217,11 +224,25 @@ const EvaluationScreen = () => {
         alert(
           "Something went wrong while fetching the settings! See the console for details."
         );
+      } finally {
+        setLoading(false);
       }
     }
     fetchData();
     fetchRounds();
   }, [gameId, currentCategory, setPlayers, setCategories, setAnswers, setScores,categories]);
+
+  if (loading) {
+    return (
+      <BaseContainer>
+        <div className="authentication container">
+          <div className="authentication form">
+            <CategoriesLoadingScreen />
+          </div>
+        </div>
+      </BaseContainer>
+    );
+  }
 
   return (
     <BaseContainer>

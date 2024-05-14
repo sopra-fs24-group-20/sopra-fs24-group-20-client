@@ -5,6 +5,8 @@ import {useNavigate} from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import "styles/views/Leaderboard.scss";
+import "styles/views/Authentication.scss";
+import CategoriesLoadingScreen from "components/ui/LoadingScreen";
 
 const Player = ({ user, index }) => {
   const change = [
@@ -36,6 +38,7 @@ const Leader = () => {
   const navigate = useNavigate();
   const [playersPoints, setPlayersPoints] = useState([]);
   const [allPlayers, setAllPlayers] = useState([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const localLobbyName = localStorage.getItem(("lobbyName"));
   const localUsername = localStorage.getItem("username");
@@ -79,6 +82,7 @@ const Leader = () => {
   };
   const fetchPoints = async () => {
     try {
+      setLoading(true);
       const response = await api.get(`/rounds/leaderboard/${localGameId}`);
       const sortedPlayers: { username: string; points: number }[] = Object.entries(response.data)
         .map(([username, points]: [string, number]) => ({ username, points }))
@@ -88,10 +92,13 @@ const Leader = () => {
       alert(
         `Something went wrong during fetching the points: \n${handleError(error)}`
       );
+    } finally {
+      setLoading(false);
     }
   }
   const fetchPlayers = async () =>{
     try {
+      setLoading(true);
       const response = await api.get(`/lobby/players/${localLobbyId}`);
       setAllPlayers(response.data);
       console.log(allPlayers)
@@ -103,7 +110,21 @@ const Leader = () => {
       alert(
         `Something went wrong during fetching the players: \n${handleError(error)}`
       );
+    } finally {
+      setLoading(false);
     }
+  }
+
+  if (loading) {
+    return (
+      <BaseContainer>
+        <div className="authentication container">
+          <div className="authentication form">
+            <CategoriesLoadingScreen />
+          </div>
+        </div>
+      </BaseContainer>
+    );
   }
 
   return (

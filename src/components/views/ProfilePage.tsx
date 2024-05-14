@@ -5,6 +5,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import "styles/views/Profile.scss";
 import { User } from "types";
+import "styles/views/Authentication.scss";
+import CategoriesLoadingScreen from "components/ui/LoadingScreen";
 
 const ProfilePage = () => {
   const { id: id } = useParams();
@@ -20,6 +22,7 @@ const ProfilePage = () => {
 
   const logout = async () => {
     try {
+      setLoading(true);
       const response = await api.post("players/logout",{username});
       localStorage.clear();
       navigate("/start");
@@ -27,6 +30,8 @@ const ProfilePage = () => {
       console.error(
         `An error occurred while trying to exit the lobby: \n${handleError(error)}`
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -39,6 +44,7 @@ const ProfilePage = () => {
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true);
         const response = await api.get(`/players/${localStorage.getItem("username")}`);
         setUser(response.data);
         setLevel(response.data.level);
@@ -51,11 +57,25 @@ const ProfilePage = () => {
       } catch (error) {
         console.error("Error fetching user data:", error);
         alert("Something went wrong while fetching the user! See the console for details.");
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchData();
   }, [localStorage.getItem("username")]);
+
+  if (loading) {
+    return (
+      <BaseContainer>
+        <div className="authentication container">
+          <div className="authentication form">
+            <CategoriesLoadingScreen />
+          </div>
+        </div>
+      </BaseContainer>
+    );
+  }
 
   return (
     <BaseContainer>
