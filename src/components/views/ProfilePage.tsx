@@ -128,6 +128,7 @@ const ProfilePage = () => {
         </div>
       </BaseContainer>
     );
+  }
 
   function hashUsername(username) {
     const hashedUsername = CryptoJS.SHA256(username).toString(CryptoJS.enc.Hex);
