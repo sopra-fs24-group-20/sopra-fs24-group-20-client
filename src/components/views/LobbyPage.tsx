@@ -96,7 +96,7 @@ const LobbyPage = () => {
     const fetchGameId = async () => {
       try{
         const response = await api.get(`game/${localLobbyId}`);
-        if (response.status == 200){
+        if (response.status === 200){
           localStorage.setItem("gameId", response.data.toString());
         }
       }catch(error){
