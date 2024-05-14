@@ -5,8 +5,10 @@ import {useNavigate} from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import "styles/views/Leaderboard.scss";
+import "styles/views/Authentication.scss";
 import { Lobby, User } from "types";
 import Confetti from "react-confetti";
+import CategoriesLoadingScreen from "components/ui/LoadingScreen";
 
 const Player = ({ user, index }) => {
   // Define medal emojis
@@ -32,6 +34,7 @@ Player.propTypes = {
 const FinalLeader = () => {
   const navigate = useNavigate();
   const [lobby, setLobby] = useState<Lobby[]>({});
+  const [loading, setLoading] = useState<boolean>(false);
   const [players, setPlayers] = useState([]);
   const mockplayers = { "barbara": 30 , "paul": 25, "glory":20,"joshi":35 };
   const localLobbyName = localStorage.getItem(("lobbyName"));
@@ -44,6 +47,7 @@ const FinalLeader = () => {
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true);
         const response = await api.get(`/rounds/leaderboard/${gameId}`);
         const sortedPlayers: { username: string; points: number }[] = Object.entries(response.data)
           .map(([username, points]: [string, number]) => ({ username, points }))
@@ -55,10 +59,24 @@ const FinalLeader = () => {
         alert(
           `Something went wrong during exiting the lobby: \n${handleError(error)}`
         );
+      } finally {
+        setLoading(false);
       }
     }
     fetchData();
   }, []);
+
+  if (loading) {
+    return (
+      <BaseContainer>
+        <div className="authentication container">
+          <div className="authentication form">
+            <CategoriesLoadingScreen />
+          </div>
+        </div>
+      </BaseContainer>
+    );
+  }
 
   return (
     <BaseContainer>

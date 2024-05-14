@@ -7,6 +7,7 @@ import "styles/views/Authentication.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import JoinLobby from "./JoinLobby";
+import CategoriesLoadingScreen from "components/ui/LoadingScreen";
 
 const FormField = (props) => {
   return (
@@ -36,6 +37,7 @@ const CreateLobby = () => {
   const [lobbyPassword, setLobbyPassword] = useState("");
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const username = localStorage.getItem("username");
   /*
@@ -75,7 +77,7 @@ const CreateLobby = () => {
         lobbyPassword: lobbyPassword,
         username: username
       };
-
+      setLoading(true);
       const response = await api.post("/lobby/join", requestBody);
       console.log(response.data.game.id);
       console.log(response.data);
@@ -128,6 +130,8 @@ const CreateLobby = () => {
         console.error("Error", error.message);
         setError("An unexpected error occurred. Please try again later.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -138,6 +142,7 @@ const CreateLobby = () => {
       ownerUsername: username,
     };
     try {
+      setLoading(true);
       const create_response = await api.post("/lobby/create", createBody);
       if (create_response.status === 201) {
         await doJoinLobby();
@@ -167,12 +172,26 @@ const CreateLobby = () => {
         console.error("Error", error.message);
         setError("An unexpected error occurred. Please try again later.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   const goBack = () => {
     window.history.back(); // Navigate back using browser's history object
   };
+
+  if (loading) {
+    return (
+      <BaseContainer>
+        <div className="authentication container">
+          <div className="authentication form">
+            <CategoriesLoadingScreen />
+          </div>
+        </div>
+      </BaseContainer>
+    );
+  }
 
   return (
     <BaseContainer>
