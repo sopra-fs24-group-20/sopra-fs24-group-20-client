@@ -88,7 +88,7 @@ const Game = () => {
         console.log("round duration", response.data.roundDuration);
         
       } catch (error) {
-        console.error('Error fetching settings:', error);
+        console.error("Error fetching settings:", error);
         // Handle error
       }
     }
@@ -101,7 +101,8 @@ const Game = () => {
     categories.forEach((category, index) => {
       data[category] = answers[category] || "";
     });
-    console.log(JSON.stringify(data))
+    console.log(JSON.stringify(data));
+
     return JSON.stringify(data);
   };
 
@@ -133,6 +134,7 @@ const Game = () => {
       await submitAnswers(answer);
     }catch(error){
       setError("Error submitting data");
+
       return;
     }
     const response = await api.get(`/rounds/scores/${gameId}`);
@@ -172,7 +174,7 @@ const Game = () => {
       console.log("round duration", response.data.roundDuration);
       
     } catch (error) {
-      console.error('Error fetching settings:', error);
+      console.error("Error fetching settings:", error);
       // Handle error
     }
   }
