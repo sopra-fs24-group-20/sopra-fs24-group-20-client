@@ -7,6 +7,7 @@ import "styles/views/Profile.scss";
 import { User } from "types";
 import "styles/views/Authentication.scss";
 import CategoriesLoadingScreen from "components/ui/LoadingScreen";
+import PopupWindow from "components/views/PopupWindow";
 // @ts-ignore
 import svgImage1 from "images/1.svg";
 // @ts-ignore
@@ -71,6 +72,12 @@ const ProfilePage = () => {
   const [username,setUsername] = useState<string>(null);
   const CryptoJS = require("crypto-js");
   const all_pictures = [svgImage1, svgImage2, svgImage3, svgImage4,svgImage5,svgImage6,svgImage7,svgImage8,svgImage9,svgImage10,svgImage11,svgImage12,svgImage13,svgImage14,svgImage15,svgImage16,svgImage17,svgImage18,svgImage19,svgImage20,svgImage21,svgImage22,svgImage23,svgImage24,svgImage25];
+  const [showPopup, setShowPopup] = useState(false);
+
+  const togglePopup = () => {
+    console.log("toggle Popup");
+    setShowPopup(!showPopup);
+  };
 
   const logout = async () => {
     try {
@@ -173,7 +180,7 @@ const ProfilePage = () => {
                   <div className="profile stat-category">⌀ points per round:</div>
                   <div className="profile stat-value">{averagePointsPerRound}</div>
                 </div>
-                <div className="profile stat-container" style={{marginBottom: "60px"}}>
+                <div className="profile stat-container" style={{ marginBottom: "60px" }}>
                   <div className="profile stat-category">Victories:</div>
                   <div className="profile stat-value">{victories}</div>
                 </div>
@@ -198,8 +205,14 @@ const ProfilePage = () => {
               </Button>
             </div>
           </div>
+          <div className="profile svg-container">
+            <a href="#" className="profile svg-link" onClick={() => togglePopup()}>
+              ⓘ
+            </a>
+          </div>
         </div>
       </div>
+      {showPopup && <PopupWindow onClose={togglePopup} />}
     </BaseContainer>
   );
 };

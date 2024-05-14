@@ -83,7 +83,7 @@
 
   &.stat-value {
     position: absolute;
-    right: 40px;
+    right: 30px;
     margin-bottom: 5px;
     font-weight: bold;
   }
@@ -97,6 +97,38 @@
     margin-top: 3em;
     color: white;
     text-decoration: underline;
+  }
+
+  &.svg-container {
+    position: absolute;
+    bottom: 20px;
+    right: 18px;
+    width: 30px;
+    height: 30px; /* Adjust the height to match the SVG icon */
+  }
+
+  &.svg-container:hover {
+    transform: scale(1.1);
+  }
+
+  &.svg-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    font-size: 1.5em;
+  }
+
+  &.svg-link:visited {
+    color: white;
+  }
+
+  &.svg-image {
+    width: 100%;
+    height: 100%; /* Ensure the SVG icon fills the entire clickable area */
   }
 
   &.avatar-container {
