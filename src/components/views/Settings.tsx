@@ -13,7 +13,7 @@ const FormField = (props) => {
     <div className="settings field">
       <input
         className="settings input"
-        placeholder="enter here..."
+        placeholder={props.placeholder}
         value={props.value}
         type={props.type}
         onChange={(e) => props.onChange(e.target.value)}
@@ -38,13 +38,14 @@ FormField.propTypes = {
 
 const Settings = () => {
   const navigate = useNavigate();
-  const [settings, setSettings] = useState({ categories: [] });
+  const [settings, setSettings] = useState({ categories: [], gameMode: 1 }); // Initialize gameMode to 0 (easy)
   const localLobbyId = localStorage.getItem("lobbyId");
   const localUsername = localStorage.getItem("username");
   const localLobbyName = localStorage.getItem("lobbyName");
   const [owner, setOwner] = useState(true);
   const [disableSave, setDisableSave] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -62,6 +63,7 @@ const Settings = () => {
       setLoading(true);
       const response = await api.get(`/lobby/settings/${localLobbyId}`);
       setSettings(response.data);
+      console.log(response.data);
       if (localUsername === response.data.lobbyOwner.username) {
         setOwner(false);
       }
@@ -81,7 +83,8 @@ const Settings = () => {
     try {
       await api.put(`/lobby/settings/${localLobbyId}`, JSON.stringify(settings));
     } catch (error) {
-      alert(`Something went wrong while saving changes: \n${handleError(error)}`);
+      console.log(handleError(error));
+      setError("Are your excluded letters in the right format e.g. X,Y,Z ?");
     }
   };
 
@@ -127,6 +130,7 @@ const Settings = () => {
         <div className="settings form">
           <div>
             <h2 className="settings centered-text">Settings</h2>
+            {error && <div className="authentication error-message">{error}</div>}
             <div className="settings column">
               Categories
               {settings.categories &&
@@ -168,14 +172,28 @@ const Settings = () => {
                 }
                 type="number"
               />
+              Exclude Letter
+              <FormField
+                value={settings.excludedChars ? settings.excludedChars.join(",").toUpperCase() : ""}                placeholder="e.g. X,Y,Z"
+                onChange={(excludedChars) =>
+                  setSettings({
+                    ...settings,
+                    excludedChars: excludedChars.split(",").map(char => char.trim()),
+                  })
+                }
+                type="text"
+              />
             </div>
             <div className="settings column">
               Game Mode
-              <FormField
-                value={settings.gamemode || ""}
-                onChange={(gamemode) => setSettings({ ...settings, gamemode })}
-                type="text"
-              />
+              <select
+                className="settings dropdown"
+                value={settings.gameMode}
+                onChange={(e) => setSettings({ ...settings, gameMode: parseInt(e.target.value, 10) })}
+              >
+                <option value={0}>easy</option>
+                <option value={1}>normal</option>
+              </select>
             </div>
           </div>
           <div className="settings centered-text">
