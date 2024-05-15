@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { api, handleError, client } from "helpers/api";
+import { api, handleError } from "helpers/api";
 import User from "models/User";
+import webSocketService from "helpers/websocketContext";
 import { useNavigate } from "react-router-dom";
 import { Button } from "components/ui/Button";
 import "styles/views/Authentication.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
+import CategoriesLoadingScreen from "components/ui/LoadingScreen";
 
 const FormField = (props) => {
   return (
@@ -35,39 +37,10 @@ const JoinLobby = () => {
   const [LobbyPassword, setLobbyPassword] = useState<string>(null);
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const username = localStorage.getItem("username");
 
-  /*
-  useEffect(() => {
-    // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
-    async function stompConnect() {
-      try {
-        if (!client["connected"]) {
-          client.connect({}, function () {
-            client.send("/app/connect", {}, JSON.stringify({ username: username }));
-            client.subscribe("/topic/lobby_join", function (response) {
-            });
-          });
-        }
-      } catch (error) {
-        console.error(`Something went wrong: \n${handleError(error)}`);
-        console.error("Details:", error);
-        alert("Something went wrong! See the console for details.");
-      }
-    }
-    stompConnect();
-    // return a function to disconnect on unmount
-
-    return function cleanup() {
-      if (client && client["connected"]) {
-        client.disconnect(function () {
-          console.log("disconnected from stomp");
-        });
-      }
-    };
-  }, []);
-*/
   const doJoinLobby = async () => {
     try {
       const requestBody = {
@@ -75,7 +48,7 @@ const JoinLobby = () => {
         lobbyPassword: LobbyPassword,
         username: username
       };
-      
+      setLoading(true);
       const response = await api.post("/lobby/join", requestBody);
       console.log(response.data);
       if (response.status === 200) {
@@ -83,20 +56,19 @@ const JoinLobby = () => {
         localStorage.setItem("lobbyId", response.data.lobbyId);
         localStorage.setItem("gameId", response.data.game.id.toString());
         console.log(response.data.game.id);
-        /*try {
-          // Make a request to get the game ID
-          const gameIdResponse = await api.get(`/${response.data.id}/gameId`);
-          if (gameIdResponse.status === 200) {
-            const gameId = gameIdResponse.data;
-            localStorage.setItem("gameId", gameId);
-            console.log("gameid in storage:", gameId);
-          } else {
-            console.error("Failed to retrieve game ID:", gameIdResponse.data);
-          }
-        } catch (error) {
-          console.error("Error while retrieving game ID:", error);
-        }*/
-        //client.send("/topic/lobby_join", {}, "{}");
+
+        // establish websocket connection when joining lobby
+        webSocketService.connect();
+        // wait until actually connected to websocket
+        await new Promise<void>((resolve) => { 
+          const interval = setInterval(() => {
+            if (webSocketService.connected) {
+              clearInterval(interval);
+              resolve(); 
+            }
+          }, 100);
+        });
+        await webSocketService.sendMessage('/app/join', { username: username , lobbyId: response.data.lobbyId});
         navigate(`/lobby/${LobbyName}`);
       } 
     } catch (error) {
@@ -124,12 +96,26 @@ const JoinLobby = () => {
         console.error("Error", error.message);
         setError("An unexpected error occurred. Please try again later.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   const goBack = () => {
     window.history.back(); // Navigate back using browser's history object
   };
+
+  if (loading) {
+    return (
+      <BaseContainer>
+        <div className="authentication container">
+          <div className="authentication form">
+            <CategoriesLoadingScreen />
+          </div>
+        </div>
+      </BaseContainer>
+    );
+  }
 
   return (
     <BaseContainer>

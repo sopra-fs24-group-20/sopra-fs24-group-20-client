@@ -162,7 +162,7 @@
     align-items: center;
     padding-left: 1em;
     margin-bottom: 2em;
-    width: 10em;
+    width: 100%;
     justify-content: flex-end;
   }
   .middle-left-axis h1 {
@@ -194,12 +194,12 @@
     display: flex;
     position: relative;
     flex-direction: row;
-    width: calc(15% - 0.25em);
+    width: 15%;
     justify-content: center;
     align-items: flex-end;
     margin-left: 1em;
     max-width: 9em;
-    height: 18em;
+    min-height: 18em;
     font-size: 16px;
     font-weight: 300;
     border-radius: 0.75em;
@@ -218,7 +218,7 @@
   &.button-container-bottom {
     display: flex;
     justify-content: center;
-    width: 6em;
+    width: 100%;
     background-color: #58d1d1;
     font-size: 24px;
     height: 2.5em;

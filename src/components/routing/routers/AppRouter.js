@@ -21,6 +21,7 @@ import { LeaderboardGuard } from "../routeProtectors/LeaderboardGuard";
 import FinalLeader from "../../views/FinalLeader";
 import Leader from "../../views/Leader";
 import Settings from "../../views/Settings";
+import BackupScreen from "../../views/BackupScreen";
 
 /**
  * Main router of your application.
@@ -87,6 +88,8 @@ const AppRouter = () => {
         <Route path="/" element={
           <Navigate to="/start" replace />
         }/>
+
+        <Route path="*" element={<BackupScreen />} />
 
       </Routes>
     </BrowserRouter>

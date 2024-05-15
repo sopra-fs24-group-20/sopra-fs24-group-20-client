@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { api, handleError } from "helpers/api";
 import User from "models/User";
 import {useNavigate} from "react-router-dom";
@@ -6,6 +6,7 @@ import { Button } from "components/ui/Button";
 import "styles/views/Authentication.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
+import CategoriesLoadingScreen from "components/ui/LoadingScreen";
 
 const FormField = (props) => {
   return (
@@ -35,10 +36,12 @@ const Login = () => {
   const [password, setPassword] = useState<string>(null);
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const doLogin = async () => {
     try {
       const requestBody = JSON.stringify({ username, password });
+      setLoading(true);
       const response = await api.post("/players/login", requestBody);
       const user = response.data;
 
@@ -49,8 +52,31 @@ const Login = () => {
       setError ("Invalid username or password");
       console.log(handleError(error))
       navigate("/login");
+    } finally {
+      setLoading(false);
     }
   };
+  //test the loading screen
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLoading(true);
+      setTimeout(() => setLoading(false), 2000);
+    }, 1000);
+    
+    return () => clearTimeout(timeout);
+  }, []);
+
+  if (loading) {
+    return (
+      <BaseContainer>
+        <div className="authentication container">
+          <div className="authentication form">
+            <CategoriesLoadingScreen />
+          </div>
+        </div>
+      </BaseContainer>
+    );
+  }
 
   return (
     <BaseContainer>

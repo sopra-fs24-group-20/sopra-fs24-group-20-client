@@ -6,6 +6,7 @@ import { Button } from "components/ui/Button";
 import "styles/views/Authentication.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
+import CategoriesLoadingScreen from "components/ui/LoadingScreen";
 
 const FormField = (props) => {
   return (
@@ -35,10 +36,12 @@ const Register = () => {
   const [password, setPassword] = useState<string>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const doRegister = async () => {
     try {
       const requestBody = JSON.stringify({ username, password });
+      setLoading(true);
       const registerResponse = await api.post("/players", requestBody);
       const userData = registerResponse.data;
       // Get the returned user and update a new object.
@@ -56,9 +59,22 @@ const Register = () => {
       setError ("username already taken");
       console.log(handleError(error))
       navigate("/register");
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (loading) {
+    return (
+      <BaseContainer>
+        <div className="authentication container">
+          <div className="authentication form">
+            <CategoriesLoadingScreen />
+          </div>
+        </div>
+      </BaseContainer>
+    );
+  }
 
   return (
     <BaseContainer>

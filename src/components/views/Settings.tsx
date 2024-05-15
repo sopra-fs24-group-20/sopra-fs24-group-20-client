@@ -4,7 +4,9 @@ import { Button } from "components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import "styles/views/Settings.scss";
+import "styles/views/Authentication.scss";
 import PropTypes from "prop-types";
+import CategoriesLoadingScreen from "components/ui/LoadingScreen";
 
 const FormField = (props) => {
   return (
@@ -42,6 +44,7 @@ const Settings = () => {
   const localLobbyName = localStorage.getItem("lobbyName");
   const [owner, setOwner] = useState(true);
   const [disableSave, setDisableSave] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     fetchData();
@@ -56,6 +59,7 @@ const Settings = () => {
 
   const fetchData = async () => {
     try {
+      setLoading(true);
       const response = await api.get(`/lobby/settings/${localLobbyId}`);
       setSettings(response.data);
       if (localUsername === response.data.lobbyOwner.username) {
@@ -63,6 +67,8 @@ const Settings = () => {
       }
     } catch (error) {
       alert(`Something went wrong during fetching the settings: \n${handleError(error)}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -102,6 +108,18 @@ const Settings = () => {
     updatedCategories.splice(index, 1);
     setSettings({ ...settings, categories: updatedCategories });
   };
+
+  if (loading) {
+    return (
+      <BaseContainer>
+        <div className="authentication container">
+          <div className="authentication form">
+            <CategoriesLoadingScreen />
+          </div>
+        </div>
+      </BaseContainer>
+    );
+  }
 
   return (
     <BaseContainer>
