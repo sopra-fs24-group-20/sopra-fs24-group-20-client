@@ -34,7 +34,7 @@ const EvaluationScreen = () => {
   const [scores, setScores] = useState<number[]>(null);
   const [rounds, setRounds] = useState(null);
   const [currentRound, setCurrentRound] = useState(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  // const [loading, setLoading] = useState<boolean>(false);
   const votes = {};
 
   const leaveLobby = async () => {
@@ -46,8 +46,6 @@ const EvaluationScreen = () => {
       localStorage.removeItem("lobbyId");
       localStorage.removeItem("gameId");
       localStorage.removeItem("roundDuration");
-      localStorage.removeItem("readyws");
-      localStorage.removeItem("gamews");
       navigate(`/user/${username}`);
     } catch (error) {
       if (error.response.status === 404){
@@ -186,7 +184,7 @@ const EvaluationScreen = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        setLoading(true);
+        // setLoading(true);
         const response = await api.get(`/rounds/scores/${gameId}`,gameId);
         const fetchedPlayers = getPlayerNames(response.data);
         const fetchedCategories = getCategories(response.data);
@@ -206,12 +204,12 @@ const EvaluationScreen = () => {
           "Something went wrong while fetching the players! See the console for details."
         );
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     }
     async function fetchRounds() {
       try {
-        setLoading(true);
+        // setLoading(true);
         const response = await api.get(`lobby/settings/${lobbyId}`);
         setRounds(response.data.rounds);
       } catch (error) {
@@ -225,14 +223,14 @@ const EvaluationScreen = () => {
           "Something went wrong while fetching the settings! See the console for details."
         );
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     }
     fetchData();
     fetchRounds();
   }, [gameId, currentCategory, setPlayers, setCategories, setAnswers, setScores,categories]);
 
-  if (loading) {
+  /* if (true) {
     return (
       <BaseContainer>
         <div className="authentication container">
@@ -242,7 +240,7 @@ const EvaluationScreen = () => {
         </div>
       </BaseContainer>
     );
-  }
+  }*/ 
 
   return (
     <BaseContainer>
