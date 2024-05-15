@@ -13,13 +13,19 @@ const PopupWindow = () => {
             <div><strong>Getting Started</strong></div>
             <div>You are currently on your profile screen, where you can see your username and the stats.</div>
             <div>Your options are:</div>
-            <div><strong>1.</strong> Clicking on &quot;Create Lobby&quot; lets you create a new lobby as a host.</div>
-            <div><strong>2.</strong> Clicking on &quot;Join Lobby&quot; lets you join an existing lobby as a regular player.</div>
+            <div><strong>1.</strong> Clicking on <span style={{ fontStyle: "italic" }}>Create Lobby</span> lets you
+              create a new lobby as a host.
+            </div>
+            <div><strong>2.</strong> Clicking on <span style={{ fontStyle: "italic" }}>Join Lobby</span> lets you join
+              an existing lobby as a regular player.
+            </div>
 
             <div style={{ marginBottom: "50px" }}></div>
 
             <div><strong>Lobby Screen:</strong></div>
-            <div>Once you created or joined a lobby, you can click on ready to ready up for the game.</div>
+            <div>Once you created or joined a lobby, you can click on <span
+              style={{ fontStyle: "italic" }}>Ready</span> to ready up for the game.
+            </div>
             <div>Only once all players, which are in the lobby, have pressed on ready, the game will start.</div>
             <div>Note that by clicking on the gear icon on the top right, every player is able to view the</div>
             <div>game settings. Only the host, however, is able to change them.</div>
@@ -39,7 +45,8 @@ const PopupWindow = () => {
             <div>Once a round has started, every player is able to fill out their answers. A random letter</div>
             <div>gets chosen and is displayed in the top left corner. The remaining time is displayed in</div>
             <div>the top right corner.</div>
-            <div>Once the first player presses on the &quot;stop&quot;-button, or the timer runs out, the round stops
+            <div>Once the first player presses on <span style={{ fontStyle: "italic" }}>Stop</span>, or the
+              timer runs out, the round stops
             </div>
             <div>for every player and everyone get redirected to the evaluation screen.</div>
 
@@ -54,12 +61,14 @@ const PopupWindow = () => {
             <div style={{ marginBottom: "20px" }}></div>
 
             <div><strong>1. Veto:</strong> If the majority of the players gives a certain answer a veto, the answer changes</div>
-            <div>it&apos;s validity status.</div>
+            <div>its validity status.</div>
             <div><strong>2. Bonus:</strong> Players are able to award certain answers a bonus of three points.</div>
 
             <div style={{ marginBottom: "20px" }}></div>
 
-            <div>Once a player feels confident in their votes, they can press on the next button, to evaluate</div>
+            <div>Once a player feels confident in their votes, they can press on <span style={{ fontStyle: "italic" }}>next</span>,
+              to evaluate
+            </div>
             <div>the answers of the next category. Once all categories are evaluated, players have to wait for</div>
             <div>the other players to finish. After every player has finished their votes, they are either</div>
             <div>transferred to the Intermediate Leaderboard Screen (if they haven&apos;t played all the rounds) or
