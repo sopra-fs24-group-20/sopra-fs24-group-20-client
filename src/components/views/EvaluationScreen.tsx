@@ -316,20 +316,19 @@ const EvaluationScreen = () => {
             </div>
           </div>
           <div className="evaluation form-right">
-            <div className="evaluation right axis">
-              <div className="evaluation button-container-bottom">
-                <Button
-                  className="secondary-button"
-                  style={{ width: "100%", height: "100%" }}
-                  onClick={() => nextEval()}
-                >
-                  Finish
-                </Button>
-              </div>
+            <div className="evaluation button-container-bottom">
+              <Button
+                className="secondary-button"
+                style={{ width: "100%", height: "100%" }}
+                onClick={() => nextEval()}
+              >
+                Finish
+              </Button>
             </div>
           </div>
         </div>
       </div>
-    </BaseContainer>)}
+    </BaseContainer>)
+}
 
 export default EvaluationScreen;
