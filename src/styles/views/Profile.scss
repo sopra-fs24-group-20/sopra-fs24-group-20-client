@@ -40,7 +40,7 @@
     flex-direction: row; /* Change to row to align axes horizontally */
     width: 100%;
     max-width: 30em;
-    height: 18em;
+    min-height: 18em;
     font-size: 16px;
     font-weight: 300;
     border-radius: 0.75em;
