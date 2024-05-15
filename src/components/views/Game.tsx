@@ -40,10 +40,11 @@ const Game = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [error, setError] = useState(null);
+  const[position, setPosition] = useState<string>("");
   
   useEffect(() => {
     const subscription = webSocketService.subscribe(
-      '/topic/game-control',
+      "/topic/game-control",
       async (message) => {
         const messageData = JSON.parse(message.body);
         console.log("Received messageData:", messageData);
@@ -51,6 +52,7 @@ const Game = () => {
         if (messageData.command === "stop" && messageData.lobbyId.toString() === lobbyId) {
           console.log("received stop");
           const answer = getFormattedData();
+          await new Promise(resolve => setTimeout(resolve, 1000)); 
           await doStop(answer);
         } 
       },
@@ -134,7 +136,7 @@ const Game = () => {
   };
 
   const StopGame = async () => {
-    webSocketService.sendMessage('/app/stop-game', {lobbyId: lobbyId});
+    webSocketService.sendMessage("/app/stop-game", {lobbyId: lobbyId});
     const answer = getFormattedData();
     doStop(answer);
   };
@@ -145,6 +147,24 @@ const Game = () => {
       const response = await api.get(`/rounds/letters/${gameId}`);
       setLetter(response.data);
     } catch (error) {
+      console.log("Error fetching the current letter");
+    }
+    try{
+      const response = await api.get(`/rounds/letterPosition/${gameId}`);
+      const pos = response.data.toString();
+      if (pos === "-1"){
+        setPosition("last");
+      }
+      else if (pos === "0"){
+        setPosition("first");
+      }
+      else if (pos === "1"){
+        setPosition("second");
+      }
+      else if (pos === "2"){
+        setPosition("third");
+      }
+    }catch (error) {
       console.log("Error fetching the current letter");
     }
   };
@@ -205,7 +225,7 @@ const Game = () => {
       <div className="game container">
         <div className="game form">
           <div className="header">
-            <h1 className="Letter">{letter}</h1>
+            <h1 className="Letter">{letter} at position {position}</h1>
             <h1 className="countdown">{countdown}</h1>
           </div>
           {error && <div className="game error-message">{error}</div>}
