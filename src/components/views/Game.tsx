@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { api, handleError , client} from "helpers/api";
+import { api, handleError } from "helpers/api";
 import { Button } from "components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import "styles/views/Game.scss";
+import webSocketService from "helpers/websocketContext";
 
 const FormField = (props) => {
   return (
@@ -39,38 +40,28 @@ const Game = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [error, setError] = useState(null);
-  const ws = localStorage.getItem("gamews");
   
   useEffect(() => {
-    if (ws === "false") {
-      window.location.reload();
-      localStorage.setItem("gamews", "true");
-    }
-  }, [ws]);
+    const subscription = webSocketService.subscribe(
+      '/topic/game-control',
+      async (message) => {
+        const messageData = JSON.parse(message.body);
+        console.log("Received messageData:", messageData);
+        console.log("message.command:", message.command);
+        if (messageData.command === "stop" && messageData.lobbyId.toString() === lobbyId) {
+          console.log("received stop");
+          const answer = getFormattedData();
+          await doStop(answer);
+        } 
+      },
+      { lobbyId: lobbyId}
+    );
 
-  useEffect(() => {
-    async function stompConnect() {
-      try {
-        if (!client["connected"]) {
-          client.connect({}, function () {
-            client.send("/app/connect", {}, JSON.stringify({ username: username }));
-            client.subscribe("/topic/game-control", function (response) {
-              const data = JSON.parse(response.body);
-              if (data.command === "stop") {
-                setCountdown(0);
-              }
-            });
-          });
-        }
-      } catch (error) {
-        console.error(`Something went wrong: \n${handleError(error)}`);
-        console.error("Details:", error);
-        alert("Something went wrong! See the console for details.");
-      }
-    }
-    stompConnect();
-    
-  }, []);
+    return () => {
+      webSocketService.unsubscribe(subscription);
+    };
+  }, [lobbyId]);
+
 
   useEffect(() => {
     // Fetch settings before the game starts
@@ -117,21 +108,18 @@ const Game = () => {
   };
 
 
-  const doStop = async () => {
-    if (client && client["connected"]) {
-      client.disconnect(function () {
-        console.log("disconnected from stomp");
-      });
-    }
+  const doStop = async (answer) => {
+    console.log("in dostop");
     await api.put(`/players/${username}`, JSON.stringify({ready: false}));
+    console.log("put ready to false");
     clearInterval(countdownInterval); // Stop the countdown timer
-
+    console.log("cleared timer");
     
-    const answer = getFormattedData();
-
+    console.log("got formatted data");
     // send the answers to backend for verification
     try{
       await submitAnswers(answer);
+      console.log("submitted answers");
     }catch(error){
       setError("Error submitting data");
 
@@ -146,8 +134,9 @@ const Game = () => {
   };
 
   const StopGame = async () => {
-    client.send("/app/stop-game", {}, "{}");
-    doStop();
+    webSocketService.sendMessage('/app/stop-game', {lobbyId: lobbyId});
+    const answer = getFormattedData();
+    doStop(answer);
   };
 
   const getLetter = async () => {
@@ -199,7 +188,8 @@ const Game = () => {
     if (countdown === 0) {
       clearInterval(countdownInterval); // Stop the countdown timer
       // Perform actions when countdown reaches 0
-      doStop();
+      const answer = getFormattedData();
+      doStop(answer);
     }
   }, [countdown]);
 

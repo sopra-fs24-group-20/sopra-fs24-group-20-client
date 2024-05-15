@@ -4,6 +4,7 @@ import { Button } from "components/ui/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import "styles/views/Lobby.scss";
+import webSocketService from "helpers/websocketContext";
 import PropTypes from "prop-types";
 // @ts-ignore
 import svgImage1 from "images/1.svg";
@@ -55,6 +56,7 @@ import svgImage23 from "images/23.svg";
 import svgImage24 from "images/24.svg";
 // @ts-ignore
 import svgImage25 from "images/25.svg";
+import { all } from "axios";
 
 const CryptoJS = require("crypto-js");
 const all_pictures = [svgImage1, svgImage2, svgImage3, svgImage4,svgImage5,svgImage6,svgImage7,svgImage8,svgImage9,svgImage10,svgImage11,svgImage12,svgImage13,svgImage14,svgImage15,svgImage16,svgImage17,svgImage18,svgImage19,svgImage20,svgImage21,svgImage22,svgImage23,svgImage24,svgImage25];
@@ -90,7 +92,10 @@ const LobbyPage = () => {
   const localLobbyId = localStorage.getItem(("lobbyId"))
   const [ready_ws, setReadyWS] = useState(null);
   const [new_join, setNewJoinWS] = useState(null);
+  const [readyPlayers, setReadyPlayers] = useState(0);
+  const [onlinePlayers, setOnlinePlayers] = useState(0);
   const [allPlayers, setAllPlayers] = useState([]);
+  const [loading, setLoading] = useState<boolean>(false);
   
   useEffect(() => {
     const fetchGameId = async () => {
@@ -98,7 +103,9 @@ const LobbyPage = () => {
         const response = await api.get(`game/${localLobbyId}`);
         if (response.status === 200){
           localStorage.setItem("gameId", response.data.toString());
+          await fetchPlayers();
         }
+
       }catch(error){
         alert(
           `Something went wrong when fetching the gameId: \n${handleError(error)}`
@@ -106,63 +113,69 @@ const LobbyPage = () => {
       }
     }
     fetchGameId();
-  })
-
+  }, [])
 
 
   useEffect(() => {
-    const intervalId = setInterval(fetchPlayers, 2000); // 2000 milliseconds = 2 seconds
-
-    // Cleanup function to clear the interval when component unmounts or when allPlayers changes
-    return () => clearInterval(intervalId);
-  }, [allPlayers]);
-  
-
-  /*useEffect(() => {
-
-    const lobbyRefreshSubscription = subscribeToTopic(
-      "/topic/lobby-refresh",
-      (response) => {
-        const data = JSON.parse(response.body);
-        if (data.command === "refresh") {
+    const subscription = webSocketService.subscribe(
+      '/topic/ready-count',
+      async (message) => {
+        const messageData = JSON.parse(message.body);
+        console.log("Received messageData:", messageData);
+        console.log("message.command:", message.command);
+        console.log("Received messageData:", messageData.lobbyId);
+        if (messageData.command === "start" && messageData.lobbyId.toString() === localLobbyId) {
+          await handleStartGame();
+        } else {
+          const readyPlayersCount = messageData.readyPlayers !== undefined ? messageData.readyPlayers : 0;
+          const onlinePlayersCount = messageData.onlinePlayers !== undefined ? messageData.onlinePlayers : 0;
+          setReadyPlayers(readyPlayersCount.toString());
+          setOnlinePlayers(onlinePlayersCount.toString());
           fetchPlayers();
         }
-      }
+      },
+      { lobbyId: localLobbyId, username: local_username }
     );
-
-    const gameControlSubscription = subscribeToTopic(
-      "/topic/ready-count",
-      (response) => {
-        const data = JSON.parse(response.body);
-        console.log(data);
-        if (data.command === "start") {
-          start_game();
-        }
-      }
-    );
-
-    fetchPlayers();
 
     return () => {
-      lobbyRefreshSubscription.unsubscribe();
-      gameControlSubscription.unsubscribe();
+      webSocketService.unsubscribe(subscription);
     };
-  }, []);*/
+  }, [localLobbyId, local_username]);
+
+
+  const handleStartGame = async () => {
+    try {
+      await api.put(`/players/${local_username}`, JSON.stringify({ ready: false }));
+      navigate(`/game/${localLobbyName}`);
+    } catch (error) {
+      alert(`Error starting game: ${handleError(error)}`);
+    }
+  };
+
+  /*useEffect(() => {
+    const intervalId = setInterval(fetchPlayers, 2000); // 2000 milliseconds = 2 seconds
+    
+    // Cleanup function to clear the interval when component unmounts or when allPlayers changes
+    return () => clearInterval(intervalId);
+  }, [allPlayers]);*/
+  
 
   const exit = async () => {
     try {
       await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
-      // client.send("/topic/refresh", {}, "{}");
-      // client.disconnect();
+      if (webSocketService.connected){
+        webSocketService.sendMessage('/app/leave', { username: local_username , lobbyId: localLobbyId });
+        await new Promise(resolve => setTimeout(resolve, 1000)); 
+        await webSocketService.disconnect();
+      }
       localStorage.removeItem("lobbyName");
       localStorage.removeItem("lobbyId");
       localStorage.removeItem("gameId");
-      localStorage.removeItem("gamews");
       await api.put(`/players/${local_username}`, JSON.stringify({ready: false}));
       navigate(`/user/${local_username}`);
     } catch (error) {
       alert(
-        `Something went wrong during exiting the lobby: \n${handleError(error)}`
+        `Something went wrong when exiting the lobby: \n${handleError(error)}`
       );
     }
   };
@@ -171,6 +184,7 @@ const LobbyPage = () => {
     try {
       await api.put(`/players/${local_username}`, JSON.stringify({ready: true}));
       setButtonClicked(true);
+      webSocketService.sendMessage('/app/ready-up', {username: local_username, lobbyId: localLobbyId});
       // client.send("/app/ready-up", {}, JSON.stringify({ username: local_username, lobbyId:localLobbyId }));
     } catch (error) {
       alert(
@@ -179,29 +193,17 @@ const LobbyPage = () => {
     }
   };
 
-  const players_ready = (players) => {
-    return players.filter(player => player.ready).length;
-  };
 
-  const start_game = async () => {
-    try {
-      localStorage.setItem("gamews", "false")
-      await api.put(`/players/${local_username}`, JSON.stringify({ready: false}));
-      navigate(`/game/${localLobbyName}`);
-    } catch (error) {
-      alert(`Error starting game: ${handleError(error)}`);
-    }
-  };
 
   const fetchPlayers = async () =>{
     try {
       const response = await api.get(`/lobby/players/${localLobbyId}`);
       setAllPlayers(response.data);
+      setOnlinePlayers(response.data.length);
       console.log(allPlayers)
-
-      if(allPlayers.length!==0 && allPlayers.length===players_ready(allPlayers)){
+      /*if(allPlayers.length!==0 && allPlayers.length===players_ready(allPlayers)){
         start_game();
-      }
+      }*/
     } catch (error){
       alert(
         `Something went wrong during fetching the players: \n${handleError(error)}`
@@ -231,7 +233,7 @@ const LobbyPage = () => {
             </ul>
 
             <div className="lobby ready">
-              {players_ready(allPlayers)}/{allPlayers.length} players are ready
+              {readyPlayers}/{onlinePlayers} players are ready
             </div>
 
             <Button
