@@ -70,7 +70,7 @@ const CreateLobby = () => {
             }
           }, 100);
         });
-        await webSocketService.sendMessage('/app/join', { username: username , lobbyId: response.data.lobbyId});
+        await webSocketService.sendMessage("/app/join", { username: username , lobbyId: response.data.lobbyId});
         navigate(`/lobby/${lobbyName}`);
       } 
     } catch (error) {

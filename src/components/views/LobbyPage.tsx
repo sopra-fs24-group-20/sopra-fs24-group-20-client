@@ -118,7 +118,7 @@ const LobbyPage = () => {
 
   useEffect(() => {
     const subscription = webSocketService.subscribe(
-      '/topic/ready-count',
+      "/topic/ready-count",
       async (message) => {
         const messageData = JSON.parse(message.body);
         console.log("Received messageData:", messageData);
@@ -164,7 +164,7 @@ const LobbyPage = () => {
     try {
       await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
       if (webSocketService.connected){
-        webSocketService.sendMessage('/app/leave', { username: local_username , lobbyId: localLobbyId });
+        webSocketService.sendMessage("/app/leave", { username: local_username , lobbyId: localLobbyId });
         await new Promise(resolve => setTimeout(resolve, 1000)); 
         await webSocketService.disconnect();
       }
@@ -184,7 +184,7 @@ const LobbyPage = () => {
     try {
       await api.put(`/players/${local_username}`, JSON.stringify({ready: true}));
       setButtonClicked(true);
-      webSocketService.sendMessage('/app/ready-up', {username: local_username, lobbyId: localLobbyId});
+      webSocketService.sendMessage("/app/ready-up", {username: local_username, lobbyId: localLobbyId});
       // client.send("/app/ready-up", {}, JSON.stringify({ username: local_username, lobbyId:localLobbyId }));
     } catch (error) {
       alert(
@@ -192,8 +192,6 @@ const LobbyPage = () => {
       );
     }
   };
-
-
 
   const fetchPlayers = async () =>{
     try {

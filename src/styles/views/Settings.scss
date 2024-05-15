@@ -64,4 +64,20 @@
     margin-bottom: 10px;
   }
 
+  &.dropdown {
+    background: transparentize(white, 0.85);
+    color: white;
+    padding: 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 0.75em;
+  }
+  &.dropdown option {
+    background-color: #f9f9f9;
+    color: black;
+    padding: 12px;
+  }
+  &.dropdown option:checked {
+    background-color: #ccc;
+  }
 }
