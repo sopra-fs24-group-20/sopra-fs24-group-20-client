@@ -4,86 +4,62 @@ import "styles/views/Popup.scss";
 
 
 const PopupWindow = () => {
-
   return (
     <BaseContainer>
       <div className="popup container">
         <div className="popup form">
           <div className="popup text">
             <div><strong>Getting Started</strong></div>
-            <div>You are currently on your profile screen, where you can see your username and the stats.</div>
             <div>Your options are:</div>
-            <div><strong>1.</strong> Clicking on <span style={{ fontStyle: "italic" }}>Create Lobby</span> lets you
-              create a new lobby as a host.
-            </div>
-            <div><strong>2.</strong> Clicking on <span style={{ fontStyle: "italic" }}>Join Lobby</span> lets you join
-              an existing lobby as a regular player.
-            </div>
+            <div><strong>1.</strong> Clicking on <span style={{ fontStyle: "italic" }}>Create Lobby</span> lets you create a new lobby and become the lobby host. Share the lobby login credentials with your friends!</div>
+            <div><strong>2.</strong> Clicking on <span style={{ fontStyle: "italic" }}>Join Lobby</span> lets you join an existing lobby as a regular player. Ask the lobby host for the lobby login credentials.</div>
 
             <div style={{ marginBottom: "50px" }}></div>
 
             <div><strong>Lobby Screen:</strong></div>
-            <div>Once you created or joined a lobby, you can click on <span
-              style={{ fontStyle: "italic" }}>Ready</span> to ready up for the game.
-            </div>
-            <div>Only once all players, which are in the lobby, have pressed on ready, the game will start.</div>
-            <div>Note that by clicking on the gear icon on the top right, every player is able to view the</div>
-            <div>game settings. Only the host, however, is able to change them.</div>
+            <div>Once you have created or joined a lobby, you can click on <span style={{ fontStyle: "italic" }}>Ready</span> to ready up for the game.</div>
+            <div>Only once all players currently in the lobby have pressed ready does the game start.</div>
+            <div>You can click on the gear icon to view the game settings, but only the lobby host can change them.</div>
 
             <div style={{ marginBottom: "50px" }}></div>
 
-            <div><strong>Settings Screen:</strong></div>
-            <div>Currently, the following options can be changed:</div>
-            <div><strong>1. Categories:</strong> Add new categories to your game.</div>
-            <div><strong>2. Time (sec):</strong> Set the round duration.</div>
-            <div><strong>3. Rounds:</strong> Edit the number of rounds.</div>
-            <div><strong>4. Game Mode:</strong> Change the game mode. Further information can be found on the Settings Screen.</div>
+            <div><strong>Settings</strong></div>
+            <div>Currently, the following options can be changed only by the host:</div>
+            <div><strong>1. Categories:</strong> Modify the preset categories.</div>
+            <div><strong>2. Time (in seconds):</strong> Set the round duration.</div>
+            <div><strong>3. Rounds:</strong> Edit the number of rounds in a game.</div>
+            <div><strong>4. Game Mode:</strong> Change the game mode. The default mode is normal, where you get a random letter and a position. In</div>
+              <div>your answers in the game, you have to write answers including the given letter at the given position. You can also</div>
+            <div>set an easy mode to always get position 1.</div>
 
             <div style={{ marginBottom: "50px" }}></div>
 
             <div><strong>Game Screen:</strong></div>
-            <div>Once a round has started, every player is able to fill out their answers. A random letter</div>
-            <div>gets chosen and is displayed in the top left corner. The remaining time is displayed in</div>
-            <div>the top right corner.</div>
-            <div>Once the first player presses on <span style={{ fontStyle: "italic" }}>Stop</span>, or the
-              timer runs out, the round stops
-            </div>
-            <div>for every player and everyone get redirected to the evaluation screen.</div>
+            <div>Once a round has started, you should think of words with the given letter at the given position that fit the categories.</div>
+            <div>As soon as you are done filling in all answers, you can press <span style={{ fontStyle: "italic" }}>Stop</span> to stop the game for everyone in the lobby.</div>
+            <div>When someone else presses <span style={{ fontStyle: "italic" }}>Stop</span> or the timer runs out, the game stops, and you get to the evaluation screen.</div>
 
             <div style={{ marginBottom: "50px" }}></div>
 
             <div><strong>Evaluation Screen:</strong></div>
-            <div>Here, all the answers of all the players are displayed, going by category. The validity of</div>
-            <div>all answers is shown my either a green hook (valid), or a red cross (invalid). Valid answers</div>
-            <div>award 10 points, invalid answers award 0 points.</div>
-            <div>For all answers, other than their own, players can press one of the following two buttons:</div>
+            <div>Here, all the answers of all the players are displayed, sorted by category.</div>
+            <div>The validity of all answers is shown either by a green tick (valid) or a red cross (invalid).</div>
+            <div>For all answers but your own, you can press one of the following two buttons:</div>
 
             <div style={{ marginBottom: "20px" }}></div>
 
-            <div><strong>1. Veto:</strong> If the majority of the players gives a certain answer a veto, the answer changes</div>
-            <div>its validity status.</div>
-            <div><strong>2. Bonus:</strong> Players are able to award certain answers a bonus of three points.</div>
+            <div><strong>1. Veto:</strong> If you disagree with the validity of an answer, press <span style={{ fontStyle: "italic" }}>Veto</span>.</div>
+            <div>If the majority of the players give a certain answer a veto, the answer changes its validity status.</div>
+            <div><strong>2. Bonus:</strong> You can award answers a creativity bonus of three points regardless of validity status.</div>
+            <div>Generally, a valid answer that is unique for the category is rewarded with 10 points, a valid answer not unique for the category is</div>
+            <div>rewarded with 5 points, an invalid answer gets 0 points, and if you are the only player that has submitted a valid answer for a category,</div>
+            <div>you get 15 points. Bonus points are added regardless.</div>
 
             <div style={{ marginBottom: "20px" }}></div>
 
-            <div>Once a player feels confident in their votes, they can press on <span style={{ fontStyle: "italic" }}>next</span>,
-              to evaluate
-            </div>
-            <div>the answers of the next category. Once all categories are evaluated, players have to wait for</div>
-            <div>the other players to finish. After every player has finished their votes, they are either</div>
-            <div>transferred to the Intermediate Leaderboard Screen (if they haven&apos;t played all the rounds) or
-            </div>
-            <div>to the Final Leaderboard Screen.</div>
-
-            <div style={{ marginBottom: "50px" }}></div>
-
-            <div><strong>Intermediate Leaderboard Screen:</strong></div>
-            <div>Displays the current rankings.</div>
-
-            <div style={{ marginBottom: "50px" }}></div>
-
-            <div><strong>Final Leaderboard Screen:</strong></div>
-            <div>Final rankings. A button is displayed to return to the lobby.</div>
+            <div>Once you are happy with your votes, you can press on <span style={{ fontStyle: "italic" }}>Next</span> to evaluate the answers of the next category. Once you have evaluated all</div>
+              <div>categories, you have to wait until all other players have submitted their evaluations. Then you get transferred to the intermediate</div>
+            <div>leaderboard, where you can see the current ranking. If this is your last round, you get to the final leaderboard to see the final ranking.</div>
 
             <div style={{ marginBottom: "50px" }}></div>
 
