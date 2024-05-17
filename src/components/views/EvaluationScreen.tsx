@@ -34,8 +34,11 @@ const EvaluationScreen = () => {
   const [scores, setScores] = useState<number[]>(null);
   const [rounds, setRounds] = useState(null);
   const [currentRound, setCurrentRound] = useState(null);
-  // const [loading, setLoading] = useState<boolean>(false);
-  const votes = {};
+  const [displayIndex, setDisplayIndex] = useState(0);
+  const [fetchedData, setFetchedData] = useState(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [initiated, setInitiated] = useState<boolean>(false);
+  const [votes, setVotes] = useState({});
 
   const leaveLobby = async () => {
     try {
@@ -91,14 +94,17 @@ const EvaluationScreen = () => {
   }
 
   function initiateVotes() {
-    const temporaryVotes = {"veto": false, "bonus": false};
-    categories.forEach(category => {
-      votes[category] = {}; // Initialize votes for each category
-      players.forEach(name => {
+    const temporaryVotes = { veto: false, bonus: false };
+    const newVotes = {};
+    categories.forEach((category) => {
+      newVotes[category] = {}; // Initialize votes for each category
+      players.forEach((name) => {
         // Initialize each player's vote object with both bonus and veto keys
-        votes[category][name] = {...temporaryVotes};
+        newVotes[category][name] = { ...temporaryVotes };
       });
     });
+    setVotes(newVotes); // Update the votes state with the new votes object
+    setInitiated(true); // Set initiated to true after votes initialization
   }
 
   function changeCategory(allCategories) {
@@ -108,129 +114,128 @@ const EvaluationScreen = () => {
     setCurrentCategory(allCategories[parseInt(localStorage.getItem("categoryIndex"), 10)]);
   }
 
-  const submitBonus =  (player:string) => {
-    if (!localStorage.getItem("totalVotes")) {
+  const submitBonus = (player: string) => {
+    console.log("bonus accessed");
+    if (!initiated) {
       initiateVotes();
-      localStorage.setItem("totalVotes",JSON.stringify(votes));
     }
-    const temp = {...JSON.parse(localStorage.getItem("totalVotes"))};
-    temp[currentCategory][player]["bonus"] = true;
-    temp[currentCategory][player]["veto"] = false;
-    console.log("When submitting a Bonus, our DT looks like this:",temp);
-    localStorage.setItem("totalVotes",JSON.stringify(temp));
+    setVotes((prevVotes) => ({
+      ...prevVotes,
+      [currentCategory]: {
+        ...(prevVotes[currentCategory] || {}),
+        [player]: { ...(prevVotes[currentCategory]?.[player] || {}), bonus: true },
+      },
+    }));
+    console.log("When submitting a Bonus, our DT looks like this:", votes);
   };
 
-  const submitVeto =  (player:string) => {
-    if (!localStorage.getItem("totalVotes")) {
+  const submitVeto = (player: string) => {
+    console.log("veto accessed");
+    if (!initiated) {
       initiateVotes();
-      localStorage.setItem("totalVotes",JSON.stringify(votes));
     }
-    const temp = {...JSON.parse(localStorage.getItem("totalVotes"))};
-    temp[currentCategory][player]["veto"] = true;
-    temp[currentCategory][player]["bonus"] = false;
-    console.log("When submitting a Veto, our DT looks like this:",temp);
-    localStorage.setItem("totalVotes",JSON.stringify(temp));
+    setVotes((prevVotes) => ({
+      ...prevVotes,
+      [currentCategory]: {
+        ...(prevVotes[currentCategory] || {}),
+        [player]: { ...(prevVotes[currentCategory]?.[player] || {}), veto: true },
+      },
+    }));
+    console.log("When submitting a Veto, our DT looks like this:", votes);
   };
 
   const nextEval = async () => {
-    if (localStorage.getItem("categoryIndex")) {
-      if (parseInt(localStorage.getItem("categoryIndex"), 10) < categories.length-1) {
-        const newIndex = parseInt(localStorage.getItem("categoryIndex"), 10) + 1;
-        localStorage.setItem("categoryIndex", newIndex.toString());
+    if (displayIndex < categories.length - 1) {
+      setDisplayIndex(displayIndex + 1);
 
-        if (!localStorage.getItem("totalVotes")) {
-          initiateVotes();
-          localStorage.setItem("totalVotes",JSON.stringify(votes));
-        }
-        console.log("My totalVotes before navigating to the next Screen:",JSON.parse(localStorage.getItem("totalVotes")));
-        navigate(`/evaluation/${lobbyName}/${categories[newIndex]}`);
+      if (Object.keys(votes).length === 0) {
+        initiateVotes();
       }
-      else {
-        if (!localStorage.getItem("totalVotes")) {
-          initiateVotes();
-          localStorage.setItem("totalVotes",JSON.stringify(votes));
-        }
-        localStorage.removeItem("categoryIndex");
-        const temp = JSON.parse(localStorage.getItem("totalVotes"));
-        console.log("My final votes which get send to the backend:",temp);
-        localStorage.removeItem("totalVotes");
-        try {
-          const requestBody = JSON.stringify(temp);
-          console.log("requestBody",requestBody);
-          const response = await api.post(`/rounds/${gameId}/submitVotes`, requestBody);
-        } catch (error) {
-          console.error(
-            `An error occurred while trying submit the votes: \n${handleError(error)}`
-          );
-        }
-        if (!localStorage.getItem("round")) {
-          localStorage.setItem("round","1");
-        }
-        setCurrentRound(localStorage.getItem("round"));
-        if (currentRound < rounds) {
-          localStorage.setItem("round", JSON.stringify(currentRound + 1));
-          navigate(`/leaderboard/${lobbyName}`);
-        }
-        localStorage.removeItem("round");
-        navigate(`/leaderboard/final/${lobbyName}`);
-      }
-    }
-    else {
-      navigate("/start");
-    }
-  }
 
+      console.log("My totalVotes before navigating to the next Screen:", votes);
+
+    } else {
+
+      if (Object.keys(votes).length === 0) {
+        initiateVotes();
+      }
+
+      console.log("My final votes which get send to the backend:", votes);
+
+      try {
+        const requestBody = JSON.stringify(votes);
+        console.log("requestBody", requestBody);
+        const response = await api.post(`/rounds/${gameId}/submitVotes`, requestBody);
+      } catch (error) {
+        console.error(`An error occurred while trying submit the votes: \n${handleError(error)}`);
+      }
+
+      if (!localStorage.getItem("round")) {
+        localStorage.setItem("round", "1");
+      }
+      setCurrentRound(localStorage.getItem("round"));
+
+      if (currentRound < rounds) {
+        localStorage.setItem("round", JSON.stringify(currentRound + 1));
+        navigate(`/leaderboard/${lobbyName}`);
+      }
+      localStorage.removeItem("round");
+      navigate(`/leaderboard/final/${lobbyName}`);
+    }
+  };
 
   useEffect(() => {
     async function fetchData() {
       try {
-        // setLoading(true);
-        const response = await api.get(`/rounds/scores/${gameId}`,gameId);
-        const fetchedPlayers = getPlayerNames(response.data);
+        const response = await api.get(`/rounds/scores/${gameId}`, gameId);
         const fetchedCategories = getCategories(response.data);
-        setPlayers(fetchedPlayers);
-        setCategories(fetchedCategories);
-        changeCategory(fetchedCategories);
-        setAnswers(getPlayerAnswersForCategory(response.data,currentCategory));
-        setScores(getScoresForCategory(response.data,currentCategory));
-      } catch (error) {
-        console.error(
-          `Something went wrong while fetching the players: \n${handleError(
-            error
-          )}`
-        );
-        console.error("Details:", error);
-        alert(
-          "Something went wrong while fetching the players! See the console for details."
-        );
-      } finally {
-        // setLoading(false);
-      }
-    }
-    async function fetchRounds() {
-      try {
-        // setLoading(true);
-        const response = await api.get(`lobby/settings/${lobbyId}`);
-        setRounds(response.data.rounds);
-      } catch (error) {
-        console.error(
-          `Something went wrong while fetching the settings: \n${handleError(
-            error
-          )}`
-        );
-        console.error("Details:", error);
-        alert(
-          "Something went wrong while fetching the settings! See the console for details."
-        );
-      } finally {
-        // setLoading(false);
-      }
-    }
-    fetchData();
-    fetchRounds();
-  }, [gameId, currentCategory, setPlayers, setCategories, setAnswers, setScores,categories]);
+        const fetchedPlayers = getPlayerNames(response.data);
+        const fetchedRounds = response.data.rounds;
 
-  /* if (true) {
+        setFetchedData(response.data);
+        setCategories(fetchedCategories);
+        setPlayers(fetchedPlayers);
+        setRounds(fetchedRounds);
+
+        // Set the current category to the first category
+        setCurrentCategory(fetchedCategories[0]);
+
+        setAnswers(getPlayerAnswersForCategory(response.data, fetchedCategories[0]));
+        setScores(getScoresForCategory(response.data, fetchedCategories[0]));
+        setLoading(false);
+      } catch (error) {
+        console.error(`Error fetching data: ${error}`);
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [gameId]);
+
+  useEffect(() => {
+    if (fetchedData && currentCategory) {
+      // Update answers and scores when currentCategory changes
+      setAnswers(getPlayerAnswersForCategory(fetchedData, currentCategory));
+      setScores(getScoresForCategory(fetchedData, currentCategory));
+    }
+  }, [currentCategory, fetchedData]);
+
+  useEffect(() => {
+    // Update current category when display index changes
+    if (categories) {
+      setCurrentCategory(categories[displayIndex]);
+    }
+  }, [displayIndex, categories]);
+
+  useEffect(() => {
+    // Update answers and scores when display index changes
+    if (fetchedData) {
+      setAnswers(getPlayerAnswersForCategory(fetchedData, currentCategory));
+      setScores(getScoresForCategory(fetchedData, currentCategory));
+    }
+  }, [displayIndex]);
+
+   if (loading) {
     return (
       <BaseContainer>
         <div className="authentication container">
@@ -240,7 +245,7 @@ const EvaluationScreen = () => {
         </div>
       </BaseContainer>
     );
-  }*/ 
+  }
 
   return (
     <BaseContainer>
@@ -279,7 +284,13 @@ const EvaluationScreen = () => {
                   {answers?.map((answer, index) => (
                     <li key={index} className="evaluation li">
                       <div className="evaluation answer">{answer}
-                        <div className="evaluation score">{scores[index]}pt</div>
+                        <div className="evaluation score">
+                          {scores[index] === 1 ? (
+                            <span style={{ color: "green" }}>✔</span>
+                          ) : (
+                            <span style={{ color: "red" }}>✘</span>
+                          )}
+                        </div>
                       </div>
                     </li>
                   ))}
@@ -320,7 +331,7 @@ const EvaluationScreen = () => {
                 style={{ width: "100%", height: "100%" }}
                 onClick={() => nextEval()}
               >
-                Finish
+                {displayIndex < categories.length - 1 ? "Next" : "Finish"}
               </Button>
             </div>
           </div>
