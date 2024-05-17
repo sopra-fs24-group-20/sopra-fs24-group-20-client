@@ -9,11 +9,12 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-
   }
+
   &.centered-text {
     text-align: center;
   }
+
   &.form {
     display: flex;
     flex-direction: column;
@@ -26,7 +27,12 @@
     padding-left: 37px;
     padding-right: 37px;
     border-radius: 0.75em;
-    background-image: linear-gradient(0deg, $accentBottomLight, $accentMiddleLight, $accentTopLight);
+    background-image: linear-gradient(
+      0deg,
+      $accentBottomLight,
+      $accentMiddleLight,
+      $accentTopLight
+    );
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: $dropShadow;
   }
@@ -35,14 +41,17 @@
     display: flex;
     align-items: center;
   }
+
   .Letter {
     margin-right: auto; /* Add space between letter and countdown */
   }
+
   &.field {
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
+
   &.input {
     height: 35px;
     padding-left: 15px;
@@ -53,12 +62,14 @@
     background: transparentize(white, 0.85);
     color: $textColor;
   }
+
   &.label {
     color: $textColor;
     margin-bottom: 10px;
     text-transform: lowercase;
     font-weight: 300;
   }
+
   &.button-container {
     display: flex;
     justify-content: center;
@@ -67,19 +78,55 @@
     max-width: 480px;
     min-width: 200px;
   }
-  &.error-message{
-    color:red;
+
+  &.error-message {
+    color: red;
     font-weight: bold;
     font-size: 14px;
   }
+
   &.link {
     margin-top: 2em;
     color: white;
     text-decoration: underline;
   }
+
   &.link:visited {
     margin-top: 2em;
     color: white;
     text-decoration: underline;
+  }
+
+  // Fullscreen overlay styles
+  &.fullscreen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999; // Higher z-index to overlay other content
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  // Popup styles
+  &.popup {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.5); // Semi-transparent background
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    // Text styles
+    p {
+      font-weight: bold;
+      font-size: calc(14px + 20vw); // Responsive font size based on viewport width
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
   }
 }

@@ -41,6 +41,7 @@ const Game = () => {
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [error, setError] = useState(null);
   const[position, setPosition] = useState<string>("");
+  const [showStopPopup, setShowStopPopup] = useState<boolean>(false);
   
   useEffect(() => {
     const subscribeToWebSocket = async () => {
@@ -71,9 +72,15 @@ const Game = () => {
           console.log("message.command:", message.command);
           if (messageData.command === "stop" && messageData.lobbyId.toString() === lobbyId) {
             console.log("received stop");
-            const answer = getFormattedData();
-            await new Promise(resolve => setTimeout(resolve, 1000)); 
-            await doStop(answer);
+            clearInterval(countdownInterval);
+            if (countdown !== 0){
+              setCountdown(0)
+            }
+            setShowStopPopup(true); // Show the popup when receiving the stop command
+            setTimeout(() => {
+              setShowStopPopup(false); // Hide the popup after 4 seconds
+            }, 4000);
+            // await doStop(answer);
           } 
         },
         { lobbyId: lobbyId }
@@ -136,13 +143,13 @@ const Game = () => {
   };
 
 
-  const doStop = async (answer) => {
+  const doStop = async () => {
     console.log("in dostop");
     await api.put(`/players/${username}`, JSON.stringify({ready: false}));
     console.log("put ready to false");
-    clearInterval(countdownInterval); // Stop the countdown timer
-    console.log("cleared timer");
-    
+    // clearInterval(countdownInterval); // Stop the countdown timer
+    // console.log("cleared timer");
+    const answer = getFormattedData();
     console.log("got formatted data");
     // send the answers to backend for verification
     try{
@@ -163,8 +170,6 @@ const Game = () => {
 
   const StopGame = async () => {
     webSocketService.sendMessage("/app/stop-game", {lobbyId: lobbyId});
-    const answer = getFormattedData();
-    doStop(answer);
   };
 
   const getLetter = async () => {
@@ -234,8 +239,11 @@ const Game = () => {
     if (countdown === 0) {
       clearInterval(countdownInterval); // Stop the countdown timer
       // Perform actions when countdown reaches 0
-      const answer = getFormattedData();
-      doStop(answer);
+      setShowStopPopup(true); // Show the popup when receiving the stop command
+      setTimeout(() => {
+        setShowStopPopup(false); // Hide the popup after 4 seconds
+      }, 4000);
+      doStop();
     }
   }, [countdown]);
 
@@ -248,10 +256,20 @@ const Game = () => {
 
   return (
     <BaseContainer>
+      {/* Popup */}
+      {showStopPopup && (
+        <div className="game fullscreen-overlay">
+          <div className="game popup">
+            <p className="game stop-text">STOP</p>
+          </div>
+        </div>
+      )}
       <div className="game container">
         <div className="game form">
           <div className="header">
-            <h1 className="Letter">{letter} at position {position}</h1>
+            <h1 className="Letter">
+              {letter} at {position} position{" "}
+            </h1>
             <h1 className="countdown">{countdown}</h1>
           </div>
           {error && <div className="game error-message">{error}</div>}
@@ -260,7 +278,9 @@ const Game = () => {
               key={index}
               label={category}
               value={answers[category] || ""}
-              onChange={(value: string) => handleInputChange(category, value)}
+              onChange={(value: string) =>
+                handleInputChange(category, value)
+              }
             />
           ))}
         </div>
@@ -276,6 +296,6 @@ const Game = () => {
       </div>
     </BaseContainer>
   );
-};
+};  
 
 export default Game;
