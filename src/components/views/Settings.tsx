@@ -38,7 +38,7 @@ FormField.propTypes = {
 
 const Settings = () => {
   const navigate = useNavigate();
-  const [settings, setSettings] = useState({ categories: [], gameMode: 1 }); // Initialize gameMode to 0 (easy)
+  const [settings, setSettings] = useState({ categories: [], gameMode: 1 });
   const localLobbyId = localStorage.getItem("lobbyId");
   const localUsername = localStorage.getItem("username");
   const localLobbyName = localStorage.getItem("lobbyName");
@@ -46,6 +46,7 @@ const Settings = () => {
   const [disableSave, setDisableSave] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState(null);
+  const [saveConfirmation, setSaveConfirmation] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -82,15 +83,17 @@ const Settings = () => {
   const saveChanges = async () => {
     try {
       await api.put(`/lobby/settings/${localLobbyId}`, JSON.stringify(settings));
+      setSaveConfirmation("Settings saved successfully!");
+      setError(null);
     } catch (error) {
       console.log(handleError(error));
       setError("Are your excluded letters in the right format e.g. X,Y,Z ?");
+      setSaveConfirmation(null);
     }
   };
 
   const addCategory = () => {
     const lastCategory = settings.categories[settings.categories.length - 1];
-    // Check if the last category field is not empty
     if (lastCategory && lastCategory.trim() !== "") {
       if (settings.categories.length < 8) {
         setSettings({ ...settings, categories: [...settings.categories, ""] });
@@ -130,7 +133,8 @@ const Settings = () => {
         <div className="settings form">
           <div>
             <h2 className="settings centered-text">Settings</h2>
-            {error && <div className="authentication error-message">{error}</div>}
+            {error && <div className="settings error-message">{error}</div>}
+            {saveConfirmation && <div className="settings success-message">{saveConfirmation}</div>} {/* Display success message */}
             <div className="settings column">
               Categories
               {settings.categories &&
