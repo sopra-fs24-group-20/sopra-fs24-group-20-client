@@ -115,7 +115,7 @@ const Leader = () => {
     }
   }
 
-  if (loading) {
+  /*if (loading) {
     return (
       <BaseContainer>
         <div className="authentication container">
@@ -125,7 +125,7 @@ const Leader = () => {
         </div>
       </BaseContainer>
     );
-  }
+  }*/
 
   return (
     <BaseContainer>
