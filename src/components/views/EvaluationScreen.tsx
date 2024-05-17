@@ -154,7 +154,8 @@ const EvaluationScreen = () => {
 
       console.log("My totalVotes before navigating to the next Screen:", votes);
 
-    } else {
+    }
+    else {
 
       if (Object.keys(votes).length === 0) {
         initiateVotes();
@@ -173,14 +174,16 @@ const EvaluationScreen = () => {
       if (!localStorage.getItem("round")) {
         localStorage.setItem("round", "1");
       }
-      setCurrentRound(localStorage.getItem("round"));
+      const storedRound = parseInt(localStorage.getItem("round"), 10);
 
-      if (currentRound < rounds) {
-        localStorage.setItem("round", JSON.stringify(currentRound + 1));
+      if (storedRound < rounds) {
+        localStorage.setItem("round", JSON.stringify(storedRound + 1));
         navigate(`/leaderboard/${lobbyName}`);
       }
-      localStorage.removeItem("round");
-      navigate(`/leaderboard/final/${lobbyName}`);
+      else {
+        localStorage.removeItem("round");
+        navigate(`/leaderboard/final/${lobbyName}`);
+      }
     }
   };
 
@@ -188,9 +191,10 @@ const EvaluationScreen = () => {
     async function fetchData() {
       try {
         const response = await api.get(`/rounds/scores/${gameId}`, gameId);
+        const second_response = await api.get(`/lobby/settings/${lobbyId}`);
         const fetchedCategories = getCategories(response.data);
         const fetchedPlayers = getPlayerNames(response.data);
-        const fetchedRounds = response.data.rounds;
+        const fetchedRounds = second_response.data.rounds;
 
         setFetchedData(response.data);
         setCategories(fetchedCategories);
