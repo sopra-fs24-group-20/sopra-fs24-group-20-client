@@ -117,31 +117,97 @@ const LobbyPage = () => {
 
 
   useEffect(() => {
-    const subscription = webSocketService.subscribe(
-      "/topic/ready-count",
-      async (message) => {
+    const subscribeToWebSocket = async () => {
+      // If the websocket is not connected, connect and wait until it is connected
+      if (!webSocketService.connected) {
+        // Establish websocket connection
+        webSocketService.connect();
+  
+        // Wait until actually connected to websocket
+        await new Promise<void>((resolve) => {
+          const interval = setInterval(() => {
+            if (webSocketService.connected) {
+              clearInterval(interval);
+              resolve();
+            }
+          }, 100);
+        });
+  
+        // Send the join message once connected
+        await webSocketService.sendMessage("/app/join", { username: local_username, lobbyId: localLobbyId });
+      }
+
+      const handleReadyCountMessage = async (message) => {
         const messageData = JSON.parse(message.body);
-        console.log("Received messageData:", messageData);
-        console.log("message.command:", message.command);
-        console.log("Received messageData:", messageData.lobbyId);
         if (messageData.command === "start" && messageData.lobbyId.toString() === localLobbyId) {
           await handleStartGame();
-        } else {
+        } /*else {
           const readyPlayersCount = messageData.readyPlayers !== undefined ? messageData.readyPlayers : 0;
           const onlinePlayersCount = messageData.onlinePlayers !== undefined ? messageData.onlinePlayers : 0;
-          setReadyPlayers(readyPlayersCount.toString());
-          setOnlinePlayers(onlinePlayersCount.toString());
+          setReadyPlayers(readyPlayersCount);
+          setOnlinePlayers(onlinePlayersCount);
           fetchPlayers();
+        }*/
+      };
+      
+      const handleOnlinePlayersMessage = async (message) => {
+        const messageData = JSON.parse(message.body);
+        console.log(messageData);
+        if (messageData){
+        const { readyPlayers, onlinePlayers } = messageData; // Destructuring to extract readyPlayers and onlinePlayers
+        setReadyPlayers(readyPlayers);
+        setOnlinePlayers(onlinePlayers);
+        fetchPlayers();
         }
-      },
-      { lobbyId: localLobbyId, username: local_username }
-    );
+      }
 
-    return () => {
-      webSocketService.unsubscribe(subscription);
+      const readyCountSubscription = webSocketService.subscribe(
+        "/topic/ready-count",
+        handleReadyCountMessage,
+        {lobbyId: localLobbyId, username: local_username}
+      );
+
+      const handleOnlinePlayersSubscription = webSocketService.subscribe(
+        "/topic/online-players",
+        handleOnlinePlayersMessage,
+        {lobbyId: localLobbyId}
+      );
+  
+      // Subscribe to the topic
+      /*const subscription = webSocketService.subscribe(
+        "/topic/ready-count",
+        async (message) => {
+          const messageData = JSON.parse(message.body);
+          console.log("Received messageData:", messageData);
+          console.log("message.command:", message.command);
+          console.log("Received messageData:", messageData.lobbyId);
+  
+          if (messageData.command === "start" && messageData.lobbyId.toString() === localLobbyId) {
+            await handleStartGame();
+          } else {
+            const readyPlayersCount = messageData.readyPlayers !== undefined ? messageData.readyPlayers : 0;
+            const onlinePlayersCount = messageData.onlinePlayers !== undefined ? messageData.onlinePlayers : 0;
+            setReadyPlayers(readyPlayersCount.toString());
+            setOnlinePlayers(onlinePlayersCount.toString());
+            fetchPlayers();
+          }
+        },
+        { lobbyId: localLobbyId, username: local_username }
+      );*/
+  
+      // Cleanup function to unsubscribe when the component unmounts or dependencies change
+      return () => {
+        webSocketService.unsubscribe(readyCountSubscription);
+        webSocketService.unsubscribe(handleOnlinePlayersSubscription);
+      };
     };
-  }, [localLobbyId, local_username]);
-
+  
+    // Call the async function
+    subscribeToWebSocket();
+    
+    // Empty dependency array means this effect runs once when the component mounts
+  }, []);
+  
 
   const handleStartGame = async () => {
     try {

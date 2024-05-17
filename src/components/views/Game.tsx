@@ -43,26 +43,52 @@ const Game = () => {
   const[position, setPosition] = useState<string>("");
   
   useEffect(() => {
-    const subscription = webSocketService.subscribe(
-      "/topic/game-control",
-      async (message) => {
-        const messageData = JSON.parse(message.body);
-        console.log("Received messageData:", messageData);
-        console.log("message.command:", message.command);
-        if (messageData.command === "stop" && messageData.lobbyId.toString() === lobbyId) {
-          console.log("received stop");
-          const answer = getFormattedData();
-          await new Promise(resolve => setTimeout(resolve, 1000)); 
-          await doStop(answer);
-        } 
-      },
-      { lobbyId: lobbyId}
-    );
-
-    return () => {
-      webSocketService.unsubscribe(subscription);
+    const subscribeToWebSocket = async () => {
+      // If the websocket is not connected, connect and wait until it is connected
+      if (!webSocketService.connected) {
+        // Establish websocket connection
+        webSocketService.connect();
+  
+        // Wait until actually connected to websocket
+        await new Promise<void>((resolve) => {
+          const interval = setInterval(() => {
+            if (webSocketService.connected) {
+              clearInterval(interval);
+              resolve();
+            }
+          }, 100);
+        });
+  
+        // Send the join message once connected
+        await webSocketService.sendMessage("/app/join", { username: username, lobbyId: lobbyId });
+      }
+  
+      const subscription = webSocketService.subscribe(
+        "/topic/game-control",
+        async (message) => {
+          const messageData = JSON.parse(message.body);
+          console.log("Received messageData:", messageData);
+          console.log("message.command:", message.command);
+          if (messageData.command === "stop" && messageData.lobbyId.toString() === lobbyId) {
+            console.log("received stop");
+            const answer = getFormattedData();
+            await new Promise(resolve => setTimeout(resolve, 1000)); 
+            await doStop(answer);
+          } 
+        },
+        { lobbyId: lobbyId }
+      );
+      
+      return () => {
+        webSocketService.unsubscribe(subscription);
+      };
     };
-  }, [lobbyId]);
+  
+    subscribeToWebSocket();
+    
+  }, []);
+  
+  
 
 
   useEffect(() => {

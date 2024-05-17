@@ -54,31 +54,53 @@ const Leader = () => {
   useEffect(() => {
     fetchPlayers();
     fetchPoints();
-    const subscription = webSocketService.subscribe(
-      "/topic/ready-count",
-      async (message) => {
-        const messageData = JSON.parse(message.body);
-        console.log("Received messageData:", messageData);
-        console.log("message.command:", message.command);
-        console.log("Received messageData:", messageData.lobbyId);
-        if (messageData.command === "start" && messageData.lobbyId.toString() === localLobbyId) {
-          await start_game();
-        } else {
-          const readyPlayersCount = messageData.readyPlayers !== undefined ? messageData.readyPlayers : 0;
-          const onlinePlayersCount = messageData.onlinePlayers !== undefined ? messageData.onlinePlayers : 0;
-          setReadyPlayers(readyPlayersCount.toString());
-          setOnlinePlayers(onlinePlayersCount.toString());
-          fetchPlayers();
-          fetchPoints();
+    const subscribeToWebSocket = async () => {
+        // If the websocket is not connected, connect and wait until it is connected
+        if (!webSocketService.connected) {
+            // Establish websocket connection
+            webSocketService.connect();
+  
+            // Wait until actually connected to websocket
+            await new Promise<void>((resolve) => {
+                const interval = setInterval(() => {
+                    if (webSocketService.connected) {
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, 100);
+            });
+  
+            // Send the join message once connected
+            await webSocketService.sendMessage("/app/join", { username: localUsername, lobbyId: localLobbyId });
         }
-      },
-      { lobbyId: localLobbyId, username: localUsername }
-    );
+    
+      const subscription = webSocketService.subscribe(
+          "/topic/ready-count",
+          async (message) => {
+              const messageData = JSON.parse(message.body);
+              console.log("Received messageData:", messageData);
+              console.log("message.command:", message.command);
+              console.log("Received messageData:", messageData.lobbyId);
+              if (messageData.command === "start" && messageData.lobbyId.toString() === localLobbyId) {
+                  await start_game();
+              } else {
+                  const readyPlayersCount = messageData.readyPlayers !== undefined ? messageData.readyPlayers : 0;
+                  const onlinePlayersCount = messageData.onlinePlayers !== undefined ? messageData.onlinePlayers : 0;
+                  setReadyPlayers(readyPlayersCount.toString());
+                  setOnlinePlayers(onlinePlayersCount.toString());
+                  fetchPlayers();
+                  fetchPoints();
+              }
+          },
+          { lobbyId: localLobbyId, username: localUsername }
+      );
 
-    return () => {
-      webSocketService.unsubscribe(subscription);
+      return () => {
+          webSocketService.unsubscribe(subscription);
+      };
     };
-  }, [localLobbyId, localUsername]);
+    subscribeToWebSocket();
+}, []);
 
   const local_ready = async () => {
     try {
