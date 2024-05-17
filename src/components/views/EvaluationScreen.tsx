@@ -8,11 +8,76 @@ import { User } from "types";
 import PropTypes from "prop-types";
 import "styles/views/Authentication.scss";
 import CategoriesLoadingScreen from "components/ui/LoadingScreen";
+// @ts-ignore
+import svgImage1 from "images/1.svg";
+// @ts-ignore
+import svgImage2 from "images/2.svg";
+// @ts-ignore
+import svgImage3 from "images/3.svg";
+// @ts-ignore
+import svgImage4 from "images/4.svg";
+// @ts-ignore
+import svgImage5 from "images/5.svg";
+// @ts-ignore
+import svgImage6 from "images/6.svg";
+// @ts-ignore
+import svgImage7 from "images/7.svg";
+// @ts-ignore
+import svgImage8 from "images/8.svg";
+// @ts-ignore
+import svgImage9 from "images/9.svg";
+// @ts-ignore
+import svgImage10 from "images/10.svg";
+// @ts-ignore
+import svgImage11 from "images/11.svg";
+// @ts-ignore
+import svgImage12 from "images/12.svg";
+// @ts-ignore
+import svgImage13 from "images/13.svg";
+// @ts-ignore
+import svgImage14 from "images/14.svg";
+// @ts-ignore
+import svgImage15 from "images/15.svg";
+// @ts-ignore
+import svgImage16 from "images/16.svg";
+// @ts-ignore
+import svgImage17 from "images/17.svg";
+// @ts-ignore
+import svgImage18 from "images/18.svg";
+// @ts-ignore
+import svgImage19 from "images/19.svg";
+// @ts-ignore
+import svgImage20 from "images/20.svg";
+// @ts-ignore
+import svgImage21 from "images/21.svg";
+// @ts-ignore
+import svgImage22 from "images/22.svg";
+// @ts-ignore
+import svgImage23 from "images/23.svg";
+// @ts-ignore
+import svgImage24 from "images/24.svg";
+// @ts-ignore
+import svgImage25 from "images/25.svg";
+import { all } from "axios";
+
+const CryptoJS = require("crypto-js");
+const all_pictures = [svgImage1, svgImage2, svgImage3, svgImage4,svgImage5,svgImage6,svgImage7,svgImage8,svgImage9,svgImage10,svgImage11,svgImage12,svgImage13,svgImage14,svgImage15,svgImage16,svgImage17,svgImage18,svgImage19,svgImage20,svgImage21,svgImage22,svgImage23,svgImage24,svgImage25];
+
+function hashUsername(username) {
+  const hashedUsername = CryptoJS.SHA256(username).toString(CryptoJS.enc.Hex);
+  const hashedInt = parseInt(hashedUsername, 16);
+  const containerIndex = hashedInt % 25;
+
+  return all_pictures[containerIndex];
+}
 
 const Player = ({ user }) => (
-  <div className="player container">
+  <div>
     <div className="player username">
       {user}
+    </div>
+    <div className="player container">
+      <object type="image/svg+xml" data={hashUsername(user)}></object>
     </div>
   </div>
 );
