@@ -56,15 +56,6 @@ const Login = () => {
       setLoading(false);
     }
   };
-  //test the loading screen
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setLoading(true);
-      setTimeout(() => setLoading(false), 2000);
-    }, 1000);
-    
-    return () => clearTimeout(timeout);
-  }, []);
 
   if (loading) {
     return (

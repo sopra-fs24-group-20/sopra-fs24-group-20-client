@@ -52,8 +52,8 @@ const AppRouter = () => {
           <Route path="/user/:username" element={<ProfilePage />} />
         </Route>
 
-        <Route path="/evaluation/:lobbyname/:category" element={<EvaluationGuard />}>
-          <Route path="/evaluation/:lobbyname/:category" element={<EvaluationScreen />} />
+        <Route path="/evaluation/:lobbyname" element={<EvaluationGuard />}>
+          <Route path="/evaluation/:lobbyname" element={<EvaluationScreen />} />
         </Route>
 
         <Route path="/joinlobby" element={<JoinLobbyGuard/>}>

@@ -6,6 +6,7 @@ import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import "styles/views/Leaderboard.scss";
 import "styles/views/Authentication.scss";
+import webSocketService from "helpers/websocketContext";
 import CategoriesLoadingScreen from "components/ui/LoadingScreen";
 
 const Player = ({ user, index }) => {
@@ -45,22 +46,67 @@ const Leader = () => {
   const localLobbyId = localStorage.getItem(("lobbyId"));
   const localGameId = localStorage.getItem("gameId");
 
+  const [readyPlayers, setReadyPlayers] = useState(0);
+  const [onlinePlayers, setOnlinePlayers] = useState(0);
+
   const [readyButtonClicked, setButtonClicked] = useState(false);
-  //const mockplayers = { "barbara": 30 , "paul": 25, "glory":20,"joshi":35 };
-  /*const sortedMOCKPlayers: { username: string; points: number }[] = Object.entries(mockplayers)
-    .map(([username, points]: [string, number]) => ({ username, points }))
-    .sort((a, b) => b.points - a.points);
-*/
 
   useEffect(() => {
-    fetchPoints();
     fetchPlayers();
-  }, [allPlayers]);
+    fetchPoints();
+    const subscribeToWebSocket = async () => {
+      // If the websocket is not connected, connect and wait until it is connected
+      if (!webSocketService.connected) {
+        // Establish websocket connection
+        webSocketService.connect();
+
+        // Wait until actually connected to websocket
+        await new Promise<void>((resolve) => {
+          const interval = setInterval(() => {
+            if (webSocketService.connected) {
+              clearInterval(interval);
+              resolve();
+            }
+          }, 100);
+        });
+
+        // Send the join message once connected
+        await webSocketService.sendMessage("/app/join", { username: localUsername, lobbyId: localLobbyId });
+      }
+    
+      const subscription = webSocketService.subscribe(
+        "/topic/ready-count",
+        async (message) => {
+          const messageData = JSON.parse(message.body);
+          console.log("Received messageData:", messageData);
+          console.log("message.command:", message.command);
+          console.log("Received messageData:", messageData.lobbyId);
+          if (messageData.command === "start" && messageData.lobbyId.toString() === localLobbyId) {
+            await start_game();
+          } else {
+            const readyPlayersCount = messageData.readyPlayers !== undefined ? messageData.readyPlayers : 0;
+            const onlinePlayersCount = messageData.onlinePlayers !== undefined ? messageData.onlinePlayers : 0;
+            setReadyPlayers(readyPlayersCount.toString());
+            setOnlinePlayers(onlinePlayersCount.toString());
+            fetchPlayers();
+            fetchPoints();
+          }
+        },
+        { lobbyId: localLobbyId, username: localUsername }
+      );
+
+      return () => {
+        webSocketService.unsubscribe(subscription);
+      };
+    };
+    subscribeToWebSocket();
+  }, []);
 
   const local_ready = async () => {
     try {
       await api.put(`/players/${localUsername}`, JSON.stringify({ready: true}));
       setButtonClicked(true);
+      webSocketService.sendMessage("/app/ready-up", {username: localUsername, lobbyId: localLobbyId});
     } catch (error) {
       alert(
         `Something went wrong while getting ready: \n${handleError(error)}`
@@ -76,9 +122,6 @@ const Leader = () => {
         `Something went wrong while preparing the game: \n${handleError(error)}`
       );
     }
-  };
-  const players_ready = (players) => {
-    return players.filter(player => player.ready).length;
   };
   const fetchPoints = async () => {
     try {
@@ -101,11 +144,11 @@ const Leader = () => {
       setLoading(true);
       const response = await api.get(`/lobby/players/${localLobbyId}`);
       setAllPlayers(response.data);
-      console.log(allPlayers)
-
-      if(allPlayers.length!==0 && allPlayers.length===players_ready(allPlayers)){
+      setOnlinePlayers(response.data.length);
+      console.log(response.data)
+      /*if(allPlayers.length!==0 && allPlayers.length===players_ready(allPlayers)){
         start_game();
-      }
+      }*/
     } catch (error){
       alert(
         `Something went wrong during fetching the players: \n${handleError(error)}`
@@ -115,7 +158,7 @@ const Leader = () => {
     }
   }
 
-  if (loading) {
+  /*if (loading) {
     return (
       <BaseContainer>
         <div className="authentication container">
@@ -125,7 +168,7 @@ const Leader = () => {
         </div>
       </BaseContainer>
     );
-  }
+  }*/
 
   return (
     <BaseContainer>
@@ -141,7 +184,7 @@ const Leader = () => {
               ))}
             </ul> 
             <div className="leaderboard ready">
-              {players_ready(allPlayers)}/{allPlayers.length} players are ready
+              {readyPlayers}/{onlinePlayers} players are ready
             </div>
             <Button
               className="secondary-button"

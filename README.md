@@ -1,4 +1,47 @@
-# SoPra FS24 - Client Template with build pack
+<p>
+  <img alt="" src="https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/tree/main/src/images/categories_logo.png" /><br/>
+</p>
+
+## Introduction 
+We all used to play Stadt-Land-Fluss at school, with friends or family. That's where our enthusiasm for this game comes from.
+
+We put a lot of effort into our project to give this classic game its own twist and to develop an aesthetic but simple UI.
+
+Categories is a game where you can play with several people in a lobby. In our version, you also have the option of changing various setting variables.
+
+As soon as everyone is ready, the game and the timer start. You have to insert matching words into the categories as quickly as possible. You are given a random letter and the position in which it must appear in a word.
+If someone finishes before the timer runs out, you can press stop, which would end the round for all players.
+Afterwards you can see the answers of your opponents and rate them.
+
+You can compete with your friends by scoring lots of points and leveling up.
+
+## Technologies
+- [Node.js](https://nodejs.org/en/docs) - JavaScript runtime environment
+- [React](https://react.dev/learn) - JavaScript library for building user interfaces
+- [Google Cloud](https://cloud.google.com/appengine/docs/flexible) - Deployment
+- [RESTful](https://restfulapi.net/) - Web services for user control
+- [Websocket](https://spring.io/guides/gs/messaging-stomp-websocket/) -  Real-time bidirectional communication between client and server
+- [MySQL](https://cloud.google.com/sql/docs/mysql) - Cloud SQL for MySQL used for the database
+- [Wiktionary API](https://en.wiktionary.org/w/api.php) - Provides dictionary data
+## High-level components 
+Identify your project’s 3-5 main components. What is their role?
+How are they correlated? Reference the main class, file, or function in the README text
+with a link.
+### Profile Page
+The [Profile Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/ProfilePage.tsx)...
+### Lobby Page
+The [Lobby Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/LobbyPage.tsx)...
+### Game Page
+The [Game Page]()
+### Evaluation Page
+The [Evaluation Page]()
+### Leaderboard
+The [Intermediate Leaderboard](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/Leader.tsx)...[Final Leaderboard](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/FinalLeader.tsx)...
+## Launch & Deployment
+Write down the steps a new developer joining your team would
+have to take to get started with your application. What commands are required to build and
+run your project locally? How can they run the tests? Do you have external dependencies
+or a database that needs to be running? How can they do releases?
 
 ### new installs:
 
@@ -14,8 +57,18 @@ npm install --save-dev svg-loader
 
 npm install crypto-js
 
+## Illustrations
+In your client repository, briefly describe and illustrate the main user flow(s)
+of your interface. How does it work (without going into too much detail)? Feel free to
+include a few screenshots of your application.
+## Roadmap
+The top 2-3 features that new developers who want to contribute to your project could add.
+## Authors and acknowledgment.
+## License
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details
 
 
+# old
 ## Getting started
 Read and go through these Tutorials. It will make your life easier:)
 
@@ -71,10 +124,3 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified, and the filenames include hashes.<br>
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-## Learn More
-
-To learn React, check out the [React documentation](https://react.dev/).
-
-
-> Thanks to Lucas Pelloni Kyrill Hux and Marco Leder for working on the template.

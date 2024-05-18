@@ -80,4 +80,16 @@
   &.dropdown option:checked {
     background-color: #ccc;
   }
+  &.error-message{
+    color:red;
+    font-weight: bold;
+    font-size: 14px;
+    padding-left: 9px;
+  }
+  &.success-message{
+    color:forestgreen;
+    font-weight: bold;
+    font-size: 14px;
+    padding-left: 9px;
+  }
 }
