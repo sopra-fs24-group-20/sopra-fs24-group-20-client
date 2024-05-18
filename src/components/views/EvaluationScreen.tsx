@@ -304,7 +304,7 @@ const EvaluationScreen = () => {
     }
   }, [displayIndex]);
 
-   if (loading) {
+  if (loading) {
     return (
       <BaseContainer>
         <div className="authentication container">
