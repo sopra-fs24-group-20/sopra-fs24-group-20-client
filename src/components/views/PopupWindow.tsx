@@ -29,7 +29,7 @@ const PopupWindow = () => {
             <div><strong>2. Time (in seconds):</strong> Set the round duration.</div>
             <div><strong>3. Rounds:</strong> Edit the number of rounds in a game.</div>
             <div><strong>4. Game Mode:</strong> Change the game mode. The default mode is normal, where you get a random letter and a position. In</div>
-              <div>your answers in the game, you have to write answers including the given letter at the given position. You can also</div>
+            <div>your answers in the game, you have to write answers including the given letter at the given position. You can also</div>
             <div>set an easy mode to always get position 1.</div>
 
             <div style={{ marginBottom: "50px" }}></div>
@@ -58,7 +58,7 @@ const PopupWindow = () => {
             <div style={{ marginBottom: "20px" }}></div>
 
             <div>Once you are happy with your votes, you can press on <span style={{ fontStyle: "italic" }}>Next</span> to evaluate the answers of the next category. Once you have evaluated all</div>
-              <div>categories, you have to wait until all other players have submitted their evaluations. Then you get transferred to the intermediate</div>
+            <div>categories, you have to wait until all other players have submitted their evaluations. Then you get transferred to the intermediate</div>
             <div>leaderboard, where you can see the current ranking. If this is your last round, you get to the final leaderboard to see the final ranking.</div>
 
             <div style={{ marginBottom: "50px" }}></div>

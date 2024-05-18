@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import "styles/views/Lobby.scss";
 import webSocketService from "helpers/websocketContext";
+import "styles/views/Authentication.scss";
 import PropTypes from "prop-types";
 // @ts-ignore
 import svgImage1 from "images/1.svg";
@@ -155,9 +156,9 @@ const LobbyPage = () => {
         console.log(messageData);
         if (messageData && messageData.lobbyId.toString() === localLobbyId){
         const { readyPlayers, onlinePlayers } = messageData; // Destructuring to extract readyPlayers and onlinePlayers
-        setReadyPlayers(readyPlayers);
-        setOnlinePlayers(onlinePlayers);
-        fetchPlayers();
+          setReadyPlayers(readyPlayers);
+          setOnlinePlayers(onlinePlayers);
+          fetchPlayers();
         }
       }
 
@@ -212,6 +213,7 @@ const LobbyPage = () => {
   const handleStartGame = async () => {
     try {
       await api.put(`/players/${local_username}`, JSON.stringify({ ready: false }));
+      console.log("ready false on lobby page");
       navigate(`/game/${localLobbyName}`);
     } catch (error) {
       alert(`Error starting game: ${handleError(error)}`);

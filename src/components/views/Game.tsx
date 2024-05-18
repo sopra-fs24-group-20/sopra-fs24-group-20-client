@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import "styles/views/Game.scss";
 import webSocketService from "helpers/websocketContext";
 import CategoriesLoadingScreen from "components/ui/LoadingScreen";
+import "styles/views/Authentication.scss";
 
 const FormField = (props) => {
   return (
@@ -70,7 +71,6 @@ const Game = () => {
         await webSocketService.sendMessage("/app/join", { username: username, lobbyId: lobbyId });
       }
      
-
       
       const subscription = webSocketService.subscribe(
         "/topic/game-control",
@@ -80,15 +80,11 @@ const Game = () => {
           console.log("message.command:", message.command);
           if (messageData.command === "stop" && messageData.lobbyId.toString() === lobbyId) {
             console.log("received stop");
+            // this should stop the game, since when the timer hits 0 the game should stop 
             clearInterval(countdownInterval);
             if (countdown !== 0){
               setCountdown(0)
             }
-            setShowStopPopup(true); // Show the popup when receiving the stop command
-            setTimeout(() => {
-              setShowStopPopup(false); // Hide the popup after 4 seconds
-            }, 4000);
-            // await doStop(answer);
           } 
         },
         { lobbyId: lobbyId }
@@ -124,17 +120,17 @@ const Game = () => {
   }, []);
   
   
-
-
-
-
   const getFormattedData = () => {
+
     const data: { [key: string]: string } = { username };
     categories.forEach((category, index) => {
       data[category] = answers[category] || "";
     });
-    console.log(JSON.stringify(data));
-
+    console.log("formatted data", JSON.stringify(data));
+    if (localStorage.getItem("answers")){
+      return JSON.stringify(data);
+    }
+    
     return JSON.stringify(data);
   };
 
@@ -159,14 +155,21 @@ const Game = () => {
     // clearInterval(countdownInterval); // Stop the countdown timer
     // console.log("cleared timer");
     const answer = getFormattedData();
+    console.log("answer", answer);
     console.log("got formatted data");
     // send the answers to backend for verification
     try{
       const response = await api.post(`/rounds/${gameId}/entries`, answer);
-      if (response.status === 200){
+      /*if (response.status === 200){
         console.log("submitted answers");
         webSocketService.sendMessage("/app/answers-submitted", {username: username, lobbyId: lobbyId});
         setLoading(true);
+      }*/
+      if (response.status === 200){
+        const response = await api.get(`/rounds/scores/${gameId}`);
+        const categoriesObject = response.data;
+        const firstCategory = Object.keys(categoriesObject)[0];
+        navigate(`/evaluation/${lobbyName}/${firstCategory}`);
       }
     }catch(error){
       setError("Error submitting data");
@@ -253,6 +256,7 @@ const Game = () => {
   }, []);*/
 
   useEffect(() => {
+    localStorage.setItem("answers", "false");
     getLetter();
     settings();
     setTimeout(startCountdown, 1); // Delay startCountdown by 1 second
@@ -339,7 +343,7 @@ const Game = () => {
           <Button
             disabled={categories.some((category) => !answers[category])}
             width="100%"
-            onClick={() => StopGame()}
+            onClick={() => webSocketService.sendMessage("/app/stop-game", {lobbyId: lobbyId})}
           >
             Stop
           </Button>

@@ -54,7 +54,6 @@ const JoinLobby = () => {
       if (response.status === 200) {
         localStorage.setItem("lobbyName", LobbyName);
         localStorage.setItem("lobbyId", response.data.lobbyId);
-        localStorage.setItem("gameId", response.data.game.id.toString());
         console.log(response.data.game.id);
 
         // establish websocket connection when joining lobby

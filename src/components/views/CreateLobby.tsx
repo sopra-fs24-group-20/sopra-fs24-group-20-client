@@ -54,7 +54,6 @@ const CreateLobby = () => {
       if (response.status === 200) {
         localStorage.setItem("lobbyName", lobbyName);
         localStorage.setItem("lobbyId", response.data.lobbyId);
-        localStorage.setItem("gameId", response.data.game.id.toString());
         console.log(localStorage.getItem("gameId"));
         const categories = {categories: ["country", "city", "profession", "celebrity"]};
         JSON.stringify(categories);
