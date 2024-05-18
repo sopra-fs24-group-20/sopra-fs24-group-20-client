@@ -96,11 +96,11 @@ const Leader = () => {
       );
 
       return () => {
-          webSocketService.unsubscribe(subscription);
+        webSocketService.unsubscribe(subscription);
       };
     };
     subscribeToWebSocket();
-}, []);
+  }, []);
 
   const local_ready = async () => {
     try {

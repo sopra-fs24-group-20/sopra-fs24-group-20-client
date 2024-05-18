@@ -155,7 +155,7 @@ const LobbyPage = () => {
         const messageData = JSON.parse(message.body);
         console.log(messageData);
         if (messageData && messageData.lobbyId.toString() === localLobbyId){
-        const { readyPlayers, onlinePlayers } = messageData; // Destructuring to extract readyPlayers and onlinePlayers
+          const { readyPlayers, onlinePlayers } = messageData; // Destructuring to extract readyPlayers and onlinePlayers
           setReadyPlayers(readyPlayers);
           setOnlinePlayers(onlinePlayers);
           fetchPlayers();

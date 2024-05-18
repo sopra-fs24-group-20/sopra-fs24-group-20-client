@@ -130,7 +130,7 @@ const Game = () => {
     if (localStorage.getItem("answers")){
       return JSON.stringify(data);
     }
-    
+
     return JSON.stringify(data);
   };
 
@@ -166,10 +166,7 @@ const Game = () => {
         setLoading(true);
       }*/
       if (response.status === 200){
-        const response = await api.get(`/rounds/scores/${gameId}`);
-        const categoriesObject = response.data;
-        const firstCategory = Object.keys(categoriesObject)[0];
-        navigate(`/evaluation/${lobbyName}/${firstCategory}`);
+        navigate(`/evaluation/${lobbyName}`);
       }
     }catch(error){
       setError("Error submitting data");
