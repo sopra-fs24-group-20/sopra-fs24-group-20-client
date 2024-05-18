@@ -6,6 +6,7 @@ import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import "styles/views/Game.scss";
 import webSocketService from "helpers/websocketContext";
+import CategoriesLoadingScreen from "components/ui/LoadingScreen";
 
 const FormField = (props) => {
   return (
@@ -42,8 +43,13 @@ const Game = () => {
   const [error, setError] = useState(null);
   const[position, setPosition] = useState<string>("");
   const [showStopPopup, setShowStopPopup] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
+  const [letterLoaded, setLetterLoaded] = useState(false);
+  const [positionLoaded, setPositionLoaded] = useState(false);
   
   useEffect(() => {
+    
     const subscribeToWebSocket = async () => {
       // If the websocket is not connected, connect and wait until it is connected
       if (!webSocketService.connected) {
@@ -63,7 +69,9 @@ const Game = () => {
         // Send the join message once connected
         await webSocketService.sendMessage("/app/join", { username: username, lobbyId: lobbyId });
       }
-  
+     
+
+      
       const subscription = webSocketService.subscribe(
         "/topic/game-control",
         async (message) => {
@@ -86,8 +94,28 @@ const Game = () => {
         { lobbyId: lobbyId }
       );
       
+      // checking whether all have successfully submitted entries before going to next screen
+      /*const subscription2 = webSocketService.subscribe(
+        "/topic/answers-count",
+        async(message) => {
+          const messageData = JSON.parse(message.body);
+          if (messageData.command === "done" && messageData.lobbyId.toString() === lobbyId){
+            console.log("received all answers");
+            setLoading(false);
+            const response = await api.get(`/rounds/scores/${gameId}`);
+            const categoriesObject = response.data;
+            const firstCategory = Object.keys(categoriesObject)[0];
+            navigate(`/evaluation/${lobbyName}/${firstCategory}`);
+
+          }
+        },
+        {lobbyId: lobbyId, username: username }
+      );*/
+      
       return () => {
+
         webSocketService.unsubscribe(subscription);
+        // webSocketService.unsubscribe(subscription2);
       };
     };
   
@@ -98,29 +126,7 @@ const Game = () => {
   
 
 
-  useEffect(() => {
-    // Fetch settings before the game starts
-    async function fetchSettings() {
-      try {
-        const response = await api.get(`/lobby/settings/${lobbyId}`);
-        console.log(gameId);
-        const categories = response.data.categories;
-        console.log(response.data);
-        const rounddurationval = parseInt(response.data.roundDuration)
-        setroundDuration(rounddurationval);
-        setCountdown(rounddurationval);
-        setCategories(categories);
-        console.log("categories", response.data.categories);
-        console.log("round duration", response.data.roundDuration);
-        
-      } catch (error) {
-        console.error("Error fetching settings:", error);
-        // Handle error
-      }
-    }
 
-    fetchSettings();
-  }, []);
 
   const getFormattedData = () => {
     const data: { [key: string]: string } = { username };
@@ -135,7 +141,10 @@ const Game = () => {
   const submitAnswers = async (data) =>{
     console.log("submit answers ", data);
     try{
-      await api.post(`/rounds/${gameId}/entries`, data);
+      const response = await api.post(`/rounds/${gameId}/entries`, data);
+      if (response.data === 200){
+        
+      }
 
     }catch(error){
       throw new Error("Error submitting data")
@@ -153,19 +162,18 @@ const Game = () => {
     console.log("got formatted data");
     // send the answers to backend for verification
     try{
-      await submitAnswers(answer);
-      console.log("submitted answers");
+      const response = await api.post(`/rounds/${gameId}/entries`, answer);
+      if (response.status === 200){
+        console.log("submitted answers");
+        webSocketService.sendMessage("/app/answers-submitted", {username: username, lobbyId: lobbyId});
+        setLoading(true);
+      }
     }catch(error){
       setError("Error submitting data");
 
       return;
     }
-    const response = await api.get(`/rounds/scores/${gameId}`);
-    const categoriesObject = response.data;
-    const firstCategory = Object.keys(categoriesObject)[0];
-    console.log(firstCategory);
-    localStorage.setItem("gamews", "false");
-    navigate(`/evaluation/${lobbyName}/${firstCategory}`);
+
   };
 
   const StopGame = async () => {
@@ -177,6 +185,7 @@ const Game = () => {
       // await api.put(`/players/${username}`, JSON.stringify({ready: false}));
       const response = await api.get(`/rounds/letters/${gameId}`);
       setLetter(response.data);
+      setLetterLoaded(true);
     } catch (error) {
       console.log("Error fetching the current letter");
     }
@@ -195,6 +204,7 @@ const Game = () => {
       else if (pos === "2"){
         setPosition("third");
       }
+      setPositionLoaded(true);
     }catch (error) {
       console.log("Error fetching the current letter");
     }
@@ -212,18 +222,47 @@ const Game = () => {
       setCategories(categories);
       console.log("categories", response.data.categories);
       console.log("round duration", response.data.roundDuration);
-      
+      setSettingsLoaded(true);
     } catch (error) {
       console.error("Error fetching settings:", error);
       // Handle error
     }
   }
 
+  /*useEffect(() => {
+    // Fetch settings before the game starts
+    async function fetchSettings() {
+      try {
+        const response = await api.get(`/lobby/settings/${lobbyId}`);
+        console.log(gameId);
+        const categories = response.data.categories;
+        console.log(response.data);
+        const rounddurationval = parseInt(response.data.roundDuration)
+        setroundDuration(rounddurationval);
+        setCountdown(rounddurationval);
+        setCategories(categories);
+        console.log("categories", response.data.categories);
+        console.log("round duration", response.data.roundDuration);
+      } catch (error) {
+        console.error("Error fetching settings:", error);
+        // Handle error
+      }
+    }
+
+    fetchSettings();
+  }, []);*/
+
   useEffect(() => {
     getLetter();
     settings();
     setTimeout(startCountdown, 1); // Delay startCountdown by 1 second
   }, []);
+
+  useEffect(() => {
+    if (settingsLoaded && letterLoaded && positionLoaded) {
+      setLoading(false); // Set loading to false when both settings and letter are loaded
+    }
+  }, [settingsLoaded, letterLoaded, positionLoaded]);
 
 
   const startCountdown = () => {
@@ -253,6 +292,18 @@ const Game = () => {
       [category]: value,
     }));
   };
+
+  if (loading) {
+    return (
+      <BaseContainer>
+        <div className="authentication container">
+          <div className="authentication form">
+            <CategoriesLoadingScreen />
+          </div>
+        </div>
+      </BaseContainer>
+    );
+  }
 
   return (
     <BaseContainer>
