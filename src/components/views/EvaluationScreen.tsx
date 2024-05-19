@@ -170,12 +170,12 @@ const EvaluationScreen = () => {
 
   const leaveLobby = async () => {
     try {
-      await api.put(`/lobby/leave/${lobbyId}?username=${username}`);
       if (webSocketService.connected){
         webSocketService.sendMessage("/app/leave", { username: username , lobbyId: lobbyId });
         await new Promise(resolve => setTimeout(resolve, 1000)); 
         await webSocketService.disconnect();
       }
+      await api.put(`/lobby/leave/${lobbyId}?username=${username}`);
       console.log("leave lobby success");
       localStorage.removeItem("lobbyName");
       localStorage.removeItem("categoryIndex");

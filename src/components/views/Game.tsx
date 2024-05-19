@@ -42,7 +42,7 @@ const Game = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [error, setError] = useState(null);
-  const[position, setPosition] = useState<string>("");
+  const [position, setPosition] = useState<string>("");
   const [showStopPopup, setShowStopPopup] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
@@ -164,10 +164,9 @@ const Game = () => {
         console.log("submitted answers");
         webSocketService.sendMessage("/app/answers-submitted", {username: username, lobbyId: lobbyId});
         setLoading(true);
-      }
-      if (response.status === 200){
         navigate(`/evaluation/${lobbyName}`);
       }
+
     }catch(error){
       setError("Error submitting data");
 
