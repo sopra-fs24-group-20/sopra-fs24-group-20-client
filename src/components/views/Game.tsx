@@ -48,15 +48,17 @@ const Game = () => {
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [letterLoaded, setLetterLoaded] = useState(false);
   const [positionLoaded, setPositionLoaded] = useState(false);
-  
+  const [players, setPlayers] = useState<string[]>([]);
+
+
   useEffect(() => {
-    
+
     const subscribeToWebSocket = async () => {
       // If the websocket is not connected, connect and wait until it is connected
       if (!webSocketService.connected) {
         // Establish websocket connection
         webSocketService.connect();
-  
+
         // Wait until actually connected to websocket
         await new Promise<void>((resolve) => {
           const interval = setInterval(() => {
@@ -66,12 +68,12 @@ const Game = () => {
             }
           }, 100);
         });
-  
+
         // Send the join message once connected
         await webSocketService.sendMessage("/app/join", { username: username, lobbyId: lobbyId });
       }
-     
-      
+
+
       const subscription = webSocketService.subscribe(
         "/topic/game-control",
         async (message) => {
@@ -85,11 +87,11 @@ const Game = () => {
             if (countdown !== 0){
               setCountdown(0)
             }
-          } 
+          }
         },
         { lobbyId: lobbyId }
       );
-      
+
       // checking whether all have successfully submitted entries before going to next screen
       const subscription2 = webSocketService.subscribe(
         "/topic/answers-count",
@@ -98,28 +100,25 @@ const Game = () => {
           if (messageData.command === "done" && messageData.lobbyId.toString() === lobbyId){
             console.log("received all answers");
             setLoading(false);
-            const response = await api.get(`/rounds/scores/${gameId}`);
-            const categoriesObject = response.data;
-            const firstCategory = Object.keys(categoriesObject)[0];
             navigate(`/evaluation/${lobbyName}`);
-
           }
         },
         {lobbyId: lobbyId, username: username }
       );
       
+
       return () => {
 
         webSocketService.unsubscribe(subscription);
         webSocketService.unsubscribe(subscription2);
       };
     };
-  
+
     subscribeToWebSocket();
-    
+
   }, []);
-  
-  
+
+
   const getFormattedData = () => {
 
     const data: { [key: string]: string } = { username };
@@ -139,7 +138,7 @@ const Game = () => {
     try{
       const response = await api.post(`/rounds/${gameId}/entries`, data);
       if (response.data === 200){
-        
+
       }
 
     }catch(error){
@@ -154,24 +153,31 @@ const Game = () => {
     console.log("put ready to false");
     // clearInterval(countdownInterval); // Stop the countdown timer
     // console.log("cleared timer");
-    const answer = getFormattedData();
-    console.log("answer", answer);
-    console.log("got formatted data");
+    const index = players.indexOf(username);
+    const delayInSeconds = index * 1;
     // send the answers to backend for verification
-    try{
-      const response = await api.post(`/rounds/${gameId}/entries`, answer);
-      if (response.status === 200){
-        console.log("submitted answers");
-        webSocketService.sendMessage("/app/answers-submitted", {username: username, lobbyId: lobbyId});
-        setLoading(true);
-        navigate(`/evaluation/${lobbyName}`);
+    setTimeout(async () => {
+      const answer = getFormattedData();
+      console.log("answer", answer);
+      console.log("got formatted data");
+
+      // Record the submission time
+      const submissionTime = new Date();
+
+      // Send the answers to the backend for verification
+      try {
+        const response = await api.post(`/rounds/${gameId}/entries`, answer);
+        if (response.status === 200){
+          console.log("submitted answers");
+          webSocketService.sendMessage("/app/answers-submitted", {username: username, lobbyId: lobbyId});
+          setLoading(true);
+        }
+      } catch (error) {
+        setError("Error submitting data");
+
+        return;
       }
-
-    }catch(error){
-      setError("Error submitting data");
-
-      return;
-    }
+    }, delayInSeconds * 1000);
 
   };
 
@@ -251,10 +257,26 @@ const Game = () => {
     fetchSettings();
   }, []);*/
 
+  const sortPlayers = (playersData: { username: string }[]) => {
+    const sortedUsernames = playersData.map((player) => player.username).sort();
+    console.log("the usernames:",sortedUsernames);
+    setPlayers(sortedUsernames);
+  };
+
+  const getPlayers = async () => {
+    try {
+      const response = await api.get(`/lobby/players/${lobbyId}`);
+      sortPlayers(response.data);
+    } catch (error) {
+      console.log("Error fetching players");
+    }
+  };
+
   useEffect(() => {
     localStorage.setItem("answers", "false");
     getLetter();
     settings();
+    getPlayers();
     setTimeout(startCountdown, 1); // Delay startCountdown by 1 second
   }, []);
 
@@ -295,13 +317,11 @@ const Game = () => {
 
   if (loading) {
     return (
-      <BaseContainer>
-        <div className="authentication container">
-          <div className="authentication form">
-            <CategoriesLoadingScreen />
-          </div>
+      <div className="authentication container">
+        <div className="authentication form">
+          <CategoriesLoadingScreen />
         </div>
-      </BaseContainer>
+      </div>
     );
   }
 
@@ -347,6 +367,6 @@ const Game = () => {
       </div>
     </BaseContainer>
   );
-};  
+};
 
 export default Game;

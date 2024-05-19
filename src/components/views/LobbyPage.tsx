@@ -98,7 +98,9 @@ const LobbyPage = () => {
   const [readyPlayers, setReadyPlayers] = useState(0);
   const [onlinePlayers, setOnlinePlayers] = useState(0);
   const [allPlayers, setAllPlayers] = useState([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [fetchLoaded, setFetchLoaded] = useState<boolean>(false);
+  const [wsLoaded, setWsLoaded] = useState<boolean>(false);
   
   useEffect(() => {
     const fetchGameId = async () => {
@@ -107,6 +109,7 @@ const LobbyPage = () => {
         if (response.status === 200){
           localStorage.setItem("gameId", response.data.toString());
           await fetchPlayers();
+          setFetchLoaded(true);
         }
 
       }catch(error){
@@ -197,8 +200,9 @@ const LobbyPage = () => {
         },
         { lobbyId: localLobbyId, username: local_username }
       );*/
-  
+      setWsLoaded(true);
       // Cleanup function to unsubscribe when the component unmounts or dependencies change
+
       return () => {
         webSocketService.unsubscribe(readyCountSubscription);
         webSocketService.unsubscribe(handleOnlinePlayersSubscription);
@@ -210,12 +214,20 @@ const LobbyPage = () => {
     
     // Empty dependency array means this effect runs once when the component mounts
   }, []);
+
+  useEffect(() => {
+    if (fetchLoaded && wsLoaded) {
+      setLoading(false); // Set loading to false when both settings and letter are loaded
+    }
+  }, [fetchLoaded, wsLoaded]);
   
 
   const handleStartGame = async () => {
     try {
+      setLoading(true);
       await api.put(`/players/${local_username}`, JSON.stringify({ ready: false }));
       console.log("ready false on lobby page");
+      setLoading(false);
       navigate(`/game/${localLobbyName}`);
     } catch (error) {
       alert(`Error starting game: ${handleError(error)}`);
@@ -293,7 +305,6 @@ const LobbyPage = () => {
       </BaseContainer>
     );
   }
-
 
   return (
     <BaseContainer>
