@@ -142,6 +142,8 @@ const EvaluationScreen = () => {
               localStorage.setItem("round", "1");
             }
             const storedRound = parseInt(localStorage.getItem("round"), 10);
+            console.log("stored round", storedRound);
+            console.log("total rounds", rounds);
       
             if (storedRound < rounds) {
               localStorage.setItem("round", JSON.stringify(storedRound + 1));
