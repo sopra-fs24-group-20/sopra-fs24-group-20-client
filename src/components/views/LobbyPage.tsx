@@ -239,6 +239,7 @@ const LobbyPage = () => {
       localStorage.removeItem("lobbyName");
       localStorage.removeItem("lobbyId");
       localStorage.removeItem("gameId");
+      localStorage.removeItem("round");
       await api.put(`/players/${local_username}`, JSON.stringify({ready: false}));
       navigate(`/user/${local_username}`);
     } catch (error) {
