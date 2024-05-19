@@ -48,15 +48,15 @@ const Game = () => {
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [letterLoaded, setLetterLoaded] = useState(false);
   const [positionLoaded, setPositionLoaded] = useState(false);
-  
+
   useEffect(() => {
-    
+
     const subscribeToWebSocket = async () => {
       // If the websocket is not connected, connect and wait until it is connected
       if (!webSocketService.connected) {
         // Establish websocket connection
         webSocketService.connect();
-  
+
         // Wait until actually connected to websocket
         await new Promise<void>((resolve) => {
           const interval = setInterval(() => {
@@ -66,12 +66,12 @@ const Game = () => {
             }
           }, 100);
         });
-  
+
         // Send the join message once connected
         await webSocketService.sendMessage("/app/join", { username: username, lobbyId: lobbyId });
       }
-     
-      
+
+
       const subscription = webSocketService.subscribe(
         "/topic/game-control",
         async (message) => {
@@ -85,11 +85,11 @@ const Game = () => {
             if (countdown !== 0){
               setCountdown(0)
             }
-          } 
+          }
         },
         { lobbyId: lobbyId }
       );
-      
+
       // checking whether all have successfully submitted entries before going to next screen
       /*const subscription2 = webSocketService.subscribe(
         "/topic/answers-count",
@@ -107,19 +107,19 @@ const Game = () => {
         },
         {lobbyId: lobbyId, username: username }
       );*/
-      
+
       return () => {
 
         webSocketService.unsubscribe(subscription);
         // webSocketService.unsubscribe(subscription2);
       };
     };
-  
+
     subscribeToWebSocket();
-    
+
   }, []);
-  
-  
+
+
   const getFormattedData = () => {
 
     const data: { [key: string]: string } = { username };
@@ -139,7 +139,7 @@ const Game = () => {
     try{
       const response = await api.post(`/rounds/${gameId}/entries`, data);
       if (response.data === 200){
-        
+
       }
 
     }catch(error){
@@ -296,13 +296,11 @@ const Game = () => {
 
   if (loading) {
     return (
-      <BaseContainer>
-        <div className="authentication container">
-          <div className="authentication form">
-            <CategoriesLoadingScreen />
-          </div>
+      <div className="authentication container">
+        <div className="authentication form">
+          <CategoriesLoadingScreen />
         </div>
-      </BaseContainer>
+      </div>
     );
   }
 
@@ -348,6 +346,6 @@ const Game = () => {
       </div>
     </BaseContainer>
   );
-};  
+};
 
 export default Game;
