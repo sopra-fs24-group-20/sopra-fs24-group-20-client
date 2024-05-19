@@ -174,6 +174,7 @@ const Game = () => {
         }
       } catch (error) {
         setError("Error submitting data");
+
         return;
       }
     }, delayInSeconds * 1000);
@@ -183,8 +184,6 @@ const Game = () => {
   const StopGame = async () => {
     webSocketService.sendMessage("/app/stop-game", {lobbyId: lobbyId});
   };
-
-
 
   const getLetter = async () => {
     try {

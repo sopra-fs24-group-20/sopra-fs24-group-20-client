@@ -202,6 +202,7 @@ const LobbyPage = () => {
       );*/
       setWsLoaded(true);
       // Cleanup function to unsubscribe when the component unmounts or dependencies change
+
       return () => {
         webSocketService.unsubscribe(readyCountSubscription);
         webSocketService.unsubscribe(handleOnlinePlayersSubscription);
@@ -304,8 +305,6 @@ const LobbyPage = () => {
       </BaseContainer>
     );
   }
-
-
 
   return (
     <BaseContainer>
