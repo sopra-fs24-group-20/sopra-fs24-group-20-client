@@ -98,11 +98,7 @@ const Game = () => {
           if (messageData.command === "done" && messageData.lobbyId.toString() === lobbyId){
             console.log("received all answers");
             setLoading(false);
-            const response = await api.get(`/rounds/scores/${gameId}`);
-            const categoriesObject = response.data;
-            const firstCategory = Object.keys(categoriesObject)[0];
             navigate(`/evaluation/${lobbyName}`);
-
           }
         },
         {lobbyId: lobbyId, username: username }
