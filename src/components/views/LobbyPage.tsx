@@ -7,7 +7,7 @@ import "styles/views/Lobby.scss";
 import webSocketService from "helpers/websocketContext";
 import "styles/views/Authentication.scss";
 import CategoriesLoadingScreen from "components/ui/LoadingScreen";
-import PopupWindow from "components/views/PopupWindow";
+
 import PropTypes from "prop-types";
 // @ts-ignore
 import svgImage1 from "images/1.svg";
@@ -243,16 +243,19 @@ const LobbyPage = () => {
 
   const exit = async () => {
     try {
-      await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
+      setLoading(true);
       if (webSocketService.connected){
         webSocketService.sendMessage("/app/leave", { username: local_username , lobbyId: localLobbyId });
         await new Promise(resolve => setTimeout(resolve, 1000)); 
         await webSocketService.disconnect();
       }
+      await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
       localStorage.removeItem("lobbyName");
       localStorage.removeItem("lobbyId");
       localStorage.removeItem("gameId");
+      localStorage.removeItem("round");
       await api.put(`/players/${local_username}`, JSON.stringify({ready: false}));
+      setLoading(false);
       navigate(`/user/${local_username}`);
     } catch (error) {
       alert(
@@ -301,6 +304,8 @@ const LobbyPage = () => {
       </BaseContainer>
     );
   }
+
+
 
   return (
     <BaseContainer>

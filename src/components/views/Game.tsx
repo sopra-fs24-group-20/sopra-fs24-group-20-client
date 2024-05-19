@@ -42,12 +42,14 @@ const Game = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [error, setError] = useState(null);
-  const[position, setPosition] = useState<string>("");
+  const [position, setPosition] = useState<string>("");
   const [showStopPopup, setShowStopPopup] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [letterLoaded, setLetterLoaded] = useState(false);
   const [positionLoaded, setPositionLoaded] = useState(false);
+  const [players, setPlayers] = useState<string[]>([]);
+
 
   useEffect(() => {
 
@@ -91,27 +93,24 @@ const Game = () => {
       );
 
       // checking whether all have successfully submitted entries before going to next screen
-      /*const subscription2 = webSocketService.subscribe(
+      const subscription2 = webSocketService.subscribe(
         "/topic/answers-count",
         async(message) => {
           const messageData = JSON.parse(message.body);
           if (messageData.command === "done" && messageData.lobbyId.toString() === lobbyId){
             console.log("received all answers");
             setLoading(false);
-            const response = await api.get(`/rounds/scores/${gameId}`);
-            const categoriesObject = response.data;
-            const firstCategory = Object.keys(categoriesObject)[0];
-            navigate(`/evaluation/${lobbyName}/${firstCategory}`);
-
+            navigate(`/evaluation/${lobbyName}`);
           }
         },
         {lobbyId: lobbyId, username: username }
-      );*/
+      );
+      
 
       return () => {
 
         webSocketService.unsubscribe(subscription);
-        // webSocketService.unsubscribe(subscription2);
+        webSocketService.unsubscribe(subscription2);
       };
     };
 
@@ -154,31 +153,38 @@ const Game = () => {
     console.log("put ready to false");
     // clearInterval(countdownInterval); // Stop the countdown timer
     // console.log("cleared timer");
-    const answer = getFormattedData();
-    console.log("answer", answer);
-    console.log("got formatted data");
+    const index = players.indexOf(username);
+    const delayInSeconds = index * 1;
     // send the answers to backend for verification
-    try{
-      const response = await api.post(`/rounds/${gameId}/entries`, answer);
-      /*if (response.status === 200){
-        console.log("submitted answers");
-        webSocketService.sendMessage("/app/answers-submitted", {username: username, lobbyId: lobbyId});
-        setLoading(true);
-      }*/
-      if (response.status === 200){
-        navigate(`/evaluation/${lobbyName}`);
-      }
-    }catch(error){
-      setError("Error submitting data");
+    setTimeout(async () => {
+      const answer = getFormattedData();
+      console.log("answer", answer);
+      console.log("got formatted data");
 
-      return;
-    }
+      // Record the submission time
+      const submissionTime = new Date();
+
+      // Send the answers to the backend for verification
+      try {
+        const response = await api.post(`/rounds/${gameId}/entries`, answer);
+        if (response.status === 200){
+          console.log("submitted answers");
+          webSocketService.sendMessage("/app/answers-submitted", {username: username, lobbyId: lobbyId});
+          setLoading(true);
+        }
+      } catch (error) {
+        setError("Error submitting data");
+        return;
+      }
+    }, delayInSeconds * 1000);
 
   };
 
   const StopGame = async () => {
     webSocketService.sendMessage("/app/stop-game", {lobbyId: lobbyId});
   };
+
+
 
   const getLetter = async () => {
     try {
@@ -252,10 +258,26 @@ const Game = () => {
     fetchSettings();
   }, []);*/
 
+  const sortPlayers = (playersData: { username: string }[]) => {
+    const sortedUsernames = playersData.map((player) => player.username).sort();
+    console.log("the usernames:",sortedUsernames);
+    setPlayers(sortedUsernames);
+  };
+
+  const getPlayers = async () => {
+    try {
+      const response = await api.get(`/lobby/players/${lobbyId}`);
+      sortPlayers(response.data);
+    } catch (error) {
+      console.log("Error fetching players");
+    }
+  };
+
   useEffect(() => {
     localStorage.setItem("answers", "false");
     getLetter();
     settings();
+    getPlayers();
     setTimeout(startCountdown, 1); // Delay startCountdown by 1 second
   }, []);
 
