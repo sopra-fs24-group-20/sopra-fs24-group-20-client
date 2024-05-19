@@ -106,8 +106,6 @@ const EvaluationScreen = () => {
   const [initiated, setInitiated] = useState<boolean>(false);
   const [votes, setVotes] = useState({});
 
-
-
   useEffect(() => {
     
     const subscribeToWebSocket = async () => {
