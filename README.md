@@ -81,26 +81,26 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 - npm install crypto-js
 
 ## Illustrations
-<p>
-    <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/start.jpg" /><br/>
-</p>
+-- start page -- 
+
 A player starts here, where they have various options for accessing the website.
-<p>
-    <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/profile.jpg" /><br/>
-</p>
+
+-- profile page -- 
+
 After logging in, the player gets to this page where they can continue by creating or joining a lobby.
 
 -- lobby page --
 
 In the lobby the players can go view the settings or press ready. When everyone is ready, the game automatically begins.
 
-<p>
-    <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/game.jpg" /><br/>
-</p>
+-- game page -- 
+
 This page is there the player actually plays the game. After the timer runs out or someone presses stop the players gets automatically navigated to the next page.
 
 -- evaluation page --
+
 -- intermediate leaderboard page --
+
 -- final leaderboard page -- 
 
 
