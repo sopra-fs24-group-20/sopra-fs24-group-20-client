@@ -126,6 +126,8 @@ const CreateLobby = () => {
         } else if (error.response.status === 500) {
           // Handle INTERNAL SERVER ERROR
           setError("An internal server error occurred while creating the lobby.");
+        } else if (error.response.status ===409){
+          setError("Cannot create lobby because it already exists.")
         } else {
           // Handle other errors
           setError("An error occurred while creating the lobby.");

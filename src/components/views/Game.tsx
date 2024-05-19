@@ -42,7 +42,7 @@ const Game = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [error, setError] = useState(null);
-  const[position, setPosition] = useState<string>("");
+  const [position, setPosition] = useState<string>("");
   const [showStopPopup, setShowStopPopup] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
@@ -91,7 +91,7 @@ const Game = () => {
       );
       
       // checking whether all have successfully submitted entries before going to next screen
-      /*const subscription2 = webSocketService.subscribe(
+      const subscription2 = webSocketService.subscribe(
         "/topic/answers-count",
         async(message) => {
           const messageData = JSON.parse(message.body);
@@ -101,17 +101,17 @@ const Game = () => {
             const response = await api.get(`/rounds/scores/${gameId}`);
             const categoriesObject = response.data;
             const firstCategory = Object.keys(categoriesObject)[0];
-            navigate(`/evaluation/${lobbyName}/${firstCategory}`);
+            navigate(`/evaluation/${lobbyName}`);
 
           }
         },
         {lobbyId: lobbyId, username: username }
-      );*/
+      );
       
       return () => {
 
         webSocketService.unsubscribe(subscription);
-        // webSocketService.unsubscribe(subscription2);
+        webSocketService.unsubscribe(subscription2);
       };
     };
   
@@ -160,14 +160,13 @@ const Game = () => {
     // send the answers to backend for verification
     try{
       const response = await api.post(`/rounds/${gameId}/entries`, answer);
-      /*if (response.status === 200){
+      if (response.status === 200){
         console.log("submitted answers");
         webSocketService.sendMessage("/app/answers-submitted", {username: username, lobbyId: lobbyId});
         setLoading(true);
-      }*/
-      if (response.status === 200){
         navigate(`/evaluation/${lobbyName}`);
       }
+
     }catch(error){
       setError("Error submitting data");
 

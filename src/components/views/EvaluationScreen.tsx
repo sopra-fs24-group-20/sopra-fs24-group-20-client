@@ -8,6 +8,7 @@ import { User } from "types";
 import PropTypes from "prop-types";
 import "styles/views/Authentication.scss";
 import CategoriesLoadingScreen from "components/ui/LoadingScreen";
+import webSocketService from "helpers/websocketContext";
 // @ts-ignore
 import svgImage1 from "images/1.svg";
 // @ts-ignore
@@ -105,8 +106,73 @@ const EvaluationScreen = () => {
   const [initiated, setInitiated] = useState<boolean>(false);
   const [votes, setVotes] = useState({});
 
+  useEffect(() => {
+    
+    const subscribeToWebSocket = async () => {
+      // If the websocket is not connected, connect and wait until it is connected
+      if (!webSocketService.connected) {
+        // Establish websocket connection
+        webSocketService.connect();
+  
+        // Wait until actually connected to websocket
+        await new Promise<void>((resolve) => {
+          const interval = setInterval(() => {
+            if (webSocketService.connected) {
+              clearInterval(interval);
+              resolve();
+            }
+          }, 100);
+        });
+  
+        // Send the join message once connected
+        await webSocketService.sendMessage("/app/join", { username: username, lobbyId: lobbyId });
+      }
+     
+      const subscription = webSocketService.subscribe(
+        "/topic/answers-count",
+        async (message) => {
+          const messageData = JSON.parse(message.body);
+          console.log("Received messageData:", messageData);
+          console.log("message.command:", message.command);
+          if (messageData.command === "done" && messageData.lobbyId.toString() === lobbyId) {
+            console.log("received final scores");
+            // idk something to handle when all players are done evaluating
+            setLoading(false);
+            if (!localStorage.getItem("round")) {
+              localStorage.setItem("round", "1");
+            }
+            const storedRound = parseInt(localStorage.getItem("round"), 10);
+      
+            if (storedRound < rounds) {
+              localStorage.setItem("round", JSON.stringify(storedRound + 1));
+              navigate(`/leaderboard/${lobbyName}`);
+            }
+            else {
+              localStorage.removeItem("round");
+              navigate(`/leaderboard/final/${lobbyName}`);
+            }
+          } 
+        },
+        { lobbyId: lobbyId, username: username}
+      );
+      
+      return () => {
+
+        webSocketService.unsubscribe(subscription);
+      };
+    };
+  
+    subscribeToWebSocket();
+    
+  }, []);
+
   const leaveLobby = async () => {
     try {
+      if (webSocketService.connected){
+        webSocketService.sendMessage("/app/leave", { username: username , lobbyId: lobbyId });
+        await new Promise(resolve => setTimeout(resolve, 1000)); 
+        await webSocketService.disconnect();
+      }
       await api.put(`/lobby/leave/${lobbyId}?username=${username}`);
       console.log("leave lobby success");
       localStorage.removeItem("lobbyName");
@@ -114,6 +180,7 @@ const EvaluationScreen = () => {
       localStorage.removeItem("lobbyId");
       localStorage.removeItem("gameId");
       localStorage.removeItem("roundDuration");
+      localStorage.removeItem("round");
       navigate(`/user/${username}`);
     } catch (error) {
       if (error.response.status === 404){
@@ -224,6 +291,7 @@ const EvaluationScreen = () => {
 
       if (Object.keys(votes).length === 0) {
         initiateVotes();
+        
       }
 
       console.log("My final votes which get send to the backend:", votes);
@@ -232,30 +300,19 @@ const EvaluationScreen = () => {
         const requestBody = JSON.stringify(votes);
         console.log("requestBody", requestBody);
         const response = await api.post(`/rounds/${gameId}/submitVotes`, requestBody);
+        setLoading(true);
+        webSocketService.sendMessage("/app/answers-submitted", {username: username, lobbyId: lobbyId})
       } catch (error) {
         console.error(`An error occurred while trying submit the votes: \n${handleError(error)}`);
       }
 
-      if (!localStorage.getItem("round")) {
-        localStorage.setItem("round", "1");
-      }
-      const storedRound = parseInt(localStorage.getItem("round"), 10);
-
-      if (storedRound < rounds) {
-        localStorage.setItem("round", JSON.stringify(storedRound + 1));
-        navigate(`/leaderboard/${lobbyName}`);
-      }
-      else {
-        localStorage.removeItem("round");
-        navigate(`/leaderboard/final/${lobbyName}`);
-      }
     }
   };
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await api.get(`/rounds/scores/${gameId}`, gameId);
+        const response = await api.get(`/rounds/scores/${gameId}`);
         const second_response = await api.get(`/lobby/settings/${lobbyId}`);
         const fetchedCategories = getCategories(response.data);
         const fetchedPlayers = getPlayerNames(response.data);
