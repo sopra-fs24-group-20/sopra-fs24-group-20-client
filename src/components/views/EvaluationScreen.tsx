@@ -98,7 +98,7 @@ const EvaluationScreen = () => {
   const [answers, setAnswers] = useState<String[]>(null);
   const [currentCategory, setCurrentCategory] = useState(null);
   const [scores, setScores] = useState<number[]>(null);
-  const [rounds, setRounds] = useState(null);
+  const [rounds, setRounds] = useState<number>(1);
   const [currentRound, setCurrentRound] = useState(null);
   const [displayIndex, setDisplayIndex] = useState(0);
   const [fetchedData, setFetchedData] = useState(null);
@@ -107,6 +107,35 @@ const EvaluationScreen = () => {
   const [votes, setVotes] = useState({});
 
   useEffect(() => {
+
+    async function fetchData() {
+      try {
+        const response = await api.get(`/rounds/scores/${gameId}`);
+        const second_response = await api.get(`/lobby/settings/${lobbyId}`);
+        const fetchedCategories = getCategories(response.data);
+        const fetchedPlayers = getPlayerNames(response.data);
+        const fetchedRounds = second_response.data.rounds;
+        console.log("lobby settings", second_response.data);
+        console.log("rounds fetched", second_response.data.rounds);
+
+        setFetchedData(response.data);
+        setCategories(fetchedCategories);
+        setPlayers(fetchedPlayers);
+        setRounds(second_response.data.rounds);
+
+        // Set the current category to the first category
+        setCurrentCategory(fetchedCategories[0]);
+
+        setAnswers(getPlayerAnswersForCategory(response.data, fetchedCategories[0]));
+        setScores(getScoresForCategory(response.data, fetchedCategories[0]));
+        setLoading(false);
+      } catch (error) {
+        console.error(`Error fetching data: ${error}`);
+        setLoading(false);
+      }
+    }
+
+    fetchData();
     
     const subscribeToWebSocket = async () => {
       // If the websocket is not connected, connect and wait until it is connected
@@ -137,7 +166,7 @@ const EvaluationScreen = () => {
           if (messageData.command === "done" && messageData.lobbyId.toString() === lobbyId) {
             console.log("received final scores");
             // idk something to handle when all players are done evaluating
-            setLoading(false);
+            
             if (!localStorage.getItem("round")) {
               localStorage.setItem("round", "1");
             }
@@ -147,10 +176,12 @@ const EvaluationScreen = () => {
       
             if (storedRound < rounds) {
               localStorage.setItem("round", JSON.stringify(storedRound + 1));
+              setLoading(false);
               navigate(`/leaderboard/${lobbyName}`);
             }
             else {
               localStorage.removeItem("round");
+              setLoading(false);
               navigate(`/leaderboard/final/${lobbyName}`);
             }
           } 
@@ -299,10 +330,10 @@ const EvaluationScreen = () => {
       console.log("My final votes which get send to the backend:", votes);
 
       try {
+        setLoading(true);
         const requestBody = JSON.stringify(votes);
         console.log("requestBody", requestBody);
         const response = await api.post(`/rounds/${gameId}/submitVotes`, requestBody);
-        setLoading(true);
         webSocketService.sendMessage("/app/answers-submitted", {username: username, lobbyId: lobbyId})
       } catch (error) {
         console.error(`An error occurred while trying submit the votes: \n${handleError(error)}`);
@@ -311,34 +342,6 @@ const EvaluationScreen = () => {
     }
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await api.get(`/rounds/scores/${gameId}`);
-        const second_response = await api.get(`/lobby/settings/${lobbyId}`);
-        const fetchedCategories = getCategories(response.data);
-        const fetchedPlayers = getPlayerNames(response.data);
-        const fetchedRounds = second_response.data.rounds;
-
-        setFetchedData(response.data);
-        setCategories(fetchedCategories);
-        setPlayers(fetchedPlayers);
-        setRounds(fetchedRounds);
-
-        // Set the current category to the first category
-        setCurrentCategory(fetchedCategories[0]);
-
-        setAnswers(getPlayerAnswersForCategory(response.data, fetchedCategories[0]));
-        setScores(getScoresForCategory(response.data, fetchedCategories[0]));
-        setLoading(false);
-      } catch (error) {
-        console.error(`Error fetching data: ${error}`);
-        setLoading(false);
-      }
-    }
-
-    fetchData();
-  }, [gameId]);
 
   useEffect(() => {
     if (fetchedData && currentCategory) {
