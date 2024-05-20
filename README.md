@@ -23,43 +23,47 @@ You can compete with your friends by scoring lots of points and leveling up.
 - [MySQL](https://cloud.google.com/sql/docs/mysql) - Cloud SQL for MySQL used for the database
 - [Wiktionary API](https://en.wiktionary.org/w/api.php) - Provides dictionary data
 
-## High-level components 
-Identify your project’s 3-5 main components. What is their role?
-How are they correlated? Reference the main class, file, or function in the README text
-with a link.
+## High-level components
 ### Profile Page
-The [Profile Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/ProfilePage.tsx) displays information about the logged in user such as username, randomly assigned avatar and statistics from previous games. If you are logged in as a guest, you will not have any statistics. Additionally, you can log out or create a new lobby or join one to enjoy the game with your friends. If you don't know the game Categories before, you can read the rules by clicking on the info icon.
+The [Profile Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/ProfilePage.tsx) displays information about the logged in player such as username, randomly assigned avatar and statistics from previous games. If the player is logged in as a guest, they will not have any statistics. Additionally, they can log out or create a new lobby or join one to enjoy the game with your friends. If the player doesn't know the game Categories before, they can read the rules by clicking on the info icon.
 ### Lobby Page
-The [Lobby Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/LobbyPage.tsx) makes it possible for the user to see all other players in the lobby, leave the lobby, access the settings and prepare for the game by pressing ready. Through the websockets you can see immediately when someone joins or exits and how many players are ready.
+The [Lobby Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/LobbyPage.tsx) makes it possible for the player to see all other players in the lobby, leave the lobby, access the settings and prepare for the game by pressing ready. Through the websockets the player can see immediately when someone joins or exits and how many players are ready.
 ### Game Page
-In the [Game Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/Game.tsx) the player gets the randomly assigned letter, the timer starts counting down and the players can enter their answers. When you press stop, the game is stopped for everyone, supported by websockets, and the answers are sent to the backend to be checked with the api.
+In the [Game Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/Game.tsx) the player gets the randomly assigned letter, the timer starts counting down and the players can enter their answers. When someone presses stop, the game is stopped for everyone, supported by websockets, and the answers are sent to the backend to be checked with the api.
 ### Evaluation Page
-The [Evaluation Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/EvaluationScreen.tsx) ...
+On the [Evaluation Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/EvaluationScreen.tsx) the player can see the answers of the other players and rate them, because the API only checks the spelling and not the meaning. The player sees one category per page, to comment on the next one they have to click next. If they are at the last category they wait until all players are finished, this is again handled by websockets. Once everyone has finished, the adjustments are sent to the backend and the players are redirected to either the intermediate leaderboard or the final leaderboard, if it was the last round.
 ### Leaderboard
-The [Intermediate Leaderboard](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/Leader.tsx) ...
+The [Intermediate Leaderboard](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/Leader.tsx) shows the scores after each round before the next round begins. To start the next round there is again a ready button which is handled with websockets and a display of how many players are already ready. The [Final Leaderboard](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/FinalLeader.tsx) shows the final ranking and awards media to the top 3 and takes the player back to the lobby.
 
 ## Launch & Deployment
 ### Prerequisites and Installation
+#### Step 1
 For your local development environment you need the **v20.11.0** version of Node.js. You can download it [here](https://nodejs.org/download/release/v20.11.0/) or below.
 
-- **MacOS:** [node-v20.11.0.pkg](https://nodejs.org/download/release/v20.11.0/node-v20.11.0.pkg)
-- **Windows 32-bit:** [node-v20.11.0-x86.msi](https://nodejs.org/download/release/v20.11.0/node-v20.11.0-x86.msi)
-- **Windows 64-bit:** [node-v20.11.0-x64.msi](https://nodejs.org/download/release/v20.11.0/node-v20.11.0-x64.msi)
-- **Linux:** [node-v20.11.0.tar.xz](https://nodejs.org/dist/v20.11.0/node-v20.11.0.tar.xz)
+- MacOS: [node-v20.11.0.pkg](https://nodejs.org/download/release/v20.11.0/node-v20.11.0.pkg)
+- Windows 32-bit: [node-v20.11.0-x86.msi](https://nodejs.org/download/release/v20.11.0/node-v20.11.0-x86.msi)
+- Windows 64-bit: [node-v20.11.0-x64.msi](https://nodejs.org/download/release/v20.11.0/node-v20.11.0-x64.msi)
+- Linux: [node-v20.11.0.tar.xz](https://nodejs.org/dist/v20.11.0/node-v20.11.0.tar.xz)
 
-Next, run this command to install all other dependencies, including React:
+#### Step 2
+
+Run this command to install all other dependencies, including React:
 
 ```npm install```
 
-Next, you can start the app with:
+#### Step 3
+
+You can start the app with:
 
 ```npm run dev```
+
+#### Step 4
 
 Now you can open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 In order for these requests to work, you need to install and start the server as well.
 
 ### Testing
-Testing is optional, and you can run the tests with `npm run test`\
+You can run the tests with `npm run test`\
 This launches the test runner in an interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
@@ -81,11 +85,15 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 - npm install crypto-js
 
 ## Illustrations
--- start page -- 
+<p>
+    <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/start.png" /><br/>
+</p>
 
 A player starts here, where they have various options for accessing the website.
 
--- profile page -- 
+<p>
+    <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/profile.png" /><br/>
+</p>
 
 After logging in, the player gets to this page where they can continue by creating or joining a lobby.
 
@@ -93,16 +101,23 @@ After logging in, the player gets to this page where they can continue by creati
 
 In the lobby the players can go view the settings or press ready. When everyone is ready, the game automatically begins.
 
--- game page -- 
+<p>
+    <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/game.png" /><br/>
+</p> 
 
 This page is there the player actually plays the game. After the timer runs out or someone presses stop the players gets automatically navigated to the next page.
 
 -- evaluation page --
 
+Here the player can view and evaluate the answers of the other players. To continue the players need to press next. If all the players are finished evaluating, everyone get redirected to the intermediate leaderboard or the final leaderboard if the previous round was the last one.
+
 -- intermediate leaderboard page --
+
+This page is where the players can view the current ranking and points of the previous rounds. This is also where they can get ready for the next round.
 
 -- final leaderboard page -- 
 
+When all rounds are played and evaluated, the players get redirected to the final leaderboard instead of the intermediate leaderboard. They can return to the lobby as soon as they are finished viewing the final ranking.
 
 ## Roadmap
 - Ability to add other players as friends
