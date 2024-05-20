@@ -49,7 +49,7 @@ const Game = () => {
   const [letterLoaded, setLetterLoaded] = useState(false);
   const [positionLoaded, setPositionLoaded] = useState(false);
   const [players, setPlayers] = useState<string[]>([]);
-
+  const [roundsHandled, setRoundsHandled] = useState<boolean>(false);
 
   useEffect(() => {
 
@@ -220,6 +220,8 @@ const Game = () => {
       const response = await api.get(`/lobby/settings/${lobbyId}`);
       console.log(gameId);
       const categories = response.data.categories;
+      const totalRounds = response.data.rounds;
+      localStorage.setItem("totalRounds", totalRounds.toString());
       console.log(response.data);
       const rounddurationval = parseInt(response.data.roundDuration)
       setroundDuration(rounddurationval);
@@ -272,11 +274,20 @@ const Game = () => {
     }
   };
 
+  const handleRounds = async () => {
+    const currRounds = parseInt(localStorage.getItem("currentRound"),10);
+    console.log("current Round on the game screen:", currRounds);
+    const next = currRounds + 1;
+    localStorage.setItem("currentRound", next.toString());
+    setRoundsHandled(true);
+  }
+
   useEffect(() => {
     localStorage.setItem("answers", "false");
     getLetter();
     settings();
     getPlayers();
+    handleRounds();
     setTimeout(startCountdown, 1); // Delay startCountdown by 1 second
   }, []);
 

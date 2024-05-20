@@ -105,6 +105,7 @@ const EvaluationScreen = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [initiated, setInitiated] = useState<boolean>(false);
   const [votes, setVotes] = useState({});
+  const [disableButton, setDisableButton] = useState<boolean>(false);
 
   useEffect(() => {
 
@@ -166,21 +167,18 @@ const EvaluationScreen = () => {
           if (messageData.command === "done" && messageData.lobbyId.toString() === lobbyId) {
             console.log("received final scores");
             // idk something to handle when all players are done evaluating
-            
-            if (!localStorage.getItem("round")) {
-              localStorage.setItem("round", "1");
-            }
-            const storedRound = parseInt(localStorage.getItem("round"), 10);
-            console.log("stored round", storedRound);
-            console.log("total rounds", rounds);
+            const totalRounds = parseInt(localStorage.getItem("totalRounds"),10);
+            const currRound = parseInt(localStorage.getItem("currentRound"),10);
+            console.log("the total round count on the eval screen:", totalRounds);
+            console.log("the current round count on the eval screen:", currRound);
       
-            if (storedRound < rounds) {
-              localStorage.setItem("round", JSON.stringify(storedRound + 1));
+            if (currRound < totalRounds) {
               setLoading(false);
               navigate(`/leaderboard/${lobbyName}`);
             }
             else {
-              localStorage.removeItem("round");
+              localStorage.removeItem("totalRounds");
+              localStorage.removeItem("currentRound");
               setLoading(false);
               navigate(`/leaderboard/final/${lobbyName}`);
             }
@@ -310,6 +308,9 @@ const EvaluationScreen = () => {
   };
 
   const nextEval = async () => {
+    if (displayIndex === categories.length - 1) {
+      setDisableButton(true);
+    }
     if (displayIndex < categories.length - 1) {
       setDisplayIndex(displayIndex + 1);
 
@@ -461,6 +462,7 @@ const EvaluationScreen = () => {
                 className="secondary-button"
                 style={{ width: "100%", height: "100%" }}
                 onClick={() => nextEval()}
+                disabled={disableButton}
               >
                 {displayIndex < categories.length - 1 ? "Next" : "Finish"}
               </Button>

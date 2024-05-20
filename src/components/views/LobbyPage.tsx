@@ -283,6 +283,7 @@ const LobbyPage = () => {
       const response = await api.get(`/lobby/players/${localLobbyId}`);
       setAllPlayers(response.data);
       setOnlinePlayers(response.data.length);
+      localStorage.setItem("currentRound", "0");
       console.log(allPlayers)
       /*if(allPlayers.length!==0 && allPlayers.length===players_ready(allPlayers)){
         start_game();
