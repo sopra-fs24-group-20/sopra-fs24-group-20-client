@@ -1,13 +1,12 @@
 <p>
-  <img alt="" src="https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/tree/main/src/images/categories_logo.png" /><br/>
+    <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/categories_logo.png" /><br/>
 </p>
 
 ## Introduction 
 We all used to play Stadt-Land-Fluss at school, with friends or family. That's where our enthusiasm for this game comes from.
-
 We put a lot of effort into our project to give this classic game its own twist and to develop an aesthetic but simple UI.
 
-Categories is a game where you can play with several people in a lobby. In our version, you also have the option of changing various setting variables.
+Categories is a game where you can play with several people in a lobby. In our version, you also have the option of changing various setting variables such as round duration or the categories themselves.
 
 As soon as everyone is ready, the game and the timer start. You have to insert matching words into the categories as quickly as possible. You are given a random letter and the position in which it must appear in a word.
 If someone finishes before the timer runs out, you can press stop, which would end the round for all players.
@@ -23,96 +22,48 @@ You can compete with your friends by scoring lots of points and leveling up.
 - [Websocket](https://spring.io/guides/gs/messaging-stomp-websocket/) -  Real-time bidirectional communication between client and server
 - [MySQL](https://cloud.google.com/sql/docs/mysql) - Cloud SQL for MySQL used for the database
 - [Wiktionary API](https://en.wiktionary.org/w/api.php) - Provides dictionary data
-## High-level components 
-Identify your project’s 3-5 main components. What is their role?
-How are they correlated? Reference the main class, file, or function in the README text
-with a link.
+
+## High-level components
 ### Profile Page
-The [Profile Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/ProfilePage.tsx)...
+The [Profile Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/ProfilePage.tsx) displays information about the logged in player such as username, randomly assigned avatar and statistics from previous games. If the player is logged in as a guest, they will not have any statistics. Additionally, they can log out or create a new lobby or join one to enjoy the game with your friends. If the player doesn't know the game Categories before, they can read the rules by clicking on the info icon.
 ### Lobby Page
-The [Lobby Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/LobbyPage.tsx)...
+The [Lobby Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/LobbyPage.tsx) makes it possible for the player to see all other players in the lobby, leave the lobby, access the settings and prepare for the game by pressing ready. Through the websockets the player can see immediately when someone joins or exits and how many players are ready.
 ### Game Page
-The [Game Page]()
+In the [Game Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/Game.tsx) the player gets the randomly assigned letter, the timer starts counting down and the players can enter their answers. When someone presses stop, the game is stopped for everyone, supported by websockets, and the answers are sent to the backend to be checked with the api.
 ### Evaluation Page
-The [Evaluation Page]()
+On the [Evaluation Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/EvaluationScreen.tsx) the player can see the answers of the other players and rate them, because the API only checks the spelling and not the meaning. The player sees one category per page, to comment on the next one they have to click next. If they are at the last category they wait until all players are finished, this is again handled by websockets. Once everyone has finished, the adjustments are sent to the backend and the players are redirected to either the intermediate leaderboard or the final leaderboard, if it was the last round.
 ### Leaderboard
-The [Intermediate Leaderboard](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/Leader.tsx)...[Final Leaderboard](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/FinalLeader.tsx)...
+The [Intermediate Leaderboard](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/Leader.tsx) shows the scores after each round before the next round begins. To start the next round there is again a ready button which is handled with websockets and a display of how many players are already ready. The [Final Leaderboard](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/FinalLeader.tsx) shows the final ranking and awards media to the top 3 and takes the player back to the lobby.
+
 ## Launch & Deployment
-Write down the steps a new developer joining your team would
-have to take to get started with your application. What commands are required to build and
-run your project locally? How can they run the tests? Do you have external dependencies
-or a database that needs to be running? How can they do releases?
+### Prerequisites and Installation
+#### Step 1
+For your local development environment you need the **v20.11.0** version of Node.js. You can download it [here](https://nodejs.org/download/release/v20.11.0/) or below.
 
-### new installs:
+- MacOS: [node-v20.11.0.pkg](https://nodejs.org/download/release/v20.11.0/node-v20.11.0.pkg)
+- Windows 32-bit: [node-v20.11.0-x86.msi](https://nodejs.org/download/release/v20.11.0/node-v20.11.0-x86.msi)
+- Windows 64-bit: [node-v20.11.0-x64.msi](https://nodejs.org/download/release/v20.11.0/node-v20.11.0-x64.msi)
+- Linux: [node-v20.11.0.tar.xz](https://nodejs.org/dist/v20.11.0/node-v20.11.0.tar.xz)
 
-npm install react-confetti
+#### Step 2
 
-npm install net
-
-npm install stompjs
-
-npm install sockjs-client
-
-npm install --save-dev svg-loader
-
-npm install crypto-js
-
-## Illustrations
-In your client repository, briefly describe and illustrate the main user flow(s)
-of your interface. How does it work (without going into too much detail)? Feel free to
-include a few screenshots of your application.
-## Roadmap
-The top 2-3 features that new developers who want to contribute to your project could add.
-## Authors and acknowledgment.
-## License
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details
-
-
-# old
-## Getting started
-Read and go through these Tutorials. It will make your life easier:)
-
-- Read the React [Docs](https://react.dev/learn)
-- Do this React [Getting Started](https://react.dev/learn/tutorial-tic-tac-toe) Tutorial (it doesn't assume any existing React knowledge)
-- Get an Understanding of [CSS](https://www.w3schools.com/Css/), [SCSS](https://sass-lang.com/documentation/syntax), and [HTML](https://www.w3schools.com/html/html_intro.asp)!
-
-Next, there are two other technologies that you should look at:
-
-* [react-router-dom](https://reactrouter.com/en/main/start/concepts) offers declarative routing for React. It is a collection of navigational components that fit nicely with the application. 
-* [react-hooks](https://blog.logrocket.com/using-hooks-react-router/) let you access the router's state and perform navigation from inside your components.
-
-## Prerequisites and Installation
-For your local development environment, you will need Node.js.\
-We urge you to install the exact version **v20.11.0** which comes with the npm package manager. You can download it [here](https://nodejs.org/download/release/v20.11.0/).\
-If you are confused about which download to choose, feel free to use these direct links:
-
-- **MacOS:** [node-v20.11.0.pkg](https://nodejs.org/download/release/v20.11.0/node-v20.11.0.pkg)
-- **Windows 32-bit:** [node-v20.11.0-x86.msi](https://nodejs.org/download/release/v20.11.0/node-v20.11.0-x86.msi)
-- **Windows 64-bit:** [node-v20.11.0-x64.msi](https://nodejs.org/download/release/v20.11.0/node-v20.11.0-x64.msi)
-- **Linux:** [node-v20.11.0.tar.xz](https://nodejs.org/dist/v20.11.0/node-v20.11.0.tar.xz) (use this [installation guide](https://medium.com/@tgmarinho/how-to-install-node-js-via-binary-archive-on-linux-ab9bbe1dd0c2) if you are new to Linux)
-
-If you happen to have a package manager the following commands can be used:
-
-- **Homebrew:** `brew install node@20.11.0`
-- **Chocolatey:** `choco install nodejs-lts --version=20.11.0`
-
-After the installation, update the npm package manager to **10.4.0** by running ```npm install -g npm@10.4.0```\
-You can ensure the correct version of node and npm by running ```node -v``` and ```npm --version```, which should give you **v20.11.0** and **10.4.0** respectively.\
-Before you start your application for the first time, run this command to install all other dependencies, including React:
+Run this command to install all other dependencies, including React:
 
 ```npm install```
 
-Next, you can start the app with:
+#### Step 3
+
+You can start the app with:
 
 ```npm run dev```
 
-Now you can open [http://localhost:3000](http://localhost:3000) to view it in the browser.\
-Notice that the page will reload if you make any edits. You will also see any lint errors in the console (use a Chrome-based browser).\
-The client will send HTTP requests to the server which can be found [here](https://github.com/HASEL-UZH/sopra-fs24-template-server).\
+#### Step 4
+
+Now you can open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 In order for these requests to work, you need to install and start the server as well.
 
 ### Testing
-Testing is optional, and you can run the tests with `npm run test`\
+You can run the tests with `npm run test`\
 This launches the test runner in an interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
@@ -124,3 +75,63 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified, and the filenames include hashes.<br>
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### Other packages we used
+- npm install react-confetti
+- npm install net
+- npm install stompjs
+- npm install sockjs-client
+- npm install --save-dev svg-loader
+- npm install crypto-js
+
+## Illustrations
+<p>
+    <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/start.png" /><br/>
+</p>
+
+A player starts here, where they have various options for accessing the website.
+
+<p>
+    <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/profile.png" /><br/>
+</p>
+
+After logging in, the player gets to this page where they can continue by creating or joining a lobby.
+
+-- lobby page --
+
+In the lobby the players can go view the settings or press ready. When everyone is ready, the game automatically begins.
+
+<p>
+    <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/game.png" /><br/>
+</p> 
+
+This page is there the player actually plays the game. After the timer runs out or someone presses stop the players gets automatically navigated to the next page.
+
+-- evaluation page --
+
+Here the player can view and evaluate the answers of the other players. To continue the players need to press next. If all the players are finished evaluating, everyone get redirected to the intermediate leaderboard or the final leaderboard if the previous round was the last one.
+
+-- intermediate leaderboard page --
+
+This page is where the players can view the current ranking and points of the previous rounds. This is also where they can get ready for the next round.
+
+-- final leaderboard page -- 
+
+When all rounds are played and evaluated, the players get redirected to the final leaderboard instead of the intermediate leaderboard. They can return to the lobby as soon as they are finished viewing the final ranking.
+
+## Roadmap
+- Ability to add other players as friends
+- Explore other ways to join a lobby, such as through QR codes.
+- Global Top-Player Ranking
+
+## Authors and acknowledgment.
+- [Giuliano Bernasconi](https://github.com/GiulianoBernasconi)
+- [Joshua Stebler](https://github.com/Joshuastebler)
+- [Joshua Weder](https://github.com/joswed)
+- [Leonora Horvatic](https://github.com/LeoHorv)
+- [Mirjam Alexandra Weibel](https://github.com/mirjamweibel)
+
+We would like to thank our mentor [Fengjiao Ji](https://github.com/feji08) for supporting us throughout the project.
+
+## License
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details
