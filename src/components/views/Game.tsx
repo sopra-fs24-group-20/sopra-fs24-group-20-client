@@ -110,11 +110,15 @@ const Game = () => {
       return () => {
 
         webSocketService.unsubscribe("/topic/game-control");
-        webSocketService.unsubscribe("topic/game-answers");
+        webSocketService.unsubscribe("/topic/game-answers");
       };
     };
 
     subscribeToWebSocket();
+    return () => {
+      webSocketService.unsubscribe("/topic/game-control");
+      webSocketService.unsubscribe("/topic/game-answers");
+    }
 
   }, []);
 

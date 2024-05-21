@@ -158,7 +158,7 @@ const EvaluationScreen = () => {
         await webSocketService.sendMessage("/app/join", { username: username, lobbyId: lobbyId });
       }
      
-      const subscription = webSocketService.subscribe(
+      webSocketService.subscribe(
         "/topic/answers-count",
         async (message) => {
           const messageData = JSON.parse(message.body);
@@ -172,7 +172,7 @@ const EvaluationScreen = () => {
             console.log("the total round count on the eval screen:", totalRounds);
             console.log("the current round count on the eval screen:", currRound);
       
-            if (currRound < totalRounds) {
+            if (currRound <= totalRounds) {
               setLoading(false);
               navigate(`/leaderboard/${lobbyName}`);
             }
@@ -189,11 +189,14 @@ const EvaluationScreen = () => {
       
       return () => {
 
-        webSocketService.unsubscribe(subscription);
+        webSocketService.unsubscribe("/topic/answers-count");
       };
     };
   
     subscribeToWebSocket();
+    return () => {
+      webSocketService.unsubscribe("/topic/answers-count");
+    }
     
   }, []);
 

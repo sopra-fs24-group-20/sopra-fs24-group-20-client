@@ -93,8 +93,6 @@ const LobbyPage = () => {
   const local_username = localStorage.getItem("username");
   const [readyButtonClicked, setButtonClicked] = useState(false);
   const localLobbyId = localStorage.getItem(("lobbyId"))
-  const [ready_ws, setReadyWS] = useState(null);
-  const [new_join, setNewJoinWS] = useState(null);
   const [readyPlayers, setReadyPlayers] = useState(0);
   const [onlinePlayers, setOnlinePlayers] = useState(0);
   const [allPlayers, setAllPlayers] = useState([]);
@@ -108,6 +106,7 @@ const LobbyPage = () => {
         const response = await api.get(`game/${localLobbyId}`);
         if (response.status === 200){
           localStorage.setItem("gameId", response.data.toString());
+          // localStorage.setItem("currentRound", "0");
           await fetchPlayers();
           setFetchLoaded(true);
         }
@@ -142,75 +141,49 @@ const LobbyPage = () => {
         // Send the join message once connected
         await webSocketService.sendMessage("/app/join", { username: local_username, lobbyId: localLobbyId });
       }
-
-      const handleReadyCountMessage = async (message) => {
-        const messageData = JSON.parse(message.body);
-        if (messageData.command === "start" && messageData.lobbyId.toString() === localLobbyId) {
-          await handleStartGame();
-        } /*else {
-          const readyPlayersCount = messageData.readyPlayers !== undefined ? messageData.readyPlayers : 0;
-          const onlinePlayersCount = messageData.onlinePlayers !== undefined ? messageData.onlinePlayers : 0;
-          setReadyPlayers(readyPlayersCount);
-          setOnlinePlayers(onlinePlayersCount);
-          fetchPlayers();
-        }*/
-      };
       
-      const handleOnlinePlayersMessage = async (message) => {
-        const messageData = JSON.parse(message.body);
-        console.log(messageData);
-        if (messageData && messageData.lobbyId.toString() === localLobbyId){
-          const { readyPlayers, onlinePlayers } = messageData; // Destructuring to extract readyPlayers and onlinePlayers
-          setReadyPlayers(readyPlayers);
-          setOnlinePlayers(onlinePlayers);
-          fetchPlayers();
-        }
-      }
 
-      const readyCountSubscription = webSocketService.subscribe(
-        "/topic/ready-count",
-        handleReadyCountMessage,
-        {lobbyId: localLobbyId, username: local_username}
-      );
-
-      const handleOnlinePlayersSubscription = webSocketService.subscribe(
-        "/topic/online-players",
-        handleOnlinePlayersMessage,
-        {lobbyId: localLobbyId}
-      );
-  
-      // Subscribe to the topic
-      /*const subscription = webSocketService.subscribe(
+      webSocketService.subscribe(
         "/topic/ready-count",
         async (message) => {
           const messageData = JSON.parse(message.body);
-          console.log("Received messageData:", messageData);
-          console.log("message.command:", message.command);
-          console.log("Received messageData:", messageData.lobbyId);
-  
           if (messageData.command === "start" && messageData.lobbyId.toString() === localLobbyId) {
             await handleStartGame();
-          } else {
-            const readyPlayersCount = messageData.readyPlayers !== undefined ? messageData.readyPlayers : 0;
-            const onlinePlayersCount = messageData.onlinePlayers !== undefined ? messageData.onlinePlayers : 0;
-            setReadyPlayers(readyPlayersCount.toString());
-            setOnlinePlayers(onlinePlayersCount.toString());
+          }
+        },
+        {lobbyId: localLobbyId, username: local_username}
+      );
+
+      webSocketService.subscribe(
+        "/topic/online-players",
+        async (message) => {
+          const messageData = JSON.parse(message.body);
+          console.log(messageData);
+          if (messageData && messageData.lobbyId.toString() === localLobbyId){
+            const { readyPlayers, onlinePlayers } = messageData; // Destructuring to extract readyPlayers and onlinePlayers
+            setReadyPlayers(readyPlayers);
+            setOnlinePlayers(onlinePlayers);
             fetchPlayers();
           }
         },
-        { lobbyId: localLobbyId, username: local_username }
-      );*/
+        {lobbyId: localLobbyId}
+      );
+  
       setWsLoaded(true);
       // Cleanup function to unsubscribe when the component unmounts or dependencies change
 
       return () => {
-        webSocketService.unsubscribe(readyCountSubscription);
-        webSocketService.unsubscribe(handleOnlinePlayersSubscription);
+        webSocketService.unsubscribe("/topic/ready-count");
+        webSocketService.unsubscribe("/topic/online-players");
       };
     };
   
     // Call the async function
     subscribeToWebSocket();
+    return () => {
+      webSocketService.unsubscribe("/topic/ready-count");
+      webSocketService.unsubscribe("/topic/online-players");
+    }
     
     // Empty dependency array means this effect runs once when the component mounts
   }, []);

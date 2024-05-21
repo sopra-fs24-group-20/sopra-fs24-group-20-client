@@ -56,12 +56,11 @@ class WebSocketService {
     }
   }
 
-  unsubscribe(topic, params = {}) {
-    const subscriptionId = topic + JSON.stringify(params);
+  unsubscribe(topic) {
 
-    if (this.connected && this.client && this.subscriptions[subscriptionId]) {
-      this.client.unsubscribe(subscriptionId);
-      delete this.subscriptions[subscriptionId];
+    if (this.connected && this.client && this.subscriptions[topic]) {
+      this.subscriptions[topic].unsubscribe();
+      delete this.subscriptions[topic];
       console.log(`Unsubscribed from ${topic}`);
     } else {
       console.warn("WebSocket is not connected or subscription does not exist.");
@@ -79,5 +78,4 @@ class WebSocketService {
 }
 
 const webSocketService = new WebSocketService();
-
 export default webSocketService;
