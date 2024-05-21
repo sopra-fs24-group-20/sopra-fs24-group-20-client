@@ -394,7 +394,7 @@ const EvaluationScreen = () => {
                   <div className="evaluation button-container">
                     <Button
                       className="secondary-button"
-                      width="40%"
+                      width="fit-content"
                       onClick={() => leaveLobby()}
                     >
                       Exit Lobby
