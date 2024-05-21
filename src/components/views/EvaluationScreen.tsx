@@ -194,6 +194,7 @@ const EvaluationScreen = () => {
     };
   
     subscribeToWebSocket();
+    
     return () => {
       webSocketService.unsubscribe("/topic/answers-count");
     }

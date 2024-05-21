@@ -180,6 +180,7 @@ const LobbyPage = () => {
   
     // Call the async function
     subscribeToWebSocket();
+    
     return () => {
       webSocketService.unsubscribe("/topic/ready-count");
       webSocketService.unsubscribe("/topic/online-players");

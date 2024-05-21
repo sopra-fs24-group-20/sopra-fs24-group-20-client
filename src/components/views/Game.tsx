@@ -115,6 +115,7 @@ const Game = () => {
     };
 
     subscribeToWebSocket();
+    
     return () => {
       webSocketService.unsubscribe("/topic/game-control");
       webSocketService.unsubscribe("/topic/game-answers");
