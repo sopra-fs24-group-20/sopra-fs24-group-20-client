@@ -49,8 +49,27 @@ const Login = () => {
       // localStorage.setItem("id", user.id);
       navigate(`/user/${user.username}`);
     } catch (error) {
-      setError ("Invalid username or password");
-      console.log(handleError(error))
+      if (error.response) {
+        // The request was made and the server responded with a status code 
+        if (error.response.status === 401) {
+          // Handle UNAUTHORIZED error
+          setError("Username or password does not match");
+        } else if (error.response.status === 403) {
+          // Handle FORBIDDEN error
+          setError("Cannot log in, this user is already logged in");
+        } else {
+          // Handle other errors
+          setError("An error occurred while logging in. Please try again later.");
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error(error.request);
+        setError("No response received from the server. Please try again later.");
+      } else {
+        // Something happened in setting up the request that triggered an error
+        console.error("Error", error.message);
+        setError("An unexpected error occurred. Please try again later.");
+      }
       navigate("/login");
     } finally {
       setLoading(false);
