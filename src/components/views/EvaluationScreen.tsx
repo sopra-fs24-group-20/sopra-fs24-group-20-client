@@ -172,7 +172,7 @@ const EvaluationScreen = () => {
             console.log("the total round count on the eval screen:", totalRounds);
             console.log("the current round count on the eval screen:", currRound);
       
-            if (currRound <= totalRounds) {
+            if (currRound < totalRounds) {
               setLoading(false);
               navigate(`/leaderboard/${lobbyName}`);
             }
@@ -194,7 +194,7 @@ const EvaluationScreen = () => {
     };
   
     subscribeToWebSocket();
-    
+
     return () => {
       webSocketService.unsubscribe("/topic/answers-count");
     }

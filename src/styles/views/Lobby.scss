@@ -1,6 +1,17 @@
 @import "../theme";
 
 .lobby {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Aligns items vertically in the center */
+  }
+
+  
+  .exit-button {
+    order: -1; /* Puts the exit button to the left side */
+  }
+  
   &.settings{
     text-align: right;
     margin-bottom: -1em;

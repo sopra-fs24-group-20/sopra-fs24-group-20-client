@@ -115,7 +115,7 @@ const Game = () => {
     };
 
     subscribeToWebSocket();
-    
+
     return () => {
       webSocketService.unsubscribe("/topic/game-control");
       webSocketService.unsubscribe("/topic/game-answers");
@@ -240,29 +240,6 @@ const Game = () => {
       // Handle error
     }
   }
-
-  /*useEffect(() => {
-    // Fetch settings before the game starts
-    async function fetchSettings() {
-      try {
-        const response = await api.get(`/lobby/settings/${lobbyId}`);
-        console.log(gameId);
-        const categories = response.data.categories;
-        console.log(response.data);
-        const rounddurationval = parseInt(response.data.roundDuration)
-        setroundDuration(rounddurationval);
-        setCountdown(rounddurationval);
-        setCategories(categories);
-        console.log("categories", response.data.categories);
-        console.log("round duration", response.data.roundDuration);
-      } catch (error) {
-        console.error("Error fetching settings:", error);
-        // Handle error
-      }
-    }
-
-    fetchSettings();
-  }, []);*/
 
   const sortPlayers = (playersData: { username: string }[]) => {
     const sortedUsernames = playersData.map((player) => player.username).sort();

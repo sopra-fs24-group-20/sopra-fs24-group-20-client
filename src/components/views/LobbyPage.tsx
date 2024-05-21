@@ -106,7 +106,7 @@ const LobbyPage = () => {
         const response = await api.get(`game/${localLobbyId}`);
         if (response.status === 200){
           localStorage.setItem("gameId", response.data.toString());
-          // localStorage.setItem("currentRound", "0");
+          localStorage.setItem("currentRound", "0");
           await fetchPlayers();
           setFetchLoaded(true);
         }
@@ -180,7 +180,7 @@ const LobbyPage = () => {
   
     // Call the async function
     subscribeToWebSocket();
-    
+
     return () => {
       webSocketService.unsubscribe("/topic/ready-count");
       webSocketService.unsubscribe("/topic/online-players");
@@ -228,7 +228,7 @@ const LobbyPage = () => {
       localStorage.removeItem("lobbyName");
       localStorage.removeItem("lobbyId");
       localStorage.removeItem("gameId");
-      localStorage.removeItem("round");
+      localStorage.removeItem("currentRound");
       await api.put(`/players/${local_username}`, JSON.stringify({ready: false}));
       setLoading(false);
       navigate(`/user/${local_username}`);
@@ -257,7 +257,6 @@ const LobbyPage = () => {
       const response = await api.get(`/lobby/players/${localLobbyId}`);
       setAllPlayers(response.data);
       setOnlinePlayers(response.data.length);
-      localStorage.setItem("currentRound", "0");
       console.log(allPlayers)
       /*if(allPlayers.length!==0 && allPlayers.length===players_ready(allPlayers)){
         start_game();
@@ -285,12 +284,20 @@ const LobbyPage = () => {
     <BaseContainer>
       <div className="lobby container">
         <div className="lobby form">
-          <div className="lobby centered-text">
+          <div className="lobby header">
+            <Button
+              className="secondary-button exit-button"
+              onClick={exit}
+            >
+              Exit
+            </Button>
             <div className="lobby settings"
               onClick={() => navigate(`/settings/${localLobbyName}`)}
             >
-           ⚙️
+              ⚙️
             </div>
+          </div>
+          <div className="lobby centered-text">
             <h1 className="lobby title">{localLobbyName}</h1>
 
             <ul className="lobby ul">
@@ -311,17 +318,14 @@ const LobbyPage = () => {
               onClick={local_ready}
               disabled={readyButtonClicked}
             >
-              ready
+              Ready
             </Button>
-
-            <div>
-              <a className="lobby link" href="#" onClick={exit}>exit</a>
-            </div>
           </div>
         </div>
       </div>
     </BaseContainer>
   );
+  
 };
 
 export default LobbyPage;

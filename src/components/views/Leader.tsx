@@ -158,17 +158,28 @@ const Leader = () => {
     }
   }
 
-  /*if (loading) {
-    return (
-      <BaseContainer>
-        <div className="authentication container">
-          <div className="authentication form">
-            <CategoriesLoadingScreen />
-          </div>
-        </div>
-      </BaseContainer>
-    );
-  }*/
+  const exit = async () => {
+    try {
+      setLoading(true);
+      if (webSocketService.connected){
+        webSocketService.sendMessage("/app/leave", { username: localUsername , lobbyId: localLobbyId });
+        await new Promise(resolve => setTimeout(resolve, 1000)); 
+        await webSocketService.disconnect();
+      }
+      await api.put(`/lobby/leave/${localLobbyId}?username=${localUsername}`);
+      localStorage.removeItem("lobbyName");
+      localStorage.removeItem("lobbyId");
+      localStorage.removeItem("gameId");
+      localStorage.removeItem("currentRound");
+      await api.put(`/players/${localUsername}`, JSON.stringify({ready: false}));
+      setLoading(false);
+      navigate(`/user/${localUsername}`);
+    } catch (error) {
+      alert(
+        `Something went wrong when exiting the lobby: \n${handleError(error)}`
+      );
+    }
+  };
 
   return (
     <BaseContainer>
@@ -194,6 +205,9 @@ const Leader = () => {
             >
               ready
             </Button>
+            <div>
+              <a className="lobby link" href="#" onClick={exit}>exit</a>
+            </div>
           </div>
         </div>
       </div>
