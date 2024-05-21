@@ -397,7 +397,7 @@ const EvaluationScreen = () => {
                       width="40%"
                       onClick={() => leaveLobby()}
                     >
-                      Exit
+                      Exit Lobby
                     </Button>
                   </div>
                 </p>

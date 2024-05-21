@@ -181,10 +181,21 @@ const Leader = () => {
     }
   };
 
+
+
   return (
     <BaseContainer>
       <div className="leaderboard container">
         <div className="leaderboard form">
+        <div className="authentication back-arrow">
+          <Button
+              className="secondary-button"
+              width="fit-content"
+              onClick={() => exit()}
+            >
+              Exit Lobby
+            </Button>
+        </div>
           <div className="leaderboard centered-text">
             <h1>Ranking</h1>
             <ul className="leaderboard user-list">
@@ -205,9 +216,6 @@ const Leader = () => {
             >
               ready
             </Button>
-            <div>
-              <a className="lobby link" href="#" onClick={exit}>exit</a>
-            </div>
           </div>
         </div>
       </div>

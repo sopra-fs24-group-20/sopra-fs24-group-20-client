@@ -154,13 +154,16 @@ const ProfilePage = () => {
             <div className="profile avatar-container">
               <object type="image/svg+xml" data={hashUsername(localStorage.getItem("username"))}></object>
             </div>
-            <div>
-              <p>
-                <a className="profile link" href="#" onClick={handleClick}>logout</a>
-              </p>
+            <div className="authentication back-arrow">
+              <Button
+                className="secondary-button"
+                width="fit-content"
+                onClick={() => handleClick()}
+              >
+                Log out
+              </Button>
             </div>
           </div>
-
           <div className="profile right-axis">
             {username && !username.startsWith("Guest:") ? (
               <>
@@ -215,6 +218,7 @@ const ProfilePage = () => {
       {showPopup && <PopupWindow onClose={togglePopup} />}
     </BaseContainer>
   );
+  
 };
 
 export default ProfilePage;

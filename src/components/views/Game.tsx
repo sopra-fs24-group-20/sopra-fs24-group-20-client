@@ -186,10 +186,6 @@ const Game = () => {
 
   };
 
-  const StopGame = async () => {
-    webSocketService.sendMessage("/app/stop-game", {lobbyId: lobbyId});
-  };
-
   const getLetter = async () => {
     try {
       // await api.put(`/players/${username}`, JSON.stringify({ready: false}));

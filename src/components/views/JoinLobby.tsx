@@ -81,7 +81,8 @@ const JoinLobby = () => {
           setError("Join lobby failed because the lobby doesn’t exist");
         } else if (error.response.status === 409) {
           // Handle CONFLICT error
-          setError("Cannot join lobby as the game is not in SETUP mode.");
+          setError("Cannot join lobby because the game is not in SETUP mode.");
+
         } else {
           // Handle other errors
           setError("An error occurred while joining the lobby. Please try again later.");
@@ -120,6 +121,15 @@ const JoinLobby = () => {
     <BaseContainer>
       <div className="authentication container">
         <div className="authentication form">
+        <div className="authentication back-arrow">
+          <Button
+              className="secondary-button"
+              width="fit-content"
+              onClick={() => goBack()}
+            >
+              Back
+            </Button>
+        </div>
           <h1 className="authentication centered-text">Join Lobby</h1>
           {error && (
             <div className="authentication error-message">{error}</div>
@@ -152,11 +162,6 @@ const JoinLobby = () => {
           >
             Join Lobby
           </Button>
-        </div>
-        <div>
-          <a className="authentication link" href="#" onClick={goBack}>
-            Back
-          </a>
         </div>
       </div>
     </BaseContainer>

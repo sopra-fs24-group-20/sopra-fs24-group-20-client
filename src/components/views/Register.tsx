@@ -64,6 +64,10 @@ const Register = () => {
     }
   };
 
+  const goBack = () => {
+    window.history.back(); // Navigate back using browser's history object
+  };
+
   if (loading) {
     return (
       <BaseContainer>
@@ -80,6 +84,15 @@ const Register = () => {
     <BaseContainer>
       <div className="authentication container">
         <div className="authentication form">
+        <div className="authentication back-arrow">
+          <Button
+              className="secondary-button"
+              width="fit-content"
+              onClick={() => goBack()}
+            >
+              Back
+            </Button>
+        </div>
           <h1 className="authentication centered-text" >Register</h1>
           {error && <div className="authentication error-message">{error}</div>}
           <FormField
@@ -110,9 +123,6 @@ const Register = () => {
           >
             Register
           </Button>
-        </div>
-        <div>
-          <a className="authentication link" href="/start">back</a>
         </div>
       </div>
     </BaseContainer>
