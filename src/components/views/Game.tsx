@@ -74,7 +74,7 @@ const Game = () => {
       }
 
 
-      const subscription = webSocketService.subscribe(
+      webSocketService.subscribe(
         "/topic/game-control",
         async (message) => {
           const messageData = JSON.parse(message.body);
@@ -93,11 +93,11 @@ const Game = () => {
       );
 
       // checking whether all have successfully submitted entries before going to next screen
-      const subscription2 = webSocketService.subscribe(
-        "/topic/answers-count",
+      webSocketService.subscribe(
+        "/topic/game-answers",
         async(message) => {
           const messageData = JSON.parse(message.body);
-          if (messageData.command === "done" && messageData.lobbyId.toString() === lobbyId){
+          if (messageData.command === "game-done" && messageData.lobbyId.toString() === lobbyId){
             console.log("received all answers");
             setLoading(false);
             navigate(`/evaluation/${lobbyName}`);
@@ -109,8 +109,8 @@ const Game = () => {
 
       return () => {
 
-        webSocketService.unsubscribe(subscription);
-        webSocketService.unsubscribe(subscription2);
+        webSocketService.unsubscribe("/topic/game-control");
+        webSocketService.unsubscribe("topic/game-answers");
       };
     };
 
@@ -169,7 +169,7 @@ const Game = () => {
         const response = await api.post(`/rounds/${gameId}/entries`, answer);
         if (response.status === 200){
           console.log("submitted answers");
-          webSocketService.sendMessage("/app/answers-submitted", {username: username, lobbyId: lobbyId});
+          webSocketService.sendMessage("/app/game-submitted", {username: username, lobbyId: lobbyId});
           setLoading(true);
         }
       } catch (error) {
