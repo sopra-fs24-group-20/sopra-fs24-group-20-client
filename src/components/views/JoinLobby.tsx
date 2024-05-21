@@ -82,8 +82,11 @@ const JoinLobby = () => {
         } else if (error.response.status === 409) {
           // Handle CONFLICT error
           setError("Cannot join lobby because the game is not in SETUP mode.");
-
-        } else {
+        
+        } else if (error.response.status === 403) {
+          // Handle CONFLICT error
+          setError("Cannot join lobby because the lobby is full");
+        }else {
           // Handle other errors
           setError("An error occurred while joining the lobby. Please try again later.");
         }

@@ -45,6 +45,8 @@ const Leader = () => {
   const localUsername = localStorage.getItem("username");
   const localLobbyId = localStorage.getItem(("lobbyId"));
   const localGameId = localStorage.getItem("gameId");
+  const currentRound = localStorage.getItem("currentRound");
+  const [rounds, setRounds] = useState<number>(1);
 
   const [readyPlayers, setReadyPlayers] = useState(0);
   const [onlinePlayers, setOnlinePlayers] = useState(0);
@@ -143,6 +145,8 @@ const Leader = () => {
     try {
       setLoading(true);
       const response = await api.get(`/lobby/players/${localLobbyId}`);
+      const second_response = await api.get(`/lobby/settings/${localLobbyId}`);
+      setRounds(second_response.data.rounds);
       setAllPlayers(response.data);
       setOnlinePlayers(response.data.length);
       console.log(response.data)
@@ -197,7 +201,7 @@ const Leader = () => {
             </Button>
         </div>
           <div className="leaderboard centered-text">
-            <h1>Ranking</h1>
+            <h1>Ranking of round {currentRound} of {rounds}</h1>
             <ul className="leaderboard user-list">
               {playersPoints.map((player, index) => (
                 <li key={index} className="leaderboard li">

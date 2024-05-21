@@ -160,7 +160,7 @@ const ProfilePage = () => {
                 width="fit-content"
                 onClick={() => handleClick()}
               >
-                Log out
+                Logout
               </Button>
             </div>
           </div>
