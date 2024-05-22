@@ -186,20 +186,19 @@ const Leader = () => {
   };
 
 
-
   return (
     <BaseContainer>
       <div className="leaderboard container">
         <div className="leaderboard form">
-        <div className="authentication back-arrow">
-          <Button
+          <div className="authentication back-arrow">
+            <Button
               className="secondary-button"
               width="fit-content"
               onClick={() => exit()}
             >
               Exit Lobby
             </Button>
-        </div>
+          </div>
           <div className="leaderboard centered-text">
             <h1>Ranking of round {currentRound} of {rounds}</h1>
             <ul className="leaderboard user-list">

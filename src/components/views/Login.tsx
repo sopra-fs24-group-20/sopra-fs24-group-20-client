@@ -96,8 +96,8 @@ const Login = () => {
     <BaseContainer>
       <div className="authentication container">
         <div className="authentication form">
-        <div className="authentication back-arrow">
-          <Button
+          <div className="authentication back-arrow">
+            <Button
               className="secondary-button"
               width="fit-content"
               onClick={() => goBack()}
@@ -105,7 +105,7 @@ const Login = () => {
               Back
             </Button>
 
-        </div>
+          </div>
           <h1 className="authentication centered-text" >Login</h1>
           {error && <div className="authentication error-message">{error}</div>}
           <FormField

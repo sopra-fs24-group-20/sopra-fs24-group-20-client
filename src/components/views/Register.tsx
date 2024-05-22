@@ -84,15 +84,15 @@ const Register = () => {
     <BaseContainer>
       <div className="authentication container">
         <div className="authentication form">
-        <div className="authentication back-arrow">
-          <Button
+          <div className="authentication back-arrow">
+            <Button
               className="secondary-button"
               width="fit-content"
               onClick={() => goBack()}
             >
               Back
             </Button>
-        </div>
+          </div>
           <h1 className="authentication centered-text" >Register</h1>
           {error && <div className="authentication error-message">{error}</div>}
           <FormField

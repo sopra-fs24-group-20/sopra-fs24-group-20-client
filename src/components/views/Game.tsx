@@ -166,6 +166,7 @@ const Game = () => {
           console.log("encountered 500 error. Retrying to submit data in intervals...");
           setTimeout(submitData, 1200);
         }
+        
         return;
       }
     /*setTimeout(async () => {
