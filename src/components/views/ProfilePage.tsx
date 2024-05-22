@@ -159,6 +159,7 @@ const ProfilePage = () => {
                 className="secondary-button"
                 width="fit-content"
                 onClick={() => handleClick()}
+                style={{ marginBottom: "20px", marginTop: "10px" }}
               >
                 Logout
               </Button>

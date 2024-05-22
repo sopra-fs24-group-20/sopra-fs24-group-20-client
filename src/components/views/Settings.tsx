@@ -47,6 +47,8 @@ const Settings = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState(null);
   const [saveConfirmation, setSaveConfirmation] = useState(null);
+  const [roundsError, setRoundsError] = useState(null);
+  const [timeError, setTimeError] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -82,6 +84,20 @@ const Settings = () => {
 
   const saveChanges = async () => {
     try {
+
+      if (settings.roundDuration < 10 || settings.roundDuration > 300 || settings.rounds < 1 || settings.rounds > 10) {
+        if (settings.roundDuration < 10 || settings.roundDuration > 300) {
+          setTimeError("Time must be between 10 and 300 seconds");
+        }
+        if (settings.rounds < 1 || settings.rounds > 10) {
+          setRoundsError("Number of rounds must be between 1 and 10");
+        }
+        return;
+      }
+
+      setTimeError(null);
+      setRoundsError(null);
+
       await api.put(`/lobby/settings/${localLobbyId}`, JSON.stringify(settings));
       setSaveConfirmation("Settings saved successfully!");
       setError(null);
@@ -165,6 +181,9 @@ const Settings = () => {
                 }
                 type="number"
               />
+              {timeError && (
+                <div className="settings error-message">{timeError}</div>
+              )}
               Rounds
               <FormField
                 value={settings.rounds ? settings.rounds.toString() : ""}
@@ -176,6 +195,7 @@ const Settings = () => {
                 }
                 type="number"
               />
+              {roundsError && <div className="settings error-message">{roundsError}</div>}
               Exclude Letter
               <FormField
                 value={settings.excludedChars ? settings.excludedChars.join(",").toUpperCase() : ""}                placeholder="e.g. X,Y,Z"

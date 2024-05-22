@@ -75,7 +75,7 @@ function hashUsername(username) {
 const Player = ({ user }) => (
   <div className="centered-text">
     <div className="lobby_player username">
-      {user.username}
+      {user.username && user.username.replace(/^Guest:/, "")}
     </div>
     <div className="lobby_player container">
       <object type="image/svg+xml" data={hashUsername(user.username)}></object>
