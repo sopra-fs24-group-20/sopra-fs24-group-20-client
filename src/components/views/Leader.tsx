@@ -163,8 +163,8 @@ const Leader = () => {
   }
 
   const exit = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       if (webSocketService.connected){
         webSocketService.sendMessage("/app/leave", { username: localUsername , lobbyId: localLobbyId });
         await new Promise(resolve => setTimeout(resolve, 1000)); 

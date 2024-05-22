@@ -138,20 +138,6 @@ const Game = () => {
     return JSON.stringify(data);
   };
 
-  const submitAnswers = async (data) =>{
-    console.log("submit answers ", data);
-    try{
-      const response = await api.post(`/rounds/${gameId}/entries`, data);
-      if (response.data === 200){
-
-      }
-
-    }catch(error){
-      throw new Error("Error submitting data")
-    }
-  };
-
-
   const doStop = async () => {
     console.log("in dostop");
     await api.put(`/players/${username}`, JSON.stringify({ready: false}));
@@ -161,7 +147,28 @@ const Game = () => {
     const index = players.indexOf(username);
     const delayInSeconds = index * 1;
     // send the answers to backend for verification
-    setTimeout(async () => {
+
+    const submitData = async () => {
+      const answer = getFormattedData();
+      console.log("answer", answer);
+      console.log("got formatted data");
+      const submisstionTime = new Date();
+      try {
+        const response = await api.post(`/rounds/${gameId}/entries`, answer);
+        if (response.status === 200){
+          console.log("submitted answers");
+          webSocketService.sendMessage("/app/game-submitted", {username: username, lobbyId: lobbyId});
+          setLoading(true);
+        }
+      }catch(error){
+        setError("Error subbmitting data");
+        if (error.response && error.response.status === 500){
+          console.log("encountered 500 error. Retrying to submit data in intervals...");
+          setTimeout(submitData, 1200);
+        }
+        return;
+      }
+    /*setTimeout(async () => {
       const answer = getFormattedData();
       console.log("answer", answer);
       console.log("got formatted data");
@@ -181,8 +188,9 @@ const Game = () => {
         setError("Error submitting data");
 
         return;
-      }
-    }, delayInSeconds * 1000);
+      }*/
+    };
+    setTimeout(submitData, delayInSeconds * 1000);
 
   };
 
