@@ -99,6 +99,8 @@ const LobbyPage = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [fetchLoaded, setFetchLoaded] = useState<boolean>(false);
   const [wsLoaded, setWsLoaded] = useState<boolean>(false);
+  const [hostLoaded, setHostLoaded] = useState<boolean>(false);
+  const [owner, setOwner] = useState<boolean>(false);
   
   useEffect(() => {
     const fetchGameId = async () => {
@@ -118,6 +120,23 @@ const LobbyPage = () => {
       }
     }
     fetchGameId();
+  }, [])
+
+  useEffect(() => {
+    const fetchHost = async () => {
+      try{
+        const response = await api.get(`/lobby/settings/${localLobbyId}`);
+        if (local_username === response.data.lobbyOwner.username) {
+          setOwner(true);
+        }
+        setHostLoaded(true);
+      }catch(error){
+        alert(
+          `Something went wrong when fetching the settings: \n${handleError(error)}`
+        );
+      }
+    }
+    fetchHost();
   }, [])
 
 
@@ -190,7 +209,7 @@ const LobbyPage = () => {
   }, []);
 
   useEffect(() => {
-    if (fetchLoaded && wsLoaded) {
+    if (fetchLoaded && wsLoaded && hostLoaded) {
       setLoading(false); // Set loading to false when both settings and letter are loaded
     }
   }, [fetchLoaded, wsLoaded]);
@@ -291,11 +310,14 @@ const LobbyPage = () => {
             >
               Exit
             </Button>
-            <div className="lobby settings"
-              onClick={() => navigate(`/settings/${localLobbyName}`)}
-            >
-              ⚙️
-            </div>
+            {owner && (
+              <div
+                className="lobby settings"
+                onClick={() => navigate(`/settings/${localLobbyName}`)}
+              >
+                ⚙️
+              </div>
+            )}
           </div>
           <div className="lobby centered-text">
             <h1 className="lobby title">{localLobbyName}</h1>
