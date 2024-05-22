@@ -108,6 +108,7 @@ const EvaluationScreen = () => {
   const [disableButton, setDisableButton] = useState<boolean>(false);
   const [vetoButtonState, setVetoButtonState] = useState({});
   const [bonusButtonState, setBonusButtonState] = useState({});
+  const [doneVoting, setDoneVoting] = useState<boolean>(false);
 
   useEffect(() => {
 
@@ -348,6 +349,7 @@ const EvaluationScreen = () => {
 
       try {
         setLoading(true);
+        setDoneVoting(true);
         const requestBody = JSON.stringify(votes);
         console.log("requestBody", requestBody);
         const response = await api.post(`/rounds/${gameId}/submitVotes`, requestBody);
@@ -388,12 +390,32 @@ const EvaluationScreen = () => {
     }
   }, [displayIndex]);
 
-  if (loading) {
+  if (loading && !doneVoting) {
     return (
       <BaseContainer>
         <div className="authentication container">
           <div className="authentication form">
             <CategoriesLoadingScreen />
+          </div>
+        </div>
+      </BaseContainer>
+    );
+  }
+
+  if (loading && doneVoting) {
+    return (
+      <BaseContainer>
+        <div className="authentication container">
+          <div className="authentication form">
+            <div className="evaluation loading-screen">
+              <div className="evaluation loading-text">
+                <h1 className="evaluation categories-text">Waiting for other players...</h1>
+                <div className="evaluation loading-ball-first"></div>
+                <div className="evaluation loading-ball-second"></div>
+                <div className="evaluation loading-ball-third"></div>
+                <div className="evaluation loading-ball-fourth"></div>
+              </div>
+            </div>
           </div>
         </div>
       </BaseContainer>
@@ -435,7 +457,7 @@ const EvaluationScreen = () => {
               <div className="evaluation transparent-form-normal">
                 <ul className="evaluation ul">
                   {answers?.map((answer, index) => (
-                    <li key={index} className="evaluation li">
+                    <li key={index} className="evaluation li" style={{ display: "grid", placeItems: "center" }}>
                       <div className="evaluation answer">{answer || "-"}
                         <div className="evaluation score">
                           {scores[index] === 1 ? (

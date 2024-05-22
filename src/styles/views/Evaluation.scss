@@ -116,6 +116,7 @@
     justify-content: flex-start;
     ul {
       margin-top: -0.6em;
+      align-content: center;
       .li {
         position: relative;
         display: inline-block;
@@ -239,6 +240,146 @@
     font-size: 24px;
     height: 2.5em;
     border-radius: 0.5em;
+  }
+  &.loading-ball-first {
+    position: absolute;
+    width: 20px; /* Adjust ball size */
+    height: 20px; /* Adjust ball size */
+    background-color: transparent; /* Transparent ball color */
+    border-radius: 50%; /* Make ball round */
+    border: 2px solid white; /* White border */
+    animation: moveBallFirst 2s linear infinite; /* Adjust animation duration */
+    top: 50%;
+    left: 50%; /* Adjust initial position */
+  }
+
+  &.loading-ball-second {
+    position: absolute;
+    width: 20px; /* Adjust ball size */
+    height: 20px; /* Adjust ball size */
+    background-color: transparent; /* Transparent ball color */
+    border-radius: 50%; /* Make ball round */
+    border: 2px solid white; /* White border */
+    animation: moveBallSecond 2s linear infinite; /* Adjust animation duration */
+    top: 50%;
+    left: 50%; /* Adjust initial position */
+  }
+
+  &.loading-ball-third {
+    position: absolute;
+    width: 20px; /* Adjust ball size */
+    height: 20px; /* Adjust ball size */
+    background-color: transparent; /* Transparent ball color */
+    border-radius: 50%; /* Make ball round */
+    border: 2px solid white; /* White border */
+    animation: moveBallThird 2s linear infinite; /* Adjust animation duration */
+    top: 50%;
+    left: 50%; /* Adjust initial position */
+  }
+
+  &.loading-ball-fourth {
+    position: absolute;
+    width: 20px; /* Adjust ball size */
+    height: 20px; /* Adjust ball size */
+    background-color: transparent; /* Transparent ball color */
+    border-radius: 50%; /* Make ball round */
+    border: 2px solid white; /* White border */
+    animation: moveBallFourth 2s linear infinite; /* Adjust animation duration */
+    top: 50%;
+    left: 50%; /* Adjust initial position */
+  }
+  &.categories-text {
+    font-family: 'Cursive', sans-serif;
+    font-size: 20px;
+    color: white;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: white;
+    text-stroke-width: 1px;
+    text-stroke-color: white;
+  }
+  &.loading-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: linear-gradient(0deg, $accentBottomLight, $accentMiddleLight, $accentTopLight);
+  }
+
+  &.loading-text {
+    position: relative;
+  }
+
+  @keyframes moveBallFirst {
+    0% {
+      transform: rotate(0deg) translateY(-400%);
+    }
+    25% {
+      transform: rotate(90deg) translateY(-800%);
+    }
+    50% {
+      transform: rotate(180deg) translateY(-400%);
+    }
+    75% {
+      transform: rotate(270deg) translateY(-800%);
+    }
+    100% {
+      transform: rotate(360deg) translateY(-400%);
+    }
+  }
+
+  @keyframes moveBallSecond {
+    0% {
+      transform: rotate(90deg) translateY(-800%);
+    }
+    25% {
+      transform: rotate(180deg) translateY(-400%);
+    }
+    50% {
+      transform: rotate(270deg) translateY(-800%);
+    }
+    75% {
+      transform: rotate(360deg) translateY(-400%);
+    }
+    100% {
+      transform: rotate(450deg) translateY(-800%);
+    }
+  }
+
+  @keyframes moveBallThird {
+    0% {
+      transform: rotate(180deg) translateY(-400%);
+    }
+    25% {
+      transform: rotate(270deg) translateY(-800%);
+    }
+    50% {
+      transform: rotate(360deg) translateY(-400%);
+    }
+    75% {
+      transform: rotate(450deg) translateY(-800%);
+    }
+    100% {
+      transform: rotate(540deg) translateY(-400%);
+    }
+  }
+
+  @keyframes moveBallFourth {
+    0% {
+      transform: rotate(270deg) translateY(-800%);
+    }
+    25% {
+      transform: rotate(360deg) translateY(-400%);
+    }
+    50% {
+      transform: rotate(450deg) translateY(-800%);
+    }
+    75% {
+      transform: rotate(540deg) translateY(-400%);
+    }
+    100% {
+      transform: rotate(630deg) translateY(-800%);
+    }
   }
 }
 
