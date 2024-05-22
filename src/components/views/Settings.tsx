@@ -92,6 +92,7 @@ const Settings = () => {
         if (settings.rounds < 1 || settings.rounds > 10) {
           setRoundsError("Number of rounds must be between 1 and 10");
         }
+
         return;
       }
 

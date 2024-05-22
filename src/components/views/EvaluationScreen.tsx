@@ -292,6 +292,7 @@ const EvaluationScreen = () => {
     setVotes((prevVotes) => {
       const updatedVotes = { ...prevVotes };
       updatedVotes[currentCategory][player].bonus = !prevVotes[currentCategory][player].bonus;
+
       return updatedVotes;
     });
     setBonusButtonState((prevState) => ({
@@ -312,6 +313,7 @@ const EvaluationScreen = () => {
     setVotes((prevVotes) => {
       const updatedVotes = { ...prevVotes };
       updatedVotes[currentCategory][player].veto = !prevVotes[currentCategory][player].veto;
+
       return updatedVotes;
     });
     setVetoButtonState((prevState) => ({
