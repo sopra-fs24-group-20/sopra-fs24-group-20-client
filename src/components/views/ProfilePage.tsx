@@ -181,7 +181,7 @@ const ProfilePage = () => {
                 <div className="profile stat-container">
                   <div className="profile stat-category">Level:</div>
                   <div className="profile stat-value">
-                    <span style={{ marginRight: '6px' }}>{levelSymbols[getLevelSymbolIndex(level)]}</span>
+                    <span style={{ marginRight: "6px" }}>{levelSymbols[getLevelSymbolIndex(level)]}</span>
                     {level}
                   </div>
                 </div>
