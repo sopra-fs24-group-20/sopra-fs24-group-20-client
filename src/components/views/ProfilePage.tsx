@@ -73,6 +73,7 @@ const ProfilePage = () => {
   const CryptoJS = require("crypto-js");
   const all_pictures = [svgImage1, svgImage2, svgImage3, svgImage4,svgImage5,svgImage6,svgImage7,svgImage8,svgImage9,svgImage10,svgImage11,svgImage12,svgImage13,svgImage14,svgImage15,svgImage16,svgImage17,svgImage18,svgImage19,svgImage20,svgImage21,svgImage22,svgImage23,svgImage24,svgImage25];
   const [showPopup, setShowPopup] = useState(false);
+  const levelSymbols = ["🫘","🌱","🪴","🌻","☀️","✨"];
 
   const togglePopup = () => {
     console.log("toggle Popup");
@@ -94,11 +95,20 @@ const ProfilePage = () => {
     }
   };
 
-
   const handleClick = () => {
     logout()
   };
 
+  const getLevelSymbolIndex = (level) => {
+    if (level >= 1 && level <= 4) return 0;
+    if (level >= 5 && level <= 9) return 1;
+    if (level >= 10 && level <= 14) return 2;
+    if (level >= 15 && level <= 19) return 3;
+    if (level >= 20 && level <= 24) return 4;
+    if (level >= 25) return 5;
+
+    return 0;
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -170,7 +180,10 @@ const ProfilePage = () => {
               <>
                 <div className="profile stat-container">
                   <div className="profile stat-category">Level:</div>
-                  <div className="profile stat-value">{level}</div>
+                  <div className="profile stat-value">
+                    <span style={{ marginRight: '6px' }}>{levelSymbols[getLevelSymbolIndex(level)]}</span>
+                    {level}
+                  </div>
                 </div>
                 <div className="profile stat-container">
                   <div className="profile stat-category">Rounds Played:</div>
