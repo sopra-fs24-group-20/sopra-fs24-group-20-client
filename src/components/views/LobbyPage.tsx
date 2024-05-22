@@ -137,7 +137,7 @@ const LobbyPage = () => {
       }
     }
     fetchHost();
-  }, [])
+  }, [allPlayers])
 
 
   useEffect(() => {
