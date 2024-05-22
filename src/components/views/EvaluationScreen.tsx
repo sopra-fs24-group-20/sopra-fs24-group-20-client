@@ -75,7 +75,7 @@ function hashUsername(username) {
 const Player = ({ user }) => (
   <div>
     <div className="player username">
-      {user}
+      {user && user.replace(/^Guest:/, "")}
     </div>
     <div className="player container">
       <object type="image/svg+xml" data={hashUsername(user)}></object>
@@ -106,6 +106,8 @@ const EvaluationScreen = () => {
   const [initiated, setInitiated] = useState<boolean>(false);
   const [votes, setVotes] = useState({});
   const [disableButton, setDisableButton] = useState<boolean>(false);
+  const [vetoButtonState, setVetoButtonState] = useState({});
+  const [bonusButtonState, setBonusButtonState] = useState({});
 
   useEffect(() => {
 
@@ -286,11 +288,16 @@ const EvaluationScreen = () => {
     if (!initiated) {
       initiateVotes();
     }
-    setVotes((prevVotes) => ({
-      ...prevVotes,
-      [currentCategory]: {
-        ...(prevVotes[currentCategory] || {}),
-        [player]: { ...(prevVotes[currentCategory]?.[player] || {}), bonus: true },
+    setVotes((prevVotes) => {
+      const updatedVotes = { ...prevVotes };
+      updatedVotes[currentCategory][player].bonus = !prevVotes[currentCategory][player].bonus;
+      return updatedVotes;
+    });
+    setBonusButtonState((prevState) => ({
+      ...prevState,
+      [player]: {
+        ...prevState[player],
+        [currentCategory]: !prevState[player]?.[currentCategory],
       },
     }));
     console.log("When submitting a Bonus, our DT looks like this:", votes);
@@ -301,11 +308,16 @@ const EvaluationScreen = () => {
     if (!initiated) {
       initiateVotes();
     }
-    setVotes((prevVotes) => ({
-      ...prevVotes,
-      [currentCategory]: {
-        ...(prevVotes[currentCategory] || {}),
-        [player]: { ...(prevVotes[currentCategory]?.[player] || {}), veto: true },
+    setVotes((prevVotes) => {
+      const updatedVotes = { ...prevVotes };
+      updatedVotes[currentCategory][player].veto = !prevVotes[currentCategory][player].veto;
+      return updatedVotes;
+    });
+    setVetoButtonState((prevState) => ({
+      ...prevState,
+      [player]: {
+        ...prevState[player],
+        [currentCategory]: !prevState[player]?.[currentCategory],
       },
     }));
     console.log("When submitting a Veto, our DT looks like this:", votes);
@@ -347,6 +359,11 @@ const EvaluationScreen = () => {
     }
   };
 
+  const prevEval = async () => {
+    if (displayIndex > 0) {
+      setDisplayIndex(displayIndex - 1);
+    }
+  }
 
   useEffect(() => {
     if (fetchedData && currentCategory) {
@@ -419,7 +436,7 @@ const EvaluationScreen = () => {
                 <ul className="evaluation ul">
                   {answers?.map((answer, index) => (
                     <li key={index} className="evaluation li">
-                      <div className="evaluation answer">{answer}
+                      <div className="evaluation answer">{answer || "-"}
                         <div className="evaluation score">
                           {scores[index] === 1 ? (
                             <span style={{ color: "green" }}>✔</span>
@@ -439,7 +456,7 @@ const EvaluationScreen = () => {
               {players?.map((player, index) => (
                 <button
                   key={index}
-                  className="round-button-red"
+                  className={`round-button-red${vetoButtonState[player]?.[currentCategory] ? " clicked" : ""}`}
                   style={{ marginTop: index === 0 ? "36px" : 0 }}
                   onClick={() => submitVeto(players[index])}
                   disabled={username === player}
@@ -452,7 +469,7 @@ const EvaluationScreen = () => {
               {players?.map((player, index) => (
                 <button
                   key={index}
-                  className="round-button-green"
+                  className={`round-button-green${bonusButtonState[player]?.[currentCategory] ? " clicked" : ""}`}
                   style={{ marginTop: index === 0 ? "36px" : 0 }}
                   onClick={() => submitBonus(players[index])}
                   disabled={username === player}
@@ -461,6 +478,18 @@ const EvaluationScreen = () => {
             </div>
           </div>
           <div className="evaluation form-right">
+            {displayIndex > 0 && (
+              <div className="evaluation button-container-top">
+                <Button
+                  className="secondary-button"
+                  style={{ width: "100%", height: "100%" }}
+                  onClick={() => prevEval()}
+                  disabled={disableButton}
+                >
+                  Previous
+                </Button>
+              </div>
+            )}
             <div className="evaluation button-container-bottom">
               <Button
                 className="secondary-button"

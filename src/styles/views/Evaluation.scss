@@ -12,7 +12,7 @@
   .form-container {
     display: flex;
     width: calc(100% - 2em);
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
   }
 
@@ -42,9 +42,12 @@
     text-align: center;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-bottom: 1.25em;
+    margin-bottom: 2.25em;
   }
   .round-button-red:hover {
+    background-color: firebrick;
+  }
+  .round-button-red.clicked {
     background-color: darkred;
   }
   .round-button-green {
@@ -58,11 +61,15 @@
     text-align: center;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-bottom: 1.25em;
+    margin-bottom: 2.25em;
   }
 
   .round-button-green:hover {
-    background-color: lightseagreen; /* Change color on hover */
+    background-color: lightseagreen;
+  }
+
+  .round-button-green.clicked {
+    background-color: darkcyan;
   }
 
   &.transparent-form-normal {
@@ -193,9 +200,9 @@
   &.form-right {
     display: flex;
     position: relative;
-    flex-direction: row;
+    flex-direction: column;
     width: 15%;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: flex-end;
     margin-left: 1em;
     max-width: 9em;
@@ -214,6 +221,15 @@
     width: 60%;
     max-width: 480px;
     min-width: 200px;
+  }
+  &.button-container-top {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    background-color: red;
+    font-size: 24px;
+    height: 2.5em;
+    border-radius: 0.5em;
   }
   &.button-container-bottom {
     display: flex;
