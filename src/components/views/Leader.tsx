@@ -24,7 +24,7 @@ const Player = ({ user, index }) => {
         {user.username && user.username.replace(/^Guest:/, "")}
       </div>
       <div className="player-col">
-        {user.points}pt
+        {user.points}pt {user.prev_points !== null ? '+' + user.prev_points : ''}
       </div>
     </div>
   );
@@ -129,9 +129,22 @@ const Leader = () => {
     try {
       setLoading(true);
       const response = await api.get(`/rounds/leaderboard/${localGameId}`);
-      const sortedPlayers: { username: string; points: number }[] = Object.entries(response.data)
-        .map(([username, points]: [string, number]) => ({ username, points }))
+      const response_two = await api.get(`/rounds/score-difference/${localGameId}`);
+
+      const sortedPlayers: { username: string; points: number; prev_points: number }[] = Object.entries(response.data)
+        .map(([username, points]: [string, number]) => ({ username, points, prev_points: null }))
         .sort((a, b) => b.points - a.points);
+
+      if (parseInt(currentRound) !== 1) {
+        sortedPlayers.forEach((item) => {
+          const prevPoints = response_two.data[item.username];
+          if (prevPoints !== undefined) {
+            item.prev_points = prevPoints;
+          }
+        });
+      }
+
+      console.log(sortedPlayers);
       setPlayersPoints(sortedPlayers);
     } catch (error) {
       alert(
@@ -141,6 +154,7 @@ const Leader = () => {
       setLoading(false);
     }
   }
+
   const fetchPlayers = async () =>{
     try {
       setLoading(true);
@@ -150,9 +164,6 @@ const Leader = () => {
       setAllPlayers(response.data);
       setOnlinePlayers(response.data.length);
       console.log(response.data)
-      /*if(allPlayers.length!==0 && allPlayers.length===players_ready(allPlayers)){
-        start_game();
-      }*/
     } catch (error){
       alert(
         `Something went wrong during fetching the players: \n${handleError(error)}`
