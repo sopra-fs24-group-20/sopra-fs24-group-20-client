@@ -289,13 +289,10 @@
     left: 50%; /* Adjust initial position */
   }
   &.categories-text {
-    font-family: 'Cursive', sans-serif;
     font-size: 20px;
     color: white;
     -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: white;
-    text-stroke-width: 1px;
-    text-stroke-color: white;
   }
   &.loading-screen {
     display: flex;
