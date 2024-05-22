@@ -24,7 +24,7 @@ const Player = ({ user, index }) => {
         {user.username && user.username.replace(/^Guest:/, "")}
       </div>
       <div className="player-col">
-        {user.points}pt {user.prev_points !== null ? '+' + user.prev_points : ''}
+        {user.points}pt {user.prev_points !== null ? "+" + user.prev_points : ""}
       </div>
     </div>
   );
