@@ -21,7 +21,7 @@ const Player = ({ user, index }) => {
         {index + 1}.
       </div>
       <div className="player-col2">
-        {user.username}
+        {user.username && user.username.replace(/^Guest:/, "")}
       </div>
       <div className="player-col">
         {user.points}pt

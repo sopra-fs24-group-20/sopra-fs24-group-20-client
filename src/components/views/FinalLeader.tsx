@@ -14,14 +14,28 @@ const Player = ({ user, index }) => {
   // Define medal emojis
   const medalEmojis = ["🥇", "🥈", "🥉"];
 
+  // Determine confetti color based on index
+  const confettiColors = index === 0 ? ["#64f1f1","#9135a4","#ff03bf","#e8d152"] : index === 1 ? ["#64f1f1","#9135a4","#ff03bf","#c0c0c0"] : index === 2 ? ["#64f1f1","#9135a4","#ff03bf","#CD7F32"]: [];
+
   return (
     <div className="player-row">
       <div className="player-col">
-        {/* Render medal emoji or placeholder */}
         {index < 3 ? <span className="medal">{medalEmojis[index]}</span> : ""}
       </div>
-      <div className="player-col2">{user.username}</div>
-      <div className="player-col">{user.points}pt</div>
+      <div className="player-col2">
+        {user.username && user.username.replace(/^Guest:/, "")}
+      </div>
+      <div className="player-col">
+        {user.points}pt
+      </div>
+      {confettiColors.length > 0 && (
+        <Confetti
+          colors={confettiColors}
+          width={window.innerWidth}
+          numberOfPieces={500}
+          height={window.innerHeight}
+        />
+      )}
     </div>
   );
 };
@@ -36,7 +50,7 @@ const FinalLeader = () => {
   const [lobby, setLobby] = useState<Lobby[]>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [players, setPlayers] = useState([]);
-  const mockplayers = { "barbara": 30 , "paul": 25, "glory":20,"joshi":35 };
+  const mockplayers = { "barbara": 35 , "paul": 25, "glory":20,"joshi":35 };
   const localLobbyName = localStorage.getItem(("lobbyName"));
   const gameId = localStorage.getItem("gameId");
   const sortedMOCKPlayers: { username: string; points: number }[] = Object.entries(mockplayers)
@@ -90,12 +104,6 @@ const FinalLeader = () => {
               </li>
             ))}
           </ul>
-          <Confetti
-            colors={["#64f1f1","#9135a4","#ff03bf","#e8d152","#c0c0c0"]}
-            width={window.innerWidth}
-            numberOfPieces={500}
-            height={window.innerHeight}>
-          </Confetti>
         </div>
         <div className="authentication button-container">
           <Button width="100%" onClick={() => navigate(`/lobby/${localLobbyName}`)}>
