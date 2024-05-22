@@ -45,6 +45,8 @@ const Leader = () => {
   const localUsername = localStorage.getItem("username");
   const localLobbyId = localStorage.getItem(("lobbyId"));
   const localGameId = localStorage.getItem("gameId");
+  const currentRound = localStorage.getItem("currentRound");
+  const [rounds, setRounds] = useState<number>(1);
 
   const [readyPlayers, setReadyPlayers] = useState(0);
   const [onlinePlayers, setOnlinePlayers] = useState(0);
@@ -143,6 +145,8 @@ const Leader = () => {
     try {
       setLoading(true);
       const response = await api.get(`/lobby/players/${localLobbyId}`);
+      const second_response = await api.get(`/lobby/settings/${localLobbyId}`);
+      setRounds(second_response.data.rounds);
       setAllPlayers(response.data);
       setOnlinePlayers(response.data.length);
       console.log(response.data)
@@ -159,8 +163,8 @@ const Leader = () => {
   }
 
   const exit = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       if (webSocketService.connected){
         webSocketService.sendMessage("/app/leave", { username: localUsername , lobbyId: localLobbyId });
         await new Promise(resolve => setTimeout(resolve, 1000)); 
@@ -181,12 +185,22 @@ const Leader = () => {
     }
   };
 
+
   return (
     <BaseContainer>
       <div className="leaderboard container">
         <div className="leaderboard form">
+          <div className="authentication back-arrow">
+            <Button
+              className="secondary-button"
+              width="fit-content"
+              onClick={() => exit()}
+            >
+              Exit Lobby
+            </Button>
+          </div>
           <div className="leaderboard centered-text">
-            <h1>Ranking</h1>
+            <h1>Ranking of round {currentRound} of {rounds}</h1>
             <ul className="leaderboard user-list">
               {playersPoints.map((player, index) => (
                 <li key={index} className="leaderboard li">
@@ -205,9 +219,6 @@ const Leader = () => {
             >
               ready
             </Button>
-            <div>
-              <a className="lobby link" href="#" onClick={exit}>exit</a>
-            </div>
           </div>
         </div>
       </div>

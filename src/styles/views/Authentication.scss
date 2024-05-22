@@ -17,7 +17,7 @@
     justify-content: center;
     width: 60%;
     max-width: 30em;
-    height: 20em;
+    height: 23em;
     font-size: 16px;
     font-weight: 300;
     padding-left: 37px;
@@ -64,13 +64,11 @@
   }
   &.link {
     margin-top: 2em;
-    color: white;
-    text-decoration: underline;
+    color: white;;
   }
   &.link:visited {
     margin-top: 2em;
-    color: white;
-    text-decoration: underline;
+    color: white;;
   }
   &.checkbox-container input[type="checkbox"] {
     appearance: none;

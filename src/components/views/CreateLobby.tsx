@@ -166,6 +166,15 @@ const CreateLobby = () => {
     <BaseContainer>
       <div className="authentication container">
         <div className="authentication form">
+          <div className="authentication back-arrow">
+            <Button
+              className="secondary-button"
+              width="fit-content"
+              onClick={() => goBack()}
+            >
+              Back
+            </Button>
+          </div>
           <h1 className="authentication centered-text">Create Lobby</h1>
           {error && (
             <div className="authentication error-message">{error}</div>
@@ -198,11 +207,6 @@ const CreateLobby = () => {
           >
             Create Lobby
           </Button>
-        </div>
-        <div>
-          <a className="authentication link" href="#" onClick={goBack}>
-            Back
-          </a>
         </div>
       </div>
     </BaseContainer>
