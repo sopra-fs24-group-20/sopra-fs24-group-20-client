@@ -15,7 +15,7 @@ const Player = ({ user, index }) => {
   const medalEmojis = ["🥇", "🥈", "🥉"];
 
   // Determine confetti color based on index
-  const confettiColors = index === 1 ? ["#64f1f1","#9135a4","#ff03bf","#e8d152"] : index === 2 ? ["#64f1f1","#9135a4","#ff03bf","#c0c0c0"] : index === 3 ? ["#64f1f1","#9135a4","#ff03bf","#CD7F32"]: [];
+  const confettiColors = index === 1 ? ["#b9a741","#e8d152","#ecda74","#d0bc49"] : index === 2 ? ["#7a7a7a","#999999","#adadad","#c0c0c0"] : index === 3 ? ["#8f5823","#a46528","#b8722d","#CD7F32"]: [];
 
   return (
     <div className="player-row">
@@ -28,14 +28,16 @@ const Player = ({ user, index }) => {
       <div className="player-col">
         {user.points}pt
       </div>
-      {confettiColors.length > 0 && (
-        <Confetti
-          colors={confettiColors}
-          width={window.innerWidth}
-          numberOfPieces={500}
-          height={window.innerHeight}
-        />
-      )}
+      {(localStorage.getItem("username")) === user.username ?
+        <span>
+          <Confetti
+            colors={confettiColors}
+            width={window.innerWidth}
+            numberOfPieces={500}
+            height={window.innerHeight}
+          />
+        </span>:""
+      }
     </div>
   );
 };
