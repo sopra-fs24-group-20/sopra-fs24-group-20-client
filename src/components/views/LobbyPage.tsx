@@ -99,6 +99,7 @@ const LobbyPage = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [fetchLoaded, setFetchLoaded] = useState<boolean>(false);
   const [wsLoaded, setWsLoaded] = useState<boolean>(false);
+  const [owner, setOwner] = useState<boolean>(false);
   
   useEffect(() => {
     const fetchGameId = async () => {
@@ -140,9 +141,20 @@ const LobbyPage = () => {
   
         // Send the join message once connected
         await webSocketService.sendMessage("/app/join", { username: local_username, lobbyId: localLobbyId });
+        
       }
       
-
+      webSocketService.subscribe(
+        "/topic/lobby-leader",
+        async(message) => {
+          const messageData = JSON.parse(message.body);
+          console.log (messageData)
+          if (messageData && messageData.lobbyOwner.toString() === local_username && messageData.lobbyId.toSring() === localLobbyId){
+            setOwner(true);
+          }
+        }, 
+        {lobbyId: localLobbyId}
+      );
       webSocketService.subscribe(
         "/topic/ready-count",
         async (message) => {
@@ -169,7 +181,7 @@ const LobbyPage = () => {
         {lobbyId: localLobbyId}
       );
   
-      setWsLoaded(true);
+      
       // Cleanup function to unsubscribe when the component unmounts or dependencies change
 
       return () => {
@@ -180,6 +192,7 @@ const LobbyPage = () => {
   
     // Call the async function
     subscribeToWebSocket();
+    setWsLoaded(true);
 
     return () => {
       webSocketService.unsubscribe("/topic/ready-count");
@@ -191,6 +204,9 @@ const LobbyPage = () => {
 
   useEffect(() => {
     if (fetchLoaded && wsLoaded) {
+      if (webSocketService.connected){
+        webSocketService.sendMessage("/app/requestLeader", {lobbyId: localLobbyId });
+      }
       setLoading(false); // Set loading to false when both settings and letter are loaded
     }
   }, [fetchLoaded, wsLoaded]);
@@ -207,13 +223,6 @@ const LobbyPage = () => {
       alert(`Error starting game: ${handleError(error)}`);
     }
   };
-
-  /*useEffect(() => {
-    const intervalId = setInterval(fetchPlayers, 2000); // 2000 milliseconds = 2 seconds
-    
-    // Cleanup function to clear the interval when component unmounts or when allPlayers changes
-    return () => clearInterval(intervalId);
-  }, [allPlayers]);*/
   
 
   const exit = async () => {
@@ -221,10 +230,13 @@ const LobbyPage = () => {
       setLoading(true);
       if (webSocketService.connected){
         webSocketService.sendMessage("/app/leave", { username: local_username , lobbyId: localLobbyId });
+      }
+      await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
+      if (webSocketService.connected){
+        webSocketService.sendMessage("/app/leave", { username: local_username , lobbyId: localLobbyId });
         await new Promise(resolve => setTimeout(resolve, 1000)); 
         await webSocketService.disconnect();
       }
-      await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
       localStorage.removeItem("lobbyName");
       localStorage.removeItem("lobbyId");
       localStorage.removeItem("gameId");
@@ -291,11 +303,13 @@ const LobbyPage = () => {
             >
               Exit Lobby
             </Button>
-            <div className="lobby settings"
-              onClick={() => navigate(`/settings/${localLobbyName}`)}
-            >
-              ⚙️
-            </div>
+            {owner && (
+              <div className="lobby settings"
+                onClick={() => navigate(`/settings/${localLobbyName}`)}
+              >
+                ⚙️
+              </div>
+            )}
           </div>
           <div className="lobby centered-text">
             <h1 className="lobby title">{localLobbyName}</h1>
