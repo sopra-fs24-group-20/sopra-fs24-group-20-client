@@ -49,6 +49,7 @@ const Settings = () => {
   const [saveConfirmation, setSaveConfirmation] = useState(null);
   const [roundsError, setRoundsError] = useState(null);
   const [timeError, setTimeError] = useState(null);
+  const [excludedCharError, setExcludedCharError] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -85,12 +86,15 @@ const Settings = () => {
   const saveChanges = async () => {
     try {
 
-      if (settings.roundDuration < 10 || settings.roundDuration > 300 || settings.rounds < 1 || settings.rounds > 10) {
+      if (settings.roundDuration < 10 || settings.roundDuration > 300 || settings.rounds < 1 || settings.rounds > 10 || settings.excludedChars.length > 10) {
         if (settings.roundDuration < 10 || settings.roundDuration > 300) {
           setTimeError("Time must be between 10 and 300 seconds");
         }
         if (settings.rounds < 1 || settings.rounds > 10) {
           setRoundsError("Number of rounds must be between 1 and 10");
+        }
+        if (settings.excludedChars.length > 10) {
+          setExcludedCharError("The maximum number of excluded letters is 10");
         }
 
         return;
@@ -208,6 +212,9 @@ const Settings = () => {
                 }
                 type="text"
               />
+              {excludedCharError && (
+                <div className="settings error-message">{excludedCharError}</div>
+              )}
             </div>
             <div className="settings column">
               Game Mode
