@@ -243,6 +243,7 @@ const Leader = () => {
               className="secondary-button"
               width="fit-content"
               onClick={() => exit()}
+              style={{marginTop: "10px"}}
             >
               Exit Lobby
             </Button>
@@ -264,6 +265,7 @@ const Leader = () => {
               width="60%"
               onClick={local_ready}
               disabled={readyButtonClicked}
+              style={{marginBottom: "10px"}}
             >
               ready
             </Button>
