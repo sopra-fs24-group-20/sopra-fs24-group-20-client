@@ -7,9 +7,13 @@
     align-items: center; /* Aligns items vertically in the center */
   }
 
-  
   .exit-button {
     order: -1; /* Puts the exit button to the left side */
+  }
+
+  &.main-container {
+    display: flex;
+    flex-direction: row;
   }
   
   &.settings{
@@ -25,6 +29,9 @@
     /* we include the center mixin defined in _theme.scss and save three duplicate lines :) */
     @include center;
     flex-direction: column;
+    flex: 1;
+    padding: 10px;
+    height: 30em;
   }
   &.centered-text {
     text-align: center;

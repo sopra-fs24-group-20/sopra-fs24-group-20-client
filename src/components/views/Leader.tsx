@@ -76,7 +76,7 @@ const Leader = () => {
         await webSocketService.sendMessage("/app/join", { username: localUsername, lobbyId: localLobbyId });
       }
     
-      const subscription = webSocketService.subscribe(
+      webSocketService.subscribe(
         "/topic/ready-count",
         async (message) => {
           const messageData = JSON.parse(message.body);
@@ -85,23 +85,40 @@ const Leader = () => {
           console.log("Received messageData:", messageData.lobbyId);
           if (messageData.command === "start" && messageData.lobbyId.toString() === localLobbyId) {
             await start_game();
-          } else {
-            const readyPlayersCount = messageData.readyPlayers !== undefined ? messageData.readyPlayers : 0;
-            const onlinePlayersCount = messageData.onlinePlayers !== undefined ? messageData.onlinePlayers : 0;
-            setReadyPlayers(readyPlayersCount.toString());
-            setOnlinePlayers(onlinePlayersCount.toString());
-            fetchPlayers();
-            fetchPoints();
-          }
+          } 
         },
         { lobbyId: localLobbyId, username: localUsername }
       );
 
+      webSocketService.subscribe(
+        "/topic/online-players",
+        async (message) => {
+          const messageData = JSON.parse(message.body);
+          console.log(messageData);
+          if (messageData && messageData.lobbyId.toString() === localLobbyId){
+            console.log("in ig of online players")
+            const { readyPlayers, onlinePlayers } = messageData; // Destructuring to extract readyPlayers and onlinePlayers
+            
+            setReadyPlayers(readyPlayers);
+            console.log("ready players set");
+            setOnlinePlayers(onlinePlayers);
+            console.log("online players set");
+            
+          }
+        },
+        {lobbyId: localLobbyId}
+      );
+
       return () => {
-        webSocketService.unsubscribe(subscription);
+        webSocketService.unsubscribe("/topic/ready-count");
+        webSocketService.unsubscribe("/topic/online-players");
       };
     };
     subscribeToWebSocket();
+    return () => {
+      webSocketService.unsubscribe("/topic/ready-count");
+      webSocketService.unsubscribe("/topic/online-players");
+    }
   }, []);
 
   const local_ready = async () => {
@@ -175,13 +192,13 @@ const Leader = () => {
 
   const exit = async () => {
     setLoading(true);
+    await api.put(`/lobby/leave/${localLobbyId}?username=${localUsername}`);
     try {
       if (webSocketService.connected){
         webSocketService.sendMessage("/app/leave", { username: localUsername , lobbyId: localLobbyId });
         await new Promise(resolve => setTimeout(resolve, 1000)); 
         await webSocketService.disconnect();
       }
-      await api.put(`/lobby/leave/${localLobbyId}?username=${localUsername}`);
       localStorage.removeItem("lobbyName");
       localStorage.removeItem("lobbyId");
       localStorage.removeItem("gameId");
