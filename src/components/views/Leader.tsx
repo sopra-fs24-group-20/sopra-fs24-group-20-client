@@ -115,6 +115,7 @@ const Leader = () => {
       };
     };
     subscribeToWebSocket();
+    
     return () => {
       webSocketService.unsubscribe("/topic/ready-count");
       webSocketService.unsubscribe("/topic/online-players");
