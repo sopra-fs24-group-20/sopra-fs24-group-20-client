@@ -122,23 +122,6 @@ const LobbyPage = () => {
     fetchGameId();
   }, [])
 
-  useEffect(() => {
-    const fetchHost = async () => {
-      try{
-        const response = await api.get(`/lobby/settings/${localLobbyId}`);
-        if (local_username === response.data.lobbyOwner.username) {
-          setOwner(true);
-        }
-        setHostLoaded(true);
-      }catch(error){
-        alert(
-          `Something went wrong when fetching the settings: \n${handleError(error)}`
-        );
-      }
-    }
-    fetchHost();
-  }, [allPlayers])
-
 
   useEffect(() => {
     const subscribeToWebSocket = async () => {
@@ -277,12 +260,21 @@ const LobbyPage = () => {
       setAllPlayers(response.data);
       setOnlinePlayers(response.data.length);
       console.log(allPlayers)
-      /*if(allPlayers.length!==0 && allPlayers.length===players_ready(allPlayers)){
-        start_game();
-      }*/
     } catch (error){
       alert(
         `Something went wrong during fetching the players: \n${handleError(error)}`
+      );
+    }
+
+    try{
+      const response = await api.get(`/lobby/settings/${localLobbyId}`);
+      if (local_username === response.data.lobbyOwner.username) {
+        setOwner(true);
+      }
+      setHostLoaded(true);
+    }catch(error){
+      alert(
+        `Something went wrong when fetching the settings: \n${handleError(error)}`
       );
     }
   }
