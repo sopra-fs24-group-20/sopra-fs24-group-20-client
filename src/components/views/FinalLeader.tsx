@@ -21,7 +21,7 @@ const Player = ({ user, index }) => {
   return (
     <div className="player-row">
       <div className="player-col">
-        {index < 4 ? <span className="medal">{medalEmojis[index-1]}</span> : ""}
+        {index < 4 ? <span className="medal">{medalEmojis[index - 1]}</span> : <span>{index}.</span>}
       </div>
       <div className="player-col2">
         {user.username && user.username.replace(/^Guest:/, "")}

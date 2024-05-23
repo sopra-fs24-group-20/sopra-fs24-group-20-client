@@ -50,6 +50,11 @@
   .round-button-red.clicked {
     background-color: darkred;
   }
+  .round-button-red:disabled {
+    background-color: transparent;
+    color: black;
+    cursor: not-allowed;
+  }
   .round-button-green {
     display: inline-block;
     padding: 14px;
@@ -70,6 +75,12 @@
 
   .round-button-green.clicked {
     background-color: darkcyan;
+  }
+
+  .round-button-green:disabled {
+    background-color: transparent;
+    color: black;
+    cursor: not-allowed;
   }
 
   &.transparent-form-normal {
@@ -388,7 +399,7 @@
     justify-content: center;
     max-width: 2em;
     min-width: 2em;
-    margin-bottom: 0.43em;
+    margin-bottom: 0.8em;
     height: 2em;
     padding: 5%;
     background-image: linear-gradient(0deg, $accentBottomLight, $accentMiddleLight, $accentTopLight);
