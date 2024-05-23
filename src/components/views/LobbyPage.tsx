@@ -223,7 +223,7 @@ const LobbyPage = () => {
       );
 
       webSocketService.subscribe(
-        "user/queue/ping", 
+        "/topic/queue/ping", 
         async(message) =>{
           const messageData = JSON.parse(message.body);
           console.log("ping received", messageData);
@@ -241,7 +241,7 @@ const LobbyPage = () => {
       return () => {
         webSocketService.unsubscribe("/topic/ready-count");
         webSocketService.unsubscribe("/topic/online-players");
-        webSocketService.unsubscribe("/user/queue/ping");
+        webSocketService.unsubscribe("/topic/queue/ping");
       };
     };
 
@@ -251,7 +251,7 @@ const LobbyPage = () => {
     return () => {
       webSocketService.unsubscribe("/topic/ready-count");
       webSocketService.unsubscribe("/topic/online-players");
-      webSocketService.unsubscribe("/user/queue/ping");
+      webSocketService.unsubscribe("/topic/queue/ping");
     }
 
     // Empty dependency array means this effect runs once when the component mounts
