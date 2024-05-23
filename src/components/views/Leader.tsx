@@ -39,7 +39,7 @@ const Leader = () => {
   const navigate = useNavigate();
   const [playersPoints, setPlayersPoints] = useState([]);
   const [allPlayers, setAllPlayers] = useState([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const localLobbyName = localStorage.getItem(("lobbyName"));
   const localUsername = localStorage.getItem("username");
@@ -52,6 +52,9 @@ const Leader = () => {
   const [onlinePlayers, setOnlinePlayers] = useState(0);
 
   const [readyButtonClicked, setButtonClicked] = useState(false);
+
+  const [playersFetched, setPlayersFetched] = useState<boolean>(false);
+  const [pointsFetched, setPointsFetched] = useState<boolean>(false);
 
   useEffect(() => {
     fetchPlayers();
@@ -122,6 +125,12 @@ const Leader = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (playersFetched && pointsFetched) {
+      setLoading(false); // Set loading to false when both settings and letter are loaded
+    }
+  }, [playersFetched, pointsFetched]);
+
   const local_ready = async () => {
     try {
       await api.put(`/players/${localUsername}`, JSON.stringify({ready: true}));
@@ -135,6 +144,7 @@ const Leader = () => {
   };
   const start_game = async () => {
     try {
+      setLoading(true);
       await api.put(`/players/${localUsername}`, JSON.stringify({ready: false}));
       navigate(`/game/${localLobbyName}`);
     } catch (error) {
@@ -145,7 +155,7 @@ const Leader = () => {
   };
   const fetchPoints = async () => {
     try {
-      setLoading(true);
+      
       const response = await api.get(`/rounds/leaderboard/${localGameId}`);
       const response_two = await api.get(`/rounds/score-difference/${localGameId}`);
 
@@ -160,17 +170,17 @@ const Leader = () => {
             item.prev_points = prevPoints;
           }
         });
+        
       }
 
       console.log(sortedPlayers);
       setPlayersPoints(sortedPlayers);
+      setPointsFetched(true);
     } catch (error) {
       alert(
         `Something went wrong during fetching the points: \n${handleError(error)}`
       );
-    } finally {
-      setLoading(false);
-    }
+    } 
   }
 
   const fetchPlayers = async () =>{
@@ -182,13 +192,12 @@ const Leader = () => {
       setAllPlayers(response.data);
       setOnlinePlayers(response.data.length);
       console.log(response.data)
+      setPlayersFetched(true);
     } catch (error){
       alert(
         `Something went wrong during fetching the players: \n${handleError(error)}`
       );
-    } finally {
-      setLoading(false);
-    }
+    } 
   }
 
   const exit = async () => {
@@ -233,6 +242,16 @@ const Leader = () => {
   };
 
   const ranks = calculateRanks(playersPoints);
+
+  if (loading) {
+    return (
+      <div className="authentication container">
+        <div className="authentication form">
+          <CategoriesLoadingScreen />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <BaseContainer>
