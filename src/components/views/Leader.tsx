@@ -18,7 +18,7 @@ const Player = ({ user, index }) => {
   return (
     <div className="player-row">
       <div className="player-col">
-        {index + 1}.
+        {index}.
       </div>
       <div className="player-col2">
         {user.username && user.username.replace(/^Guest:/, "")}
@@ -196,6 +196,25 @@ const Leader = () => {
     }
   };
 
+  const calculateRanks = (players) => {
+    if (!players.length) return [];
+
+    const ranks = [];
+    let rank = 1;
+    let prevPoints = players[0].points;
+
+    for (let i = 0; i < players.length; i++) {
+      if (i > 0 && players[i].points < prevPoints) {
+        rank = i + 1;
+      }
+      ranks.push(rank);
+      prevPoints = players[i].points;
+    }
+
+    return ranks;
+  };
+
+  const ranks = calculateRanks(playersPoints);
 
   return (
     <BaseContainer>
@@ -215,7 +234,7 @@ const Leader = () => {
             <ul className="leaderboard user-list">
               {playersPoints.map((player, index) => (
                 <li key={index} className="leaderboard li">
-                  <Player user={player} index={index} />
+                  <Player user={player} index={ranks[index]} />
                 </li>
               ))}
             </ul> 

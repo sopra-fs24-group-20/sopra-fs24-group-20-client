@@ -15,12 +15,12 @@ const Player = ({ user, index }) => {
   const medalEmojis = ["🥇", "🥈", "🥉"];
 
   // Determine confetti color based on index
-  const confettiColors = index === 0 ? ["#64f1f1","#9135a4","#ff03bf","#e8d152"] : index === 1 ? ["#64f1f1","#9135a4","#ff03bf","#c0c0c0"] : index === 2 ? ["#64f1f1","#9135a4","#ff03bf","#CD7F32"]: [];
+  const confettiColors = index === 1 ? ["#64f1f1","#9135a4","#ff03bf","#e8d152"] : index === 2 ? ["#64f1f1","#9135a4","#ff03bf","#c0c0c0"] : index === 3 ? ["#64f1f1","#9135a4","#ff03bf","#CD7F32"]: [];
 
   return (
     <div className="player-row">
       <div className="player-col">
-        {index < 3 ? <span className="medal">{medalEmojis[index]}</span> : ""}
+        {index < 4 ? <span className="medal">{medalEmojis[index-1]}</span> : ""}
       </div>
       <div className="player-col2">
         {user.username && user.username.replace(/^Guest:/, "")}
@@ -80,6 +80,26 @@ const FinalLeader = () => {
     fetchData();
   }, []);
 
+  const calculateRanks = (players) => {
+    if (!players.length) return [];
+
+    const ranks = [];
+    let rank = 1;
+    let prevPoints = players[0].points;
+
+    for (let i = 0; i < players.length; i++) {
+      if (i > 0 && players[i].points < prevPoints) {
+        rank = i + 1;
+      }
+      ranks.push(rank);
+      prevPoints = players[i].points;
+    }
+
+    return ranks;
+  };
+
+  const ranks = calculateRanks(players);
+
   if (loading) {
     return (
       <BaseContainer>
@@ -100,7 +120,7 @@ const FinalLeader = () => {
           <ul className="leaderboard user-list">
             {players.map((player, index) => (
               <li key={index} className="leaderboard li">
-                <Player user={player} index={index} />
+                <Player user={player} index={ranks[index]} />
               </li>
             ))}
           </ul>
