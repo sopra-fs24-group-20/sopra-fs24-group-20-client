@@ -18,6 +18,7 @@ const FormField = (props) => {
         placeholder="enter here.."
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
+        disabled={props.disabled}
       />
     </div>
   );
@@ -27,6 +28,7 @@ FormField.propTypes = {
   label: PropTypes.string,
   value: PropTypes.string,
   onChange: PropTypes.func,
+  disabled: PropTypes.bool,
 };
 
 const Game = () => {
@@ -50,6 +52,7 @@ const Game = () => {
   const [positionLoaded, setPositionLoaded] = useState(false);
   const [players, setPlayers] = useState<string[]>([]);
   const [roundsHandled, setRoundsHandled] = useState<boolean>(false);
+  const[inputDisabled, setInputDisabled] = useState<boolean>(false);
 
   useEffect(() => {
 
@@ -169,27 +172,6 @@ const Game = () => {
         
         return;
       }
-    /*setTimeout(async () => {
-      const answer = getFormattedData();
-      console.log("answer", answer);
-      console.log("got formatted data");
-
-      // Record the submission time
-      const submissionTime = new Date();
-
-      // Send the answers to the backend for verification
-      try {
-        const response = await api.post(`/rounds/${gameId}/entries`, answer);
-        if (response.status === 200){
-          console.log("submitted answers");
-          webSocketService.sendMessage("/app/game-submitted", {username: username, lobbyId: lobbyId});
-          setLoading(true);
-        }
-      } catch (error) {
-        setError("Error submitting data");
-
-        return;
-      }*/
     };
     setTimeout(submitData, delayInSeconds * 1000);
 
@@ -298,10 +280,12 @@ const Game = () => {
     if (countdown === 0) {
       clearInterval(countdownInterval); // Stop the countdown timer
       // Perform actions when countdown reaches 0
+      setInputDisabled(true);
       setShowStopPopup(true); // Show the popup when receiving the stop command
       setTimeout(() => {
-        setShowStopPopup(false); // Hide the popup after 4 seconds
-      }, 4000);
+        setShowStopPopup(false);
+        setLoading(true); // Hide the popup after 4 seconds
+      }, 5000);
       doStop();
     }
   }, [countdown]);
@@ -350,6 +334,7 @@ const Game = () => {
               onChange={(value: string) =>
                 handleInputChange(category, value)
               }
+              disabled={inputDisabled} 
             />
           ))}
         </div>
