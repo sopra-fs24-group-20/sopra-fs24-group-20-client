@@ -109,6 +109,7 @@ const LobbyPage = () => {
         if (response.status === 200){
           localStorage.setItem("gameId", response.data.toString());
           localStorage.setItem("currentRound", "0");
+          console.log(localLobbyId);
           await fetchPlayers();
           setFetchLoaded(true);
         }
