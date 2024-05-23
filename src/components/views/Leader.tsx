@@ -76,7 +76,7 @@ const Leader = () => {
         await webSocketService.sendMessage("/app/join", { username: localUsername, lobbyId: localLobbyId });
       }
     
-      const subscription = webSocketService.subscribe(
+      webSocketService.subscribe(
         "/topic/ready-count",
         async (message) => {
           const messageData = JSON.parse(message.body);
@@ -90,18 +90,24 @@ const Leader = () => {
             const onlinePlayersCount = messageData.onlinePlayers !== undefined ? messageData.onlinePlayers : 0;
             setReadyPlayers(readyPlayersCount.toString());
             setOnlinePlayers(onlinePlayersCount.toString());
-            fetchPlayers();
-            fetchPoints();
+            if (onlinePlayers !== 0){
+              fetchPlayers();
+              fetchPoints();
+            }
+            
           }
         },
         { lobbyId: localLobbyId, username: localUsername }
       );
 
       return () => {
-        webSocketService.unsubscribe(subscription);
+        webSocketService.unsubscribe("/topic/ready-count");
       };
     };
     subscribeToWebSocket();
+    return () => {
+      webSocketService.unsubscribe("/topic/ready-count");
+    }
   }, []);
 
   const local_ready = async () => {

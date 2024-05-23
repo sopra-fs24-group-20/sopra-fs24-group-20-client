@@ -163,10 +163,23 @@ const LobbyPage = () => {
           const messageData = JSON.parse(message.body);
           console.log(messageData);
           if (messageData && messageData.lobbyId.toString() === localLobbyId){
+            console.log("in ig of online players")
             const { readyPlayers, onlinePlayers } = messageData; // Destructuring to extract readyPlayers and onlinePlayers
-            setReadyPlayers(readyPlayers);
-            setOnlinePlayers(onlinePlayers);
-            fetchPlayers();
+            if (onlinePlayers !== 0){
+              setReadyPlayers(readyPlayers);
+              console.log("ready players set");
+              setOnlinePlayers(onlinePlayers);
+              console.log("online players set");
+              await fetchPlayers();
+              console.log("fetched players and lobby host");
+            }
+            else{
+              setReadyPlayers(readyPlayers);
+              console.log("ready players set");
+              setOnlinePlayers(onlinePlayers);
+              console.log("online players set");
+            }
+            
           }
         },
         {lobbyId: localLobbyId}
@@ -222,12 +235,12 @@ const LobbyPage = () => {
   const exit = async () => {
     try {
       setLoading(true);
+      await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
       if (webSocketService.connected){
         webSocketService.sendMessage("/app/leave", { username: local_username , lobbyId: localLobbyId });
         await new Promise(resolve => setTimeout(resolve, 1000)); 
         await webSocketService.disconnect();
       }
-      await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
       localStorage.removeItem("lobbyName");
       localStorage.removeItem("lobbyId");
       localStorage.removeItem("gameId");
