@@ -221,6 +221,18 @@ const LobbyPage = () => {
         },
         {lobbyId: localLobbyId}
       );
+
+      /*webSocketService.subscribe(
+        "user/queue/ping", 
+        async(message) =>{
+          const messageData = JSON.parse(message.body);
+          console.log("ping received", messageData);
+          if (messageData && messageData.lobbyId.toString() === localLobbyId){
+
+          }
+        }
+
+      )*/
   
       setWsLoaded(true);
       // Cleanup function to unsubscribe when the component unmounts or dependencies change
