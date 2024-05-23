@@ -9,6 +9,7 @@ import "styles/views/Authentication.scss";
 import { Lobby, User } from "types";
 import Confetti from "react-confetti";
 import CategoriesLoadingScreen from "components/ui/LoadingScreen";
+import LobbyPage from "./LobbyPage";
 
 const Player = ({ user, index }) => {
   // Define medal emojis
@@ -53,6 +54,7 @@ const FinalLeader = () => {
   const mockplayers = { "barbara": 35 , "paul": 25, "glory":20,"joshi":35 };
   const localLobbyName = localStorage.getItem(("lobbyName"));
   const gameId = localStorage.getItem("gameId");
+  const lobbyId = localStorage.getItem("lobbyId");
   const sortedMOCKPlayers: { username: string; points: number }[] = Object.entries(mockplayers)
     .map(([username, points]: [string, number]) => ({ username, points }))
     .sort((a, b) => b.points - a.points);
@@ -80,6 +82,20 @@ const FinalLeader = () => {
     fetchData();
   }, []);
 
+
+  const returnToLobby = async () => {
+    try {
+      const response = await api.post(`/game/done/${lobbyId}`);
+      if (response.status === 200){
+        console.log("sucessfully reset points")
+        navigate(`/lobby/${localLobbyName}`);
+      }
+    }catch(error){
+      alert("failed to reset points");
+    }
+      
+  }
+
   const calculateRanks = (players) => {
     if (!players.length) return [];
 
@@ -99,6 +115,7 @@ const FinalLeader = () => {
   };
 
   const ranks = calculateRanks(players);
+
 
   if (loading) {
     return (
@@ -126,7 +143,8 @@ const FinalLeader = () => {
           </ul>
         </div>
         <div className="authentication button-container">
-          <Button width="100%" onClick={() => navigate(`/lobby/${localLobbyName}`)}>
+          <Button width="100%" 
+            onClick = {() => returnToLobby()}>
             Back to Lobby
           </Button>
         </div>
