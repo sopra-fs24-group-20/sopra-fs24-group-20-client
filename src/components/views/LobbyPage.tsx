@@ -138,7 +138,7 @@ const LobbyPage = () => {
   const [roundsError, setRoundsError] = useState(null);
   const [timeError, setTimeError] = useState(null);
   const [excludedCharError, setExcludedCharError] = useState(null);
-
+  
   useEffect(() => {
     const fetchGameId = async () => {
       try{
@@ -167,7 +167,7 @@ const LobbyPage = () => {
       if (!webSocketService.connected) {
         // Establish websocket connection
         webSocketService.connect();
-
+  
         // Wait until actually connected to websocket
         await new Promise<void>((resolve) => {
           const interval = setInterval(() => {
@@ -177,11 +177,11 @@ const LobbyPage = () => {
             }
           }, 100);
         });
-
+  
         // Send the join message once connected
         await webSocketService.sendMessage("/app/join", { username: local_username, lobbyId: localLobbyId });
       }
-
+      
 
       webSocketService.subscribe(
         "/topic/ready-count",
@@ -216,44 +216,29 @@ const LobbyPage = () => {
               setOnlinePlayers(onlinePlayers);
               console.log("online players set");
             }
-
+            
           }
         },
         {lobbyId: localLobbyId}
       );
-
-      webSocketService.subscribe(
-        "/topic/ping", 
-        async(message) =>{
-          // const messageData = JSON.parse(message.body);
-          // console.log("ping received", messageData);
-          if (message){
-            webSocketService.sendMessage("/app/pong", {username: local_username, lobbyId: localLobbyId})
-          }
-        }
-
-      )
   
-
       setWsLoaded(true);
       // Cleanup function to unsubscribe when the component unmounts or dependencies change
 
       return () => {
         webSocketService.unsubscribe("/topic/ready-count");
         webSocketService.unsubscribe("/topic/online-players");
-        webSocketService.unsubscribe("/topic/ping");
       };
     };
-
+  
     // Call the async function
     subscribeToWebSocket();
 
     return () => {
       webSocketService.unsubscribe("/topic/ready-count");
       webSocketService.unsubscribe("/topic/online-players");
-      webSocketService.unsubscribe("/topic/ping");
     }
-
+    
     // Empty dependency array means this effect runs once when the component mounts
   }, []);
 
@@ -262,7 +247,7 @@ const LobbyPage = () => {
       setLoading(false); // Set loading to false when both settings and letter are loaded
     }
   }, [fetchLoaded, wsLoaded]);
-
+  
 
   const handleStartGame = async () => {
     try {
@@ -276,21 +261,13 @@ const LobbyPage = () => {
     }
   };
 
-  /*useEffect(() => {
-    const intervalId = setInterval(fetchPlayers, 2000); // 2000 milliseconds = 2 seconds
-    
-    // Cleanup function to clear the interval when component unmounts or when allPlayers changes
-    return () => clearInterval(intervalId);
-  }, [allPlayers]);*/
-
-
   const exit = async () => {
     try {
       setLoading(true);
       await api.put(`/lobby/leave/${localLobbyId}?username=${local_username}`);
       if (webSocketService.connected){
         webSocketService.sendMessage("/app/leave", { username: local_username , lobbyId: localLobbyId });
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 1000)); 
         await webSocketService.disconnect();
       }
       localStorage.removeItem("lobbyName");
@@ -376,12 +353,9 @@ const LobbyPage = () => {
   const saveChanges = async () => {
     try {
 
-      if (settings.roundDuration < 10 || settings.roundDuration > 180 || settings.rounds < 1 || settings.rounds > 10 || settings.excludedChars.length > 10) {
-        setTimeError(null);
-        setRoundsError(null);
-        setExcludedCharError(null);
-        if (settings.roundDuration < 10 || settings.roundDuration > 180) {
-          setTimeError("Time must be between 10 and 180 seconds");
+      if (settings.roundDuration < 10 || settings.roundDuration > 300 || settings.rounds < 1 || settings.rounds > 10 || settings.excludedChars.length > 10) {
+        if (settings.roundDuration < 10 || settings.roundDuration > 300) {
+          setTimeError("Time must be between 10 and 300 seconds");
         }
         if (settings.rounds < 1 || settings.rounds > 10) {
           setRoundsError("Number of rounds must be between 1 and 10");
@@ -455,7 +429,6 @@ const LobbyPage = () => {
               <Button
                 className="secondary-button exit-button"
                 onClick={exit}
-                style={{marginTop: "10px"}}
               >
                 Exit Lobby
               </Button>
@@ -480,7 +453,6 @@ const LobbyPage = () => {
                 width="60%"
                 onClick={local_ready}
                 disabled={readyButtonClicked}
-                style={{marginBottom: "10px"}}
               >
                 Ready
               </Button>
