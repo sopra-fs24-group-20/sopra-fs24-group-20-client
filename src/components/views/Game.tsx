@@ -16,7 +16,7 @@ const FormField = (props) => {
       <input
         className="game input"
         placeholder="enter here.."
-        value={props.value.slice(0, 40)}
+        value={props.value.slice(0, 30)}
         onChange={(e) => props.onChange(e.target.value)}
         disabled={props.disabled}
       />
@@ -291,7 +291,7 @@ const Game = () => {
   }, [countdown]);
 
   const handleInputChange = (category: string, value: string) => {
-    const truncatedValue = value.slice(0, 40);
+    const truncatedValue = value.slice(0, 30);
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
       [category]: truncatedValue,
