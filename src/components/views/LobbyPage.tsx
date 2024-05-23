@@ -430,7 +430,7 @@ const LobbyPage = () => {
 
   return (
     <BaseContainer>
-      <div className={`lobby main-container ${owner ? 'owner' : ''}`}>
+      <div className={"lobby main-container ${owner ? 'owner' : ''}"}>
         <div className="lobby container">
           <div className="lobby form" style={{ width: owner ? "100%" : "60%" }}>
             <div className="lobby header">
