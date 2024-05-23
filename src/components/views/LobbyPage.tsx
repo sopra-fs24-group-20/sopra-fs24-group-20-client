@@ -289,7 +289,7 @@ const LobbyPage = () => {
               className="secondary-button exit-button"
               onClick={exit}
             >
-              Exit
+              Exit Lobby
             </Button>
             <div className="lobby settings"
               onClick={() => navigate(`/settings/${localLobbyName}`)}
