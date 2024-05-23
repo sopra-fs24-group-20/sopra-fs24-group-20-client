@@ -222,17 +222,17 @@ const LobbyPage = () => {
         {lobbyId: localLobbyId}
       );
 
-      /*webSocketService.subscribe(
+      webSocketService.subscribe(
         "user/queue/ping", 
         async(message) =>{
           const messageData = JSON.parse(message.body);
           console.log("ping received", messageData);
-          if (messageData && messageData.lobbyId.toString() === localLobbyId){
-
+          if (messageData){
+            webSocketService.sendMessage("/app/pong", {username: local_username, lobbyId: localLobbyId})
           }
         }
 
-      )*/
+      )
   
       setWsLoaded(true);
       // Cleanup function to unsubscribe when the component unmounts or dependencies change
@@ -240,6 +240,7 @@ const LobbyPage = () => {
       return () => {
         webSocketService.unsubscribe("/topic/ready-count");
         webSocketService.unsubscribe("/topic/online-players");
+        webSocketService.unsubscribe("/user/queue/ping");
       };
     };
   
@@ -249,6 +250,7 @@ const LobbyPage = () => {
     return () => {
       webSocketService.unsubscribe("/topic/ready-count");
       webSocketService.unsubscribe("/topic/online-players");
+      webSocketService.unsubscribe("/user/queue/ping");
     }
     
     // Empty dependency array means this effect runs once when the component mounts
