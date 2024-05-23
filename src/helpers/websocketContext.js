@@ -45,11 +45,15 @@ class WebSocketService {
 
   subscribe(topic, callback, payloadParams = {}) {
     if (this.connected && this.client) {
-      const subscription = this.client.subscribe(topic, (message) => {
-        callback(message);
-      }, payloadParams);
-      this.subscriptions[topic] = subscription;
-      console.log(`Subscribed to ${topic}`);
+      try {
+        const subscription = this.client.subscribe(topic, (message) => {
+          callback(message);
+        }, payloadParams);
+        this.subscriptions[topic] = subscription;
+        console.log(`Subscribed to ${topic}`);
+      } catch (error) {
+        console.error(`Failed to subscribe to ${topic}: ${error.message}`);
+      }
     } else {
       console.warn("WebSocket is not connected. Subscription not added.");
       this.subscriptions[topic] = callback;
