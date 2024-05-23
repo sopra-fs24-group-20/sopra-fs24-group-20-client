@@ -7,6 +7,7 @@ import "styles/views/Lobby.scss";
 import webSocketService from "helpers/websocketContext";
 import "styles/views/Authentication.scss";
 import CategoriesLoadingScreen from "components/ui/LoadingScreen";
+import "styles/views/Settings.scss";
 
 import PropTypes from "prop-types";
 // @ts-ignore
@@ -83,6 +84,34 @@ const Player = ({ user }) => (
   </div>
 );
 
+const FormField = (props) => {
+  return (
+    <div className="settings field">
+      <input
+        className="settings input"
+        placeholder={props.placeholder}
+        value={props.value}
+        type={props.type}
+        onChange={(e) => props.onChange(e.target.value)}
+      />
+      {props.showDelete && (
+        <div className="settings delete" onClick={props.onDelete}>
+          ❌
+        </div>
+      )}
+    </div>
+  );
+};
+
+FormField.propTypes = {
+  placeholder: PropTypes.string,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+  onDelete: PropTypes.func,
+  type: PropTypes.string,
+  showDelete: PropTypes.bool,
+};
+
 Player.propTypes = {
   user: PropTypes.object,
 };
@@ -101,6 +130,14 @@ const LobbyPage = () => {
   const [wsLoaded, setWsLoaded] = useState<boolean>(false);
   const [hostLoaded, setHostLoaded] = useState<boolean>(false);
   const [owner, setOwner] = useState<boolean>(false);
+  const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
+  const [settings, setSettings] = useState({ categories: [], gameMode: 1 });
+  const [disableSave, setDisableSave] = useState(false);
+  const [error, setError] = useState(null);
+  const [saveConfirmation, setSaveConfirmation] = useState(null);
+  const [roundsError, setRoundsError] = useState(null);
+  const [timeError, setTimeError] = useState(null);
+  const [excludedCharError, setExcludedCharError] = useState(null);
   
   useEffect(() => {
     const fetchGameId = async () => {
@@ -206,7 +243,7 @@ const LobbyPage = () => {
   }, []);
 
   useEffect(() => {
-    if (fetchLoaded && wsLoaded && hostLoaded) {
+    if (fetchLoaded && wsLoaded && hostLoaded && settingsLoaded) {
       setLoading(false); // Set loading to false when both settings and letter are loaded
     }
   }, [fetchLoaded, wsLoaded]);
@@ -293,6 +330,92 @@ const LobbyPage = () => {
     }
   }
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (Object.keys(settings).length === 0) {
+      fetchData();
+    }
+    validateCategories();
+  }, [settings]);
+
+  const fetchData = async () => {
+    try {
+      const response = await api.get(`/lobby/settings/${localLobbyId}`);
+      setSettings(response.data);
+      console.log(response.data);
+    } catch (error) {
+      alert(`Something went wrong during fetching the settings: \n${handleError(error)}`);
+    } finally {
+      setSettingsLoaded(true);
+    }
+  };
+
+  const validateCategories = () => {
+    const isEmpty = settings.categories.some((category) => category.trim() === "");
+    setDisableSave(isEmpty);
+  };
+
+  const saveChanges = async () => {
+    try {
+
+      if (settings.roundDuration < 10 || settings.roundDuration > 300 || settings.rounds < 1 || settings.rounds > 10 || settings.excludedChars.length > 10) {
+        if (settings.roundDuration < 10 || settings.roundDuration > 300) {
+          setTimeError("Time must be between 10 and 300 seconds");
+        }
+        if (settings.rounds < 1 || settings.rounds > 10) {
+          setRoundsError("Number of rounds must be between 1 and 10");
+        }
+        if (settings.excludedChars.length > 10) {
+          setExcludedCharError("Number of omitted letters must be smaller than 10");
+        }
+
+        return;
+      }
+
+      setTimeError(null);
+      setRoundsError(null);
+      setExcludedCharError(null);
+
+      console.log("settings when sending them:",settings);
+      await api.put(`/lobby/settings/${localLobbyId}`, JSON.stringify(settings));
+      setSaveConfirmation("Settings saved successfully!");
+      setError(null);
+      setTimeout(() => {
+        setSaveConfirmation(null);
+      }, 4000);
+    } catch (error) {
+      console.log(handleError(error));
+      setError("Are your excluded letters in the right format e.g. X,Y,Z ?");
+      setSaveConfirmation(null);
+    }
+  };
+
+  const addCategory = () => {
+    const lastCategory = settings.categories[settings.categories.length - 1];
+    if (lastCategory && lastCategory.trim() !== "") {
+      if (settings.categories.length < 8) {
+        setSettings({ ...settings, categories: [...settings.categories, ""] });
+      }
+    } else {
+      alert("Please fill in the previous category field before adding another.");
+    }
+  };
+
+  const handleCategoryChange = (index, value) => {
+    const updatedCategories = [...settings.categories];
+    updatedCategories[index] = value;
+    setSettings({ ...settings, categories: updatedCategories });
+  };
+
+  const deleteCategory = (index) => {
+    const updatedCategories = [...settings.categories];
+    updatedCategories.splice(index, 1);
+    setSettings({ ...settings, categories: updatedCategories });
+  };
+
   if (loading) {
     return (
       <BaseContainer>
@@ -307,53 +430,140 @@ const LobbyPage = () => {
 
   return (
     <BaseContainer>
-      <div className="lobby container">
-        <div className="lobby form">
-          <div className="lobby header">
-            <Button
-              className="secondary-button exit-button"
-              onClick={exit}
-            >
-              Exit
-            </Button>
-            {owner && (
-              <div
-                className="lobby settings"
-                onClick={() => navigate(`/settings/${localLobbyName}`)}
+      <div className={`lobby main-container ${owner ? 'owner' : ''}`}>
+        <div className="lobby container">
+          <div className="lobby form" style={{ width: owner ? "100%" : "60%" }}>
+            <div className="lobby header">
+              <Button
+                className="secondary-button exit-button"
+                onClick={exit}
               >
-                ⚙️
-              </div>
-            )}
-          </div>
-          <div className="lobby centered-text">
-            <h1 className="lobby title">{localLobbyName}</h1>
-
-            <ul className="lobby ul">
-              {allPlayers.map((player, index) => (
-                <li key={index} className="lobby li">
-                  <Player user={player} />
-                </li>
-              ))}
-            </ul>
-
-            <div className="lobby ready">
-              {readyPlayers}/{onlinePlayers} players are ready
+                Exit
+              </Button>
             </div>
+            <div className="lobby centered-text">
+              <h1 className="lobby title">{localLobbyName}</h1>
 
-            <Button
-              className="secondary-button"
-              width="60%"
-              onClick={local_ready}
-              disabled={readyButtonClicked}
-            >
-              Ready
-            </Button>
+              <ul className="lobby ul">
+                {allPlayers.map((player, index) => (
+                  <li key={index} className="lobby li">
+                    <Player user={player} />
+                  </li>
+                ))}
+              </ul>
+
+              <div className="lobby ready">
+                {readyPlayers}/{onlinePlayers} players are ready
+              </div>
+
+              <Button
+                className="secondary-button"
+                width="60%"
+                onClick={local_ready}
+                disabled={readyButtonClicked}
+              >
+                Ready
+              </Button>
+            </div>
           </div>
         </div>
+        {owner && (
+          <div className="settings container">
+            <div className="settings form">
+              <div>
+                <h2 className="settings centered-text">Settings</h2>
+                {error && <div className="settings error-message">{error}</div>}
+                {saveConfirmation && (
+                  <div className="settings success-message">{saveConfirmation}</div>
+                )}
+                <div className="settings column">
+                  Categories
+                  {settings.categories &&
+                    settings.categories.map((category, index) => (
+                      <FormField
+                        key={index}
+                        placeholder="enter here..."
+                        value={category}
+                        onChange={(value) => handleCategoryChange(index, value)}
+                        onDelete={() => deleteCategory(index)}
+                        type="text"
+                        showDelete={settings.categories.length > 1}
+                      />
+                    ))}
+                  {settings.categories.length < 8 && (
+                    <Button onClick={addCategory}>Add Category</Button>
+                  )}
+                </div>
+                <div className="settings column">
+                  Time (sec)
+                  <FormField
+                    value={settings.roundDuration ? settings.roundDuration.toString() : ""}
+                    onChange={(time) =>
+                      setSettings({
+                        ...settings,
+                        roundDuration: parseInt(time, 10) || 0,
+                      })
+                    }
+                    type="number"
+                  />
+                  {timeError && (
+                    <div className="settings error-message">{timeError}</div>
+                  )}
+                  Rounds
+                  <FormField
+                    value={settings.rounds ? settings.rounds.toString() : ""}
+                    onChange={(rounds) =>
+                      setSettings({
+                        ...settings,
+                        rounds: parseInt(rounds, 10) || 0,
+                      })
+                    }
+                    type="number"
+                  />
+                  {roundsError && <div className="settings error-message">{roundsError}</div>}
+                  Exclude Letter
+                  <FormField
+                    value={settings.excludedChars ? settings.excludedChars.join(",").toUpperCase() : ""}
+                    placeholder="e.g. X,Y,Z"
+                    onChange={(excludedChars) =>
+                      setSettings({
+                        ...settings,
+                        excludedChars: excludedChars.split(",").map(char => char.trim()),
+                      })
+                    }
+                    type="text"
+                  />
+                  {excludedCharError && <div className="settings error-message">{excludedCharError}</div>}
+                </div>
+                <div className="settings column">
+                  Game Mode
+                  <select
+                    className="settings dropdown"
+                    value={settings.gameMode}
+                    onChange={(e) => setSettings({ ...settings, gameMode: parseInt(e.target.value, 10) })}
+                  >
+                    <option value={"NORMAL"}>normal</option>
+                    <option value={"HARD"}>hard</option>
+                  </select>
+                </div>
+              </div>
+              <div className="settings centered-text">
+                <Button
+                  className="secondary-button"
+                  width="60%"
+                  onClick={saveChanges}
+                  disabled={!owner || disableSave}
+                >
+                  Save
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </BaseContainer>
   );
-  
+
 };
 
 export default LobbyPage;
