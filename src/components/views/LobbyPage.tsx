@@ -225,9 +225,9 @@ const LobbyPage = () => {
       webSocketService.subscribe(
         "/topic/ping", 
         async(message) =>{
-          const messageData = JSON.parse(message.body);
-          console.log("ping received", messageData);
-          if (messageData){
+          // const messageData = JSON.parse(message.body);
+          // console.log("ping received", messageData);
+          if (message){
             webSocketService.sendMessage("/app/pong", {username: local_username, lobbyId: localLobbyId})
           }
         }
