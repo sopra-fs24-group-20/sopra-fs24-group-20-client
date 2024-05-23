@@ -411,7 +411,7 @@ const EvaluationScreen = () => {
           <div className="authentication form">
             <div className="evaluation loading-screen">
               <div className="evaluation loading-text">
-                <h1 className="evaluation categories-text">Waiting for other players...</h1>
+                <h1 className="evaluation categories-text">Waiting for others to submit their votes...</h1>
                 <div className="evaluation loading-ball-first"></div>
                 <div className="evaluation loading-ball-second"></div>
                 <div className="evaluation loading-ball-third"></div>

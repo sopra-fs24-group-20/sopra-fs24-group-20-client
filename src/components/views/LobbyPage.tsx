@@ -438,7 +438,7 @@ const LobbyPage = () => {
                 className="secondary-button exit-button"
                 onClick={exit}
               >
-                Exit
+                Exit Lobby
               </Button>
             </div>
             <div className="lobby centered-text">

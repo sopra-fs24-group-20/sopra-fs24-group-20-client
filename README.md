@@ -76,14 +76,6 @@ The build is minified, and the filenames include hashes.<br>
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### Other packages we used
-- npm install react-confetti
-- npm install net
-- npm install stompjs
-- npm install sockjs-client
-- npm install --save-dev svg-loader
-- npm install crypto-js
-
 ## Illustrations
 <p>
     <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/start.png" /><br/>
