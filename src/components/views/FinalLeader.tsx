@@ -57,6 +57,7 @@ const FinalLeader = () => {
   const localLobbyName = localStorage.getItem(("lobbyName"));
   const gameId = localStorage.getItem("gameId");
   const lobbyId = localStorage.getItem("lobbyId");
+  const localUsername = localStorage.getItem("username");
   const sortedMOCKPlayers: { username: string; points: number }[] = Object.entries(mockplayers)
     .map(([username, points]: [string, number]) => ({ username, points }))
     .sort((a, b) => b.points - a.points);
@@ -87,9 +88,9 @@ const FinalLeader = () => {
 
   const returnToLobby = async () => {
     try {
-      const response = await api.post(`/game/done/${lobbyId}`);
+      const response = await api.post(`/game/done/${lobbyId}`, localUsername);
       if (response.status === 200){
-        console.log("sucessfully reset points")
+        console.log("successfully reset points")
         navigate(`/lobby/${localLobbyName}`);
       }
     }catch(error){
