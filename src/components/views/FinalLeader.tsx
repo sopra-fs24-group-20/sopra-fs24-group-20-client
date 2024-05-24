@@ -95,6 +95,7 @@ const FinalLeader = () => {
 
 
   const returnToLobby = async () => {
+    setLoading(true);
     if (owner === true){
       try{
         const response = await api.post(`/game/done/${lobbyId}`, localUsername);
