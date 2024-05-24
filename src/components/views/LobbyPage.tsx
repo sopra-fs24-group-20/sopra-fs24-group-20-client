@@ -221,6 +221,7 @@ const LobbyPage = () => {
         },
         {lobbyId: localLobbyId}
       );
+      await webSocketService.sendMessage("/app/join", { username: local_username, lobbyId: localLobbyId });
   
       setWsLoaded(true);
       // Cleanup function to unsubscribe when the component unmounts or dependencies change

@@ -147,7 +147,7 @@ const CreateLobby = () => {
   };
 
   const goBack = () => {
-    window.history.back(); // Navigate back using browser's history object
+    navigate(`/user/${username}`);; // Navigate back using browser's history object
   };
 
   if (loading) {

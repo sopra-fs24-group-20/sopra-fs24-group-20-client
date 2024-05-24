@@ -65,7 +65,7 @@ const Register = () => {
   };
 
   const goBack = () => {
-    window.history.back(); // Navigate back using browser's history object
+    navigate("/start");; // Navigate back using browser's history object
   };
 
   if (loading) {
