@@ -19,18 +19,19 @@ const PopupWindow = () => {
             <div><strong>Lobby Screen:</strong></div>
             <div>Once you have created or joined a lobby, you can click on <span style={{ fontStyle: "italic" }}>Ready</span> to ready up for the game.</div>
             <div>Only once all players currently in the lobby have pressed ready does the game start.</div>
-            <div>You can click on the gear icon to view the game settings, but only the lobby host can change them.</div>
+            <div>The lobby host is able to see and modify the settings. To apply the changes, he has to click on <span
+              style={{ fontStyle: "italic" }}>save</span></div>
 
             <div style={{ marginBottom: "50px" }}></div>
 
             <div><strong>Settings</strong></div>
-            <div>Currently, the following options can be changed only by the host:</div>
+            <div>The following options can be changed by the host:</div>
             <div><strong>1. Categories:</strong> Modify the preset categories. You can set a minimum of 1 and maximum of 8 categories per game.</div>
             <div><strong>2. Time (in seconds):</strong> Set the round duration. You can set a minimum of 10 seconds and a maximum of 3 minutes per round.</div>
             <div><strong>3. Rounds:</strong> Edit the number of rounds in a game. You can set a minimum of 1 round and a maximum of 10 rounds per game.</div>
-            <div><strong>4. Game Mode:</strong> Change the game mode. The default mode is normal, where you get a random letter and a random position. In the game</div>
+            <div><strong>4. Game Mode:</strong> Change the game mode. The default mode is normal, where you get a random letter on the first position. In the game</div>
             <div> the game you have to fill the blanks with words fitting the categories. In your answers you have to include the given letter at the given word position.</div>
-            <div>You can set an easy mode to always get the given letter at the first position instead.</div>
+            <div>You can set a hard mode where you get a random letter which you have to place at either the first, second, third or last position.</div>
 
             <div style={{ marginBottom: "50px" }}></div>
 
@@ -57,7 +58,7 @@ const PopupWindow = () => {
 
             <div style={{ marginBottom: "20px" }}></div>
 
-            <div>You can undo your votes by clicking the corresponding button again, and you can navigate within th evaluation screen going back and forth.</div>
+            <div>You can undo your votes by clicking the corresponding button again, and you can navigate within the evaluation screen going back and forth.</div>
             <div>Once you are happy with your votes, you can press on <span style={{ fontStyle: "italic" }}>Next</span> to evaluate the answers of the next category. Once you have evaluated all</div>
             <div>categories, you have to wait until all other players have submitted their evaluations. Then you get transferred to the intermediate</div>
             <div>leaderboard, where you can see the current ranking. If this is your last round, you get to the final leaderboard to see the final ranking.</div>
