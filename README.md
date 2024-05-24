@@ -21,19 +21,19 @@ You can compete with your friends by scoring lots of points and leveling up.
 - [RESTful](https://restfulapi.net/) - Web services for user control
 - [Websocket](https://spring.io/guides/gs/messaging-stomp-websocket/) -  Real-time bidirectional communication between client and server
 - [MySQL](https://cloud.google.com/sql/docs/mysql) - Cloud SQL for MySQL used for the database
-- [Wiktionary API](https://en.wiktionary.org/w/api.php) - Provides dictionary data
+- [Wikipedia API](https://de.wikipedia.org/wiki/Wikipedia:Technik/Datenbank/API#Dokumentation_der_Funktionalit%C3%A4t) - Allows us to request information about projects and pages to check the existence of an answer
 
 ## High-level components
 ### Profile Page
 The [Profile Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/ProfilePage.tsx) displays information about the logged in player such as username, randomly assigned avatar and statistics from previous games. If the player is logged in as a guest, they will not have any statistics. Additionally, they can log out or create a new lobby or join one to enjoy the game with your friends. If the player doesn't know the game Categories before, they can read the rules by clicking on the info icon.
 ### Lobby Page
-The [Lobby Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/LobbyPage.tsx) makes it possible for the player to see all other players in the lobby, leave the lobby, access the settings and prepare for the game by pressing ready. Through the websockets the player can see immediately when someone joins or exits and how many players are ready.
+The [Lobby Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/LobbyPage.tsx) makes it possible for the player to see all other players in the lobby, leave the lobby, view or edit the settings (only possible for the lobby host) and prepare for the game by pressing ready. Through the websockets the player can see immediately when someone joins or exits and how many players are ready.
 ### Game Page
 In the [Game Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/Game.tsx) the player gets the randomly assigned letter, the timer starts counting down and the players can enter their answers. When someone presses stop, the game is stopped for everyone, supported by websockets, and the answers are sent to the backend to be checked with the api.
 ### Evaluation Page
 On the [Evaluation Page](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/EvaluationScreen.tsx) the player can see the answers of the other players and rate them, because the API only checks the spelling and not the meaning. The player sees one category per page, to comment on the next one they have to click next. If they are at the last category they wait until all players are finished, this is again handled by websockets. Once everyone has finished, the adjustments are sent to the backend and the players are redirected to either the intermediate leaderboard or the final leaderboard, if it was the last round.
 ### Leaderboard
-The [Intermediate Leaderboard](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/Leader.tsx) shows the scores after each round before the next round begins. To start the next round there is again a ready button which is handled with websockets and a display of how many players are already ready. The [Final Leaderboard](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/FinalLeader.tsx) shows the final ranking and awards media to the top 3 and takes the player back to the lobby.
+The [Intermediate Leaderboard](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/Leader.tsx) displays the total scores of all players after each round, including those who have exited the lobby. If a player has participated in more than two rounds, the leaderboard also shows how much their points increased from the previous round. To start the next round, a "ready" button is available, managed through websockets, which also indicates the number of players who are ready. The [Final Leaderboard](https://github.com/sopra-fs24-group-20/sopra-fs24-group-20-client/blob/main/src/components/views/FinalLeader.tsx) shows the final ranking and awards media to the top 3 and takes the player back to the lobby.
 
 ## Launch & Deployment
 ### Prerequisites and Installation
@@ -89,7 +89,9 @@ A player starts here, where they have various options for accessing the website.
 
 After logging in, the player gets to this page where they can continue by creating or joining a lobby.
 
--- lobby page --
+<p>
+    <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/lobby.png" /><br/>
+</p> 
 
 In the lobby the players can go view the settings or press ready. When everyone is ready, the game automatically begins.
 
@@ -99,15 +101,21 @@ In the lobby the players can go view the settings or press ready. When everyone 
 
 This page is there the player actually plays the game. After the timer runs out or someone presses stop the players gets automatically navigated to the next page.
 
--- evaluation page --
+<p>
+    <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/eval.png" /><br/>
+</p> 
 
 Here the player can view and evaluate the answers of the other players. To continue the players need to press next. If all the players are finished evaluating, everyone get redirected to the intermediate leaderboard or the final leaderboard if the previous round was the last one.
 
--- intermediate leaderboard page --
+<p>
+    <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/interLeader.png" /><br/>
+</p> 
 
 This page is where the players can view the current ranking and points of the previous rounds. This is also where they can get ready for the next round.
 
--- final leaderboard page -- 
+<p>
+    <img alt="" src="https://raw.githubusercontent.com/sopra-fs24-group-20/sopra-fs24-group-20-client/main/src/images/finalLeader.png" /><br/>
+</p> 
 
 When all rounds are played and evaluated, the players get redirected to the final leaderboard instead of the intermediate leaderboard. They can return to the lobby as soon as they are finished viewing the final ranking.
 
