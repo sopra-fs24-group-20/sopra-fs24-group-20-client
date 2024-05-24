@@ -532,7 +532,7 @@ const LobbyPage = () => {
                   <select
                     className="settings dropdown"
                     value={settings.gameMode}
-                    onChange={(e) => setSettings({ ...settings, gameMode: parseInt(e.target.value, 10) })}
+                    onChange={(e) => setSettings({ ...settings, gameMode: e.target.value })}
                   >
                     <option value={"NORMAL"}>normal</option>
                     <option value={"HARD"}>hard</option>
