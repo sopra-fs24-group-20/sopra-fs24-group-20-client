@@ -57,6 +57,7 @@ const FinalLeader = () => {
   const localLobbyName = localStorage.getItem(("lobbyName"));
   const gameId = localStorage.getItem("gameId");
   const lobbyId = localStorage.getItem("lobbyId");
+  const [owner, setOwner] = useState<boolean>(false);
   const localUsername = localStorage.getItem("username");
   const sortedMOCKPlayers: { username: string; points: number }[] = Object.entries(mockplayers)
     .map(([username, points]: [string, number]) => ({ username, points }))
@@ -78,7 +79,14 @@ const FinalLeader = () => {
         alert(
           `Something went wrong during exiting the lobby: \n${handleError(error)}`
         );
-      } finally {
+      } 
+      try {
+        const response = await api.get(`/lobby/settings/${lobbyId}`);
+        if (localUsername === response.data.lobbyOwner.username) {
+          setOwner(true);
+        }
+      }
+      finally {
         setLoading(false);
       }
     }
@@ -87,16 +95,19 @@ const FinalLeader = () => {
 
 
   const returnToLobby = async () => {
-    try {
-      const response = await api.post(`/game/done/${lobbyId}`, localUsername);
-      if (response.status === 200){
-        console.log("successfully reset points")
-        navigate(`/lobby/${localLobbyName}`);
+    if (owner === true){
+      try{
+        const response = await api.post(`/game/done/${lobbyId}`, localUsername);
+        if (response.status === 200){
+          console.log("lobby host: successfully reset points")
+          navigate(`/lobby/${localLobbyName}`);
+        }
+      }catch(error){
+        alert("lobby host: failed to reset points");
       }
-    }catch(error){
-      alert("failed to reset points");
     }
-      
+    console.log("not lobby host: did not reset points");
+    navigate(`/lobby/${localLobbyName}`);
   }
 
   const calculateRanks = (players) => {
