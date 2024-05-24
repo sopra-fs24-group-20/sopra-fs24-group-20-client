@@ -430,6 +430,7 @@ const LobbyPage = () => {
               <Button
                 className="secondary-button exit-button"
                 onClick={exit}
+                style={{marginTop: "10px"}}
               >
                 Exit Lobby
               </Button>
@@ -454,6 +455,7 @@ const LobbyPage = () => {
                 width="60%"
                 onClick={local_ready}
                 disabled={readyButtonClicked}
+                style={{marginBottom: "10px"}}
               >
                 Ready
               </Button>
